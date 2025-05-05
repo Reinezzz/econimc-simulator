@@ -1,0 +1,107 @@
+@startuml
+skinparam monochrome true
+actor Пользователь as User
+
+participant "JavaFX клиент" as Client
+participant "REST API"     as API
+participant "Spring Security" as Security
+participant "Сервисы бизнес-логики" as Service
+participant "Spring Cache"    as Cache
+participant "Spring Data JPA" as DataLayer
+participant "PostgreSQL"      as DB
+participant "OpenAI API"      as AI
+participant "WebSocket"       as WS
+
+== 1. Авторизация ==
+User -> Client: Ввод логина/пароля
+Client -> API: POST /auth/login
+API -> Security: validateCredentials()
+Security --> API: OK + UserDetails
+API -> Service: generateToken(UserDetails)
+Service --> API: JWT-токен
+API --> Client: 200 { token }
+Client -> WS: open WebSocket(token)
+WS --> Client: connected
+
+== 2. Создание/редактирование модели ==
+User -> Client: Создать или загрузить модель
+Client -> API: POST /models (ModelDTO + token)
+API -> Security: checkToken()
+Security --> API: valid
+API -> Service: createOrUpdateModel(ModelDTO, user)
+Service -> DataLayer: saveModel(...)
+DataLayer -> DB: INSERT/UPDATE
+DB --> DataLayer: подтверждение
+DataLayer --> Service: новый/обновлённый Model
+Service --> API: 201/200 { ModelDTO }
+API --> Client: показать форму модели
+
+== 3. Запуск вычислений ==
+User -> Client: Запуск расчётов (modelId, params)
+Client -> API: POST /calculations (CalculationRequestDTO)
+API -> Security: checkToken()
+Security --> API: valid
+API -> Service: calculate(modelId, params)
+Service -> Cache: get(cacheKey)
+alt есть в кеше
+    Cache --> Service: cachedResult
+else
+    Service -> DataLayer: loadModel(modelId)
+    DataLayer -> DB: SELECT
+    DB --> DataLayer: modelData
+    DataLayer --> Service: modelData
+
+    Service -> Service: computeResults(modelData, params)
+    Service -> Cache: put(cacheKey, results)
+end
+Service --> API: 200 { CalculationResultDTO }
+API --> Client: отрисовать графики
+API -> WS: send "calculationComplete" (modelId)
+WS --> Client: уведомление
+
+== 4. Сравнение с реальными данными ==
+User -> Client: Открыть экран сравнения (modelId)
+Client -> API: GET /comparisons/{modelId}
+API -> Security: checkToken()
+Security --> API: valid
+API -> Service: getComparison(modelId, user)
+Service -> DataLayer: loadCalculation(modelId)
+Service -> DataLayer: loadReport(modelId)
+DataLayer -> DB: SELECT расчёт, отчёт
+DB --> DataLayer: данные
+DataLayer --> Service: расчётные + реальные данные
+
+Service -> AI: POST /analyzeReport(reportId)
+AI --> Service: 200 { realExtractedData }
+Service -> Service: mergeData(ideal, realExtractedData)
+Service --> API: 200 { ComparisonDTO }
+API --> Client: показать таблицу и график
+
+== 5. Управление сохранёнными отчётами ==
+User -> Client: Зайти в «Сохранённые отчёты»
+Client -> API: GET /reports
+API -> Security: checkToken()
+Security --> API: valid
+API -> Service: listReports(user)
+Service -> ReportRepo: findByUser(user)
+ReportRepo -> DB: SELECT
+DB --> ReportRepo: список Report
+ReportRepo --> Service: List<Report>
+Service --> API: 200 { List<ReportDTO> }
+API --> Client: отобразить список
+
+User -> Client: Скачать или удалить отчёт
+alt Скачать
+  Client -> API: GET /reports/{id}/download
+  API -> Service: getReportFile(id)
+  Service -> ReportRepo: findById(id)
+  Service --> API: FileStream
+  API --> Client: бинарные данные
+else Удалить
+  Client -> API: DELETE /reports (список id)
+  API -> Service: deleteReports(ids)
+  Service --> API: 204 No Content
+  API --> Client: обновить список
+end
+
+@enduml

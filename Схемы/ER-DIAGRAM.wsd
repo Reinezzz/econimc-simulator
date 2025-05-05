@@ -1,0 +1,207 @@
+@startuml
+' Отключаем кружки у связей и задаём ортогональные линии
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+
+' Шрифты и размеры
+skinparam entityFontName Arial
+skinparam entityFontSize 12
+
+' Стиль сущностей
+skinparam entity {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+  FontColor #1B5E20
+}
+
+' Расположение слева направо
+left to right direction
+
+' Пользователи и сессии
+package "Пользователи и сессии" {
+  entity users {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * username      : VARCHAR(50)  <<UNIQUE>>
+    * password_hash : VARCHAR(255)
+    * email         : VARCHAR(100) <<UNIQUE>>
+    * created_at    : TIMESTAMP
+    * updated_at    : TIMESTAMP
+  }
+  entity sessions {
+    * id         : BIGSERIAL <<PK>>
+    --
+    * user_id    : BIGINT    <<FK users.id>>
+    * token      : VARCHAR(255)
+    * expires_at : TIMESTAMP
+    * created_at : TIMESTAMP
+  }
+}
+
+' Модели и расчёты
+package "Модели и расчёты" {
+  entity models {
+    * id                     : BIGSERIAL <<PK>>
+    --
+    * user_id                : BIGINT    <<FK users.id>>
+    * name                   : VARCHAR(100)
+    * description            : TEXT
+    * visualization_settings : JSONB
+    * created_at             : TIMESTAMP
+    * updated_at             : TIMESTAMP
+  }
+  entity parameters {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * name          : VARCHAR(100)
+    * description   : TEXT
+    * default_value : DOUBLE PRECISION
+    * created_at    : TIMESTAMP
+  }
+  entity model_parameters {
+    * model_id     : BIGINT <<PK,FK models.id>>
+    * parameter_id : BIGINT <<PK,FK parameters.id>>
+    --
+    * value        : DOUBLE PRECISION
+  }
+  entity calculations {
+    * id           : BIGSERIAL <<PK>>
+    --
+    * model_id     : BIGINT    <<FK models.id>>
+    * input_data   : JSONB
+    * result_data  : JSONB
+    * created_at   : TIMESTAMP
+  }
+  entity visualizations {
+    * id             : BIGSERIAL <<PK>>
+    --
+    * calculation_id : BIGINT    <<FK calculations.id>>
+    * graph_type     : VARCHAR(50)
+    * graph_data     : JSONB
+    * settings       : JSONB
+    * created_at     : TIMESTAMP
+  }
+}
+
+' Финансовые отчёты и AI-анализ
+package "Финансовые отчёты и AI-анализ" {
+  entity financial_reports {
+    * id          : BIGSERIAL <<PK>>
+    --
+    * user_id     : BIGINT    <<FK users.id>>
+    * file_path   : VARCHAR(255)
+    * parsed_data : JSONB
+    * created_at  : TIMESTAMP
+  }
+  entity ai_analyses {
+    * id                   : BIGSERIAL <<PK>>
+    --
+    * analysis_type        : VARCHAR(50)
+    * related_entity_id    : BIGINT
+    * related_entity_type  : VARCHAR(50)
+    * analysis_result      : JSONB
+    * created_at           : TIMESTAMP
+  }
+}
+
+' Сравнения идеального и реального
+package "Сравнения результатов" {
+  entity comparisons {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * user_id       : BIGINT    <<FK users.id>>
+    * model_id      : BIGINT    <<FK models.id>>
+    * report_id     : BIGINT    <<FK financial_reports.id>>
+    * ideal_data    : JSONB
+    * real_data     : JSONB
+    * created_at    : TIMESTAMP
+  }
+}
+
+' Сохранённые отчёты
+package "Сохранённые отчёты" {
+  entity saved_reports {
+    * id           : BIGSERIAL <<PK>>
+    --
+    * user_id      : BIGINT    <<FK users.id>>
+    * model_id     : BIGINT    <<FK models.id>>
+    * report_type  : VARCHAR(50)
+    * name         : VARCHAR(100)
+    * file_path    : VARCHAR(255)
+    * created_at   : TIMESTAMP
+  }
+}
+
+' Симуляции
+package "Симуляции" {
+  entity simulation_types {
+    * id          : BIGSERIAL <<PK>>
+    --
+    * name        : VARCHAR(50)
+    * description : TEXT
+  }
+  entity simulations {
+    * id           : UUID       <<PK>>
+    --
+    * user_id      : BIGINT     <<FK users.id>>
+    * type_id      : BIGINT     <<FK simulation_types.id>>
+    * input_data   : JSONB
+    * result_data  : JSONB
+    * created_at   : TIMESTAMP
+  }
+  entity agents {
+    * id             : BIGSERIAL <<PK>>
+    --
+    * user_id        : BIGINT    <<FK users.id>>
+    * name           : VARCHAR(100)
+    * behavior_model : JSONB
+    * created_at     : TIMESTAMP
+  }
+}
+
+' Документы
+package "Документы" {
+  entity documents {
+    * id             : BIGSERIAL <<PK>>
+    --
+    * user_id        : BIGINT    <<FK users.id>>
+    * model_id       : BIGINT    <<FK models.id>>      <<NULL>>
+    * simulation_id  : UUID      <<FK simulations.id>>  <<NULL>>
+    * document_type  : VARCHAR(20) <<ENUM(MODEL_DOC,FIN_REPORT)>>
+    * file_path      : VARCHAR(255)
+    * uploaded_at    : TIMESTAMP
+  }
+}
+
+'--- Связи ---
+users       ||--o{ sessions
+users       ||--o{ models
+users       ||--o{ financial_reports
+users       ||--o{ simulations
+users       ||--o{ agents
+users       ||--o{ documents
+users       ||--o{ saved_reports
+users       ||--o{ comparisons
+
+models      ||--o{ model_parameters
+parameters  ||--o{ model_parameters
+
+models      ||--o{ calculations
+calculations||--o{ visualizations
+
+models      ||--o{ documents
+simulations ||--o{ documents
+
+simulation_types ||--o{ simulations
+
+financial_reports }o..|| ai_analyses
+ai_analyses       }o..|| models
+ai_analyses       }o..|| financial_reports
+ai_analyses       }o..|| agents
+
+models      ||--o{ saved_reports
+financial_reports||--o{ comparisons
+models      ||--o{ comparisons
+saved_reports||--o{ comparisons
+@enduml

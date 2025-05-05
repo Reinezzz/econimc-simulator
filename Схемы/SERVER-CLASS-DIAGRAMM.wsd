@@ -1,0 +1,349 @@
+@startuml
+skinparam linetype ortho
+skinparam componentStyle rectangle
+
+' Контроллеры REST API
+package "Controller Layer (REST API)" {
+  class AuthController {
+    + login(AuthRequestDTO): AuthResponseDTO
+    + register(RegistrationDTO): UserDTO
+    + refreshToken(RefreshTokenDTO): AuthResponseDTO
+  }
+  class ProfileController {
+    + getProfile(): UserDTO
+    + updateProfile(UpdateUserDTO): UserDTO
+  }
+  class ModelController {
+    + createModel(ModelDTO): ModelDTO
+    + getModel(Long): ModelDTO
+    + listModels(): List<ModelDTO>
+    + analyzeDocument(DocumentDTO): AIAnalysisResultDTO
+  }
+  class CalculationController {
+    + calculate(CalculationRequestDTO): CalculationResultDTO
+    + getHistory(Long): List<CalculationResultDTO>
+  }
+  class ReportController {
+    + listReports(Long userId): List<ReportDTO>
+    + downloadReport(Long reportId): File
+    + deleteReports(List<Long>): void
+    + createReport(ReportDTO): ReportDTO
+  }
+  class DocumentController {
+    + listDocuments(Long userId): List<DocumentDTO>
+    + uploadDocument(DocumentDTO): DocumentDTO
+    + deleteDocuments(List<Long>): void
+  }
+  class ComparisonController {
+    + getComparison(Long modelId): ComparisonDTO
+    + listComparisons(Long userId): List<ComparisonDTO>
+    + saveComparison(ComparisonDTO): ComparisonDTO
+  }
+  class SimulationController {
+    + runSimulation(SimulationRequestDTO): SimulationResultDTO
+    + getStatus(UUID): SimulationStatusDTO
+  }
+}
+
+' Сервисный слой
+package "Service Layer" {
+  interface AuthService {
+    + authenticate(String,String): String
+    + register(RegistrationDTO): User
+    + refreshToken(String): String
+  }
+  interface UserDetailsService {
+    + loadUserByUsername(String): UserDetails
+  }
+  class ModelService {
+    + createModel(ModelDTO, User): Model
+    + getModel(Long, User): Model
+    + listModels(User): List<Model>
+    + analyzeDocumentation(Document): AIAnalysisResult
+  }
+  class CalculationService {
+    + performCalculation(Long, Map<String,Double>): CalculationResult
+    + getHistory(User): List<CalculationResult>
+  }
+  class ReportService {
+    + getReports(User): List<Report>
+    + downloadReport(Long): File
+    + deleteReports(List<Long>): void
+    + saveReport(Report): Report
+  }
+  class DocumentService {
+    + getDocuments(User): List<Document>
+    + uploadDocument(Document): Document
+    + deleteDocuments(List<Long>): void
+  }
+  class ComparisonService {
+    + getComparison(Long modelId): Comparison
+    + listComparisons(User): List<Comparison>
+    + saveComparison(Comparison): Comparison
+  }
+  class SimulationService {
+    + performSimulation(SimulationRequestDTO, User): SimulationResult
+    + getStatus(UUID): SimulationStatus
+  }
+  class AIService {
+    + analyzeDocument(File): AIAnalysisResult
+    + analyzeFinancialReport(File): SimulationModel
+  }
+  class MapperService {
+    + toDTO(Entity): DTO
+    + toEntity(DTO): Entity
+  }
+  class ExceptionHandler {
+    + handleAll(Exception): ResponseEntity<ErrorDTO>
+  }
+}
+
+' Репозитории Spring Data JPA
+package "Repository Layer" {
+  interface UserRepository {
+    + findByUsername(String): Optional<User>
+  }
+  interface ModelRepository {
+    + findById(Long): Optional<Model>
+    + findByUser(User): List<Model>
+  }
+  interface CalculationRepository {
+    + save(CalculationResult): CalculationResult
+    + findByUser(User): List<CalculationResult>
+  }
+  interface ReportRepository {
+    + save(Report): Report
+    + findByUser(User): List<Report>
+  }
+  interface DocumentRepository {
+    + save(Document): Document
+    + findByUser(User): List<Document>
+  }
+  interface ComparisonRepository {
+    + save(Comparison): Comparison
+    + findByModelAndUser(Long,User): Optional<Comparison>
+    + findByUser(User): List<Comparison>
+  }
+  interface SimulationRepository {
+    + save(SimulationResult): SimulationResult
+    + findByUser(User): List<SimulationResult>
+  }
+}
+
+' Доменные сущности
+package "Domain Entities" {
+  class User { 
+    id:Long 
+    username:String 
+    passwordHash:String 
+    email:String 
+    createdAt:Timestamp 
+  }
+  class Model { 
+    id:Long 
+    user:User 
+    name:String 
+    description:String 
+    parameters:List<Parameter> 
+  }
+  class Parameter { 
+    id:Long 
+    name:String 
+    value:Double 
+  }
+  class CalculationResult { 
+    id:Long 
+    model:Model 
+    results:Map<String,Double> 
+    createdAt:Timestamp 
+  }
+  class Report { 
+    id:Long 
+    user:User 
+    model:Model 
+    type:String 
+    name:String 
+    filePath:String 
+    createdAt:Timestamp 
+  }
+  class Document { 
+    id:Long 
+    user:User 
+    model:Model 
+    simulation:SimulationResult 
+    type:String 
+    filePath:String 
+    uploadedAt:Timestamp 
+  }
+  class Comparison { 
+    id:Long 
+    user:User 
+    model:Model 
+    report:Report 
+    idealData:JSON 
+    realData:JSON 
+    createdAt:Timestamp 
+  }
+  class SimulationResult { 
+    id:UUID 
+    user:User 
+    type:SimulationType 
+    inputData:JSON 
+    resultData:JSON 
+    createdAt:Timestamp 
+  }
+  class SimulationType { 
+    id:Long 
+    name:String 
+  }
+  class AIAnalysisResult { 
+    id:Long 
+    document:Document 
+    extractedData:JSON 
+    createdAt:Timestamp 
+  }
+}
+
+' DTO классы
+package "DTO Classes" {
+  class AuthRequestDTO     { 
+    username:String 
+    password:String 
+  }
+  class AuthResponseDTO    { 
+    jwtToken:String 
+    expiresAt:Timestamp 
+  }
+  class RegistrationDTO    { 
+    username:String 
+    email:String 
+    password:String 
+  }
+  class RefreshTokenDTO    { 
+    refreshToken:String 
+  }
+  class UpdateUserDTO      { 
+    email:String 
+    password:String 
+  }
+  class UserDTO            { 
+    id:Long 
+    username:String 
+    email:String 
+  }
+  class ModelDTO           { 
+    id:Long 
+    name:String 
+    description:String 
+    parameters:List<ParameterDTO> 
+    }
+  class ParameterDTO       { 
+    name:String 
+    value:Double 
+  }
+  class CalculationRequestDTO  { 
+    modelId:Long 
+    parameters:List<ParameterDTO> 
+  }
+  class CalculationResultDTO   { 
+    calculationId:Long 
+    results:Map<String,Double> 
+    createdAt:Timestamp 
+  }
+  class ReportDTO          { 
+    id:Long 
+    modelId:Long 
+    type:String 
+    name:String 
+    filePath:String 
+    createdAt:Timestamp 
+  }
+  class DocumentDTO        { 
+    id:Long 
+    modelId:Long 
+    simulationId:UUID 
+    type:String 
+    filePath:String 
+    uploadedAt:Timestamp 
+  }
+  class ComparisonDTO      { 
+    modelId:Long 
+    reportId:Long 
+    idealData:JSON 
+    realData:JSON 
+    createdAt:Timestamp 
+  }
+  class SimulationRequestDTO  { 
+    simulationType:String 
+    parameters:List<ParameterDTO> 
+  }
+  class SimulationResultDTO   { 
+    simulationId:UUID 
+    resultData:Map<String,Double> 
+    createdAt:Timestamp 
+  }
+  class SimulationStatusDTO   { 
+    simulationId:UUID 
+    status:String 
+  }
+  class AIAnalysisResultDTO   { 
+    analysisId:Long 
+    extractedData:JSON 
+  }
+  class ErrorDTO              { 
+    code:String 
+    message:String 
+  }
+}
+
+' Внешний AI сервис
+cloud "External AI Service" {
+  class AI_API {
+    + analyzeDocumentation(File): JSON
+    + analyzeFinancialReport(File): JSON
+  }
+}
+
+'--- Связи Controller → Service
+AuthController      --> AuthService
+AuthController      --> UserDetailsService
+AuthController      --> ExceptionHandler
+ProfileController   --> AuthService
+ProfileController   --> MapperService
+
+ModelController     --> ModelService
+ModelController     --> AIService
+ModelController     --> MapperService
+
+CalculationController --> CalculationService
+CalculationController --> MapperService
+
+ReportController    --> ReportService
+ReportController    --> MapperService
+
+DocumentController  --> DocumentService
+DocumentController  --> MapperService
+
+ComparisonController --> ComparisonService
+ComparisonController --> MapperService
+
+SimulationController --> SimulationService
+SimulationController --> AIService
+SimulationController --> MapperService
+
+' Service → Repository
+AuthService        --> UserRepository
+ModelService       --> ModelRepository
+CalculationService --> CalculationRepository
+ReportService      --> ReportRepository
+DocumentService    --> DocumentRepository
+ComparisonService  --> ComparisonRepository
+SimulationService  --> SimulationRepository
+
+' AIService → External AI
+AIService          --> AI_API
+
+' MapperService → Entities & DTOs
+MapperService      --> "Domain Entities"
+MapperService      --> "DTO Classes"
+@enduml
