@@ -18,7 +18,6 @@ rectangle Серверный_слой {
   component "Simulation Engine\n(Spring Batch / @Async)" as Engine
   component "Spring Cache\n(Ehcache/Redis)" as Cache
   component "Spring Mail\n(подтверждение email)" as Mail
-  component "Spring Actuator\n(metrics, health)" as Actuator
 }
 
 database "PostgreSQL\n(модели, расчёты, отчёты)" as DB
@@ -41,7 +40,6 @@ Engine --> Cache : кеширование
 Services --> AI : REST API
 Services --> FS : хранение док-тов, отчётов
 Services --> Mail : отправка писем
-Services --> Actuator : мониторинг
 Services --> DB
 
 '— Сессии/кеш

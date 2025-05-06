@@ -1,51 +1,64 @@
 @startuml
+'===========================================================
+' Настройки для печати на A4 (альбомная ориентacja)
+'===========================================================
+skinparam dpi 200
+skinparam pageWidth 29.7cm
+skinparam pageHeight 21cm
+skinparam pageMargin 1cm
+
 skinparam linetype ortho
 skinparam componentStyle rectangle
+left to right direction
 
-' Контроллеры REST API
+'===========================================================
+' 1. Controller Layer (не более 5 классов в строке)
+'===========================================================
 package "Controller Layer (REST API)" {
+  ' Первая строка
   class AuthController {
     + login(AuthRequestDTO): AuthResponseDTO
     + register(RegistrationDTO): UserDTO
     + refreshToken(RefreshTokenDTO): AuthResponseDTO
   }
-  class ProfileController {
-    + getProfile(): UserDTO
-    + updateProfile(UpdateUserDTO): UserDTO
-  }
   class ModelController {
     + createModel(ModelDTO): ModelDTO
     + getModel(Long): ModelDTO
     + listModels(): List<ModelDTO>
-    + analyzeDocument(DocumentDTO): AIAnalysisResultDTO
   }
   class CalculationController {
     + calculate(CalculationRequestDTO): CalculationResultDTO
-    + getHistory(Long): List<CalculationResultDTO>
+    + getHistory(): List<CalculationResultDTO>
   }
   class ReportController {
-    + listReports(Long userId): List<ReportDTO>
-    + downloadReport(Long reportId): File
+    + listReports(): List<ReportDTO>
+    + downloadReport(Long): File
     + deleteReports(List<Long>): void
     + createReport(ReportDTO): ReportDTO
   }
   class DocumentController {
-    + listDocuments(Long userId): List<DocumentDTO>
+    + listDocuments(): List<DocumentDTO>
     + uploadDocument(DocumentDTO): DocumentDTO
     + deleteDocuments(List<Long>): void
   }
+
+  ' Вторая строка
   class ComparisonController {
-    + getComparison(Long modelId): ComparisonDTO
-    + listComparisons(Long userId): List<ComparisonDTO>
+    + getComparison(Long): ComparisonDTO
+    + listComparisons(): List<ComparisonDTO>
     + saveComparison(ComparisonDTO): ComparisonDTO
+    + deleteComparison(Long): void
   }
   class SimulationController {
     + runSimulation(SimulationRequestDTO): SimulationResultDTO
     + getStatus(UUID): SimulationStatusDTO
+    + cancelSimulation(UUID): void
   }
 }
 
-' Сервисный слой
+'===========================================================
+' 2. Service Layer (не более 5 элементов в строке)
+'===========================================================
 package "Service Layer" {
   interface AuthService {
     + authenticate(String,String): String
@@ -59,7 +72,6 @@ package "Service Layer" {
     + createModel(ModelDTO, User): Model
     + getModel(Long, User): Model
     + listModels(User): List<Model>
-    + analyzeDocumentation(Document): AIAnalysisResult
   }
   class CalculationService {
     + performCalculation(Long, Map<String,Double>): CalculationResult
@@ -71,23 +83,27 @@ package "Service Layer" {
     + deleteReports(List<Long>): void
     + saveReport(Report): Report
   }
+
   class DocumentService {
     + getDocuments(User): List<Document>
     + uploadDocument(Document): Document
     + deleteDocuments(List<Long>): void
   }
   class ComparisonService {
-    + getComparison(Long modelId): Comparison
+    + getComparison(Long, User): Comparison
     + listComparisons(User): List<Comparison>
     + saveComparison(Comparison): Comparison
+    + deleteComparison(Long, User): void
   }
   class SimulationService {
     + performSimulation(SimulationRequestDTO, User): SimulationResult
     + getStatus(UUID): SimulationStatus
+    + cancelSimulation(UUID, User): void
   }
   class AIService {
-    + analyzeDocument(File): AIAnalysisResult
-    + analyzeFinancialReport(File): SimulationModel
+    + analyzeModelDocument(File): ModelAnalysisResult
+    + analyzeReport(File): ReportAnalysisResult
+    + analyzeSimulation(File): SimulationAnalysisResult
   }
   class MapperService {
     + toDTO(Entity): DTO
@@ -98,7 +114,9 @@ package "Service Layer" {
   }
 }
 
-' Репозитории Spring Data JPA
+'===========================================================
+' 3. Repository Layer (две строки по пять)
+'===========================================================
 package "Repository Layer" {
   interface UserRepository {
     + findByUsername(String): Optional<User>
@@ -119,217 +137,252 @@ package "Repository Layer" {
     + save(Document): Document
     + findByUser(User): List<Document>
   }
+
   interface ComparisonRepository {
     + save(Comparison): Comparison
     + findByModelAndUser(Long,User): Optional<Comparison>
     + findByUser(User): List<Comparison>
+    + deleteByIdAndUser(Long,User): void
   }
   interface SimulationRepository {
     + save(SimulationResult): SimulationResult
     + findByUser(User): List<SimulationResult>
+    + deleteByIdAndUser(UUID,User): void
+  }
+  interface ModelAnalysisRepository {
+    + save(ModelAnalysis): ModelAnalysis
+    + findByModel(Long): List<ModelAnalysis>
+  }
+  interface ReportAnalysisRepository {
+    + save(ReportAnalysis): ReportAnalysis
+    + findByReport(Long): List<ReportAnalysis>
+  }
+  interface SimulationAnalysisRepository {
+    + save(SimulationAnalysis): SimulationAnalysis
+    + findBySimulation(UUID): List<SimulationAnalysis>
   }
 }
 
-' Доменные сущности
+'===========================================================
+' 4. Domain Entities (по пять в строке)
+'===========================================================
 package "Domain Entities" {
-  class User { 
-    id:Long 
-    username:String 
-    passwordHash:String 
-    email:String 
-    createdAt:Timestamp 
+  ' Первая строка
+  class User {
+    id: Long
+    username: String
+    passwordHash: String
+    email: String
+    createdAt: Timestamp
   }
-  class Model { 
-    id:Long 
-    user:User 
-    name:String 
-    description:String 
-    parameters:List<Parameter> 
+  class Model {
+    id: Long
+    user: User
+    name: String
+    description: String
+    parameters: List<Parameter>
   }
-  class Parameter { 
-    id:Long 
-    name:String 
-    value:Double 
+  class Parameter {
+    id: Long
+    name: String
+    value: Double
   }
-  class CalculationResult { 
-    id:Long 
-    model:Model 
-    results:Map<String,Double> 
-    createdAt:Timestamp 
+  class CalculationResult {
+    id: Long
+    model: Model
+    results: Map<String,Double>
+    createdAt: Timestamp
   }
-  class Report { 
-    id:Long 
-    user:User 
-    model:Model 
-    type:String 
-    name:String 
-    filePath:String 
-    createdAt:Timestamp 
+  class Report {
+    id: Long
+    user: User
+    model: Model
+    type: String
+    name: String
+    filePath: String
+    createdAt: Timestamp
   }
-  class Document { 
-    id:Long 
-    user:User 
-    model:Model 
-    simulation:SimulationResult 
-    type:String 
-    filePath:String 
-    uploadedAt:Timestamp 
+
+  ' Вторая строка
+  class Document {
+    id: Long
+    user: User
+    model: Model
+    simulation: SimulationResult
+    type: String
+    filePath: String
+    uploadedAt: Timestamp
   }
-  class Comparison { 
-    id:Long 
-    user:User 
-    model:Model 
-    report:Report 
-    idealData:JSON 
-    realData:JSON 
-    createdAt:Timestamp 
+  class Comparison {
+    id: Long
+    user: User
+    model: Model
+    report: Report
+    idealData: JSON
+    realData: JSON
+    createdAt: Timestamp
   }
-  class SimulationResult { 
-    id:UUID 
-    user:User 
-    type:SimulationType 
-    inputData:JSON 
-    resultData:JSON 
-    createdAt:Timestamp 
+  class SimulationResult {
+    id: UUID
+    user: User
+    type: SimulationType
+    inputData: JSON
+    resultData: JSON
+    createdAt: Timestamp
   }
-  class SimulationType { 
-    id:Long 
-    name:String 
+  class SimulationType {
+    id: Long
+    name: String
   }
-  class AIAnalysisResult { 
-    id:Long 
-    document:Document 
-    extractedData:JSON 
-    createdAt:Timestamp 
+  class ModelAnalysis {
+    id: Long
+    model: Model
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
+  }
+
+  ' Третья строка
+  class ReportAnalysis {
+    id: Long
+    report: Report
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
+  }
+  class SimulationAnalysis {
+    id: Long
+    simulation: SimulationResult
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
   }
 }
 
-' DTO классы
+'===========================================================
+' 5. DTO Classes (разбито на четыре ряда)
+'===========================================================
 package "DTO Classes" {
-  class AuthRequestDTO     { 
-    username:String 
-    password:String 
+  ' Ряд 1
+  class AuthRequestDTO {
+    username: String
+    password: String
   }
-  class AuthResponseDTO    { 
-    jwtToken:String 
-    expiresAt:Timestamp 
+  class AuthResponseDTO {
+    jwtToken: String
+    expiresAt: Timestamp
   }
-  class RegistrationDTO    { 
-    username:String 
-    email:String 
-    password:String 
+  class RegistrationDTO {
+    username: String
+    email: String
+    password: String
   }
-  class RefreshTokenDTO    { 
-    refreshToken:String 
+  class RefreshTokenDTO {
+    refreshToken: String
   }
-  class UpdateUserDTO      { 
-    email:String 
-    password:String 
+  class ChangePasswordDTO {
+    token: String
+    newPassword: String
   }
-  class UserDTO            { 
-    id:Long 
-    username:String 
-    email:String 
+
+  ' Ряд 2
+  class UserDTO {
+    id: Long
+    username: String
+    email: String
   }
-  class ModelDTO           { 
-    id:Long 
-    name:String 
-    description:String 
-    parameters:List<ParameterDTO> 
-    }
-  class ParameterDTO       { 
-    name:String 
-    value:Double 
+  class ModelDTO {
+    id: Long
+    name: String
+    description: String
+    parameters: List<ParameterDTO>
   }
-  class CalculationRequestDTO  { 
-    modelId:Long 
-    parameters:List<ParameterDTO> 
+  class ParameterDTO {
+    name: String
+    value: Double
   }
-  class CalculationResultDTO   { 
-    calculationId:Long 
-    results:Map<String,Double> 
-    createdAt:Timestamp 
+  class CalculationRequestDTO {
+    modelId: Long
+    parameters: List<ParameterDTO>
   }
-  class ReportDTO          { 
-    id:Long 
-    modelId:Long 
-    type:String 
-    name:String 
-    filePath:String 
-    createdAt:Timestamp 
+  class CalculationResultDTO {
+    calculationId: Long
+    results: Map<String,Double>
+    createdAt: Timestamp
   }
-  class DocumentDTO        { 
-    id:Long 
-    modelId:Long 
-    simulationId:UUID 
-    type:String 
-    filePath:String 
-    uploadedAt:Timestamp 
+
+  ' Ряд 3
+  class ReportDTO {
+    id: Long
+    modelId: Long
+    type: String
+    name: String
+    filePath: String
+    createdAt: Timestamp
   }
-  class ComparisonDTO      { 
-    modelId:Long 
-    reportId:Long 
-    idealData:JSON 
-    realData:JSON 
-    createdAt:Timestamp 
+  class DocumentDTO {
+    id: Long
+    modelId: Long
+    simulationId: UUID
+    type: String
+    filePath: String
+    uploadedAt: Timestamp
   }
-  class SimulationRequestDTO  { 
-    simulationType:String 
-    parameters:List<ParameterDTO> 
+  class ComparisonDTO {
+    id: Long
+    modelId: Long
+    reportId: Long
+    idealData: JSON
+    realData: JSON
+    createdAt: Timestamp
   }
-  class SimulationResultDTO   { 
-    simulationId:UUID 
-    resultData:Map<String,Double> 
-    createdAt:Timestamp 
+  class SimulationRequestDTO {
+    simulationType: String
+    parameters: List<ParameterDTO>
   }
-  class SimulationStatusDTO   { 
-    simulationId:UUID 
-    status:String 
+  class SimulationResultDTO {
+    simulationId: UUID
+    resultData: Map<String,Double>
+    createdAt: Timestamp
   }
-  class AIAnalysisResultDTO   { 
-    analysisId:Long 
-    extractedData:JSON 
+
+  ' Ряд 4
+  class SimulationStatusDTO {
+    simulationId: UUID
+    status: String
   }
-  class ErrorDTO              { 
-    code:String 
-    message:String 
+  class ModelAnalysisResultDTO {
+    analysisId: Long
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
+  }
+  class ReportAnalysisResultDTO {
+    analysisId: Long
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
+  }
+  class SimulationAnalysisResultDTO {
+    analysisId: Long
+    analysisType: String
+    resultData: JSON
+    createdAt: Timestamp
+  }
+  class ErrorDTO {
+    code: String
+    message: String
   }
 }
 
-' Внешний AI сервис
-cloud "External AI Service" {
-  class AI_API {
-    + analyzeDocumentation(File): JSON
-    + analyzeFinancialReport(File): JSON
-  }
-}
-
-'--- Связи Controller → Service
+'--- Взаимосвязи Controller → Service
 AuthController      --> AuthService
-AuthController      --> UserDetailsService
-AuthController      --> ExceptionHandler
-ProfileController   --> AuthService
-ProfileController   --> MapperService
-
 ModelController     --> ModelService
-ModelController     --> AIService
-ModelController     --> MapperService
-
 CalculationController --> CalculationService
-CalculationController --> MapperService
-
 ReportController    --> ReportService
-ReportController    --> MapperService
-
 DocumentController  --> DocumentService
-DocumentController  --> MapperService
-
 ComparisonController --> ComparisonService
-ComparisonController --> MapperService
-
 SimulationController --> SimulationService
-SimulationController --> AIService
-SimulationController --> MapperService
 
 ' Service → Repository
 AuthService        --> UserRepository
@@ -339,6 +392,9 @@ ReportService      --> ReportRepository
 DocumentService    --> DocumentRepository
 ComparisonService  --> ComparisonRepository
 SimulationService  --> SimulationRepository
+AIService          --> ModelAnalysisRepository
+AIService          --> ReportAnalysisRepository
+AIService          --> SimulationAnalysisRepository
 
 ' AIService → External AI
 AIService          --> AI_API
