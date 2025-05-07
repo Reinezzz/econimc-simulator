@@ -1,0 +1,87 @@
+/* === Верхняя панель === */
+.top-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Кнопка «Выход» */
+.exit-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-font-size: 14px;
+    -fx-padding: 8 16;
+}
+
+/* Вертикальный разделитель */
+.separator {
+    -fx-background-color: #E0E0E0;
+}
+
+/* === Левая панель === */
+.side-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* Заголовок секции */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Кнопки списка моделей */
+.list-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #C4C4C4;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 10 15;
+    -fx-alignment: CENTER_LEFT;
+}
+.list-button:hover {
+    -fx-background-color: #F5F5F5;
+}
+.list-button:focused {
+    -fx-border-color: #1E00D7;
+}
+
+/* Кнопка «Добавить» */
+.add-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+}
+
+/* === Правая часть === */
+/* Обёртка плиток */
+.main-grid {
+    /* паддинги и gap заданы в FXML */
+}
+
+/* Общий стиль плиток */
+.tile-button {
+    -fx-background-color: #1E00D7;
+    -fx-background-radius: 10;
+    -fx-text-fill: #FFFFFF;
+}
+.tile-button:hover {
+    -fx-opacity: 0.9;
+}
+
+/* Заголовок плитки */
+.tile-text {
+    -fx-font-size: 16px;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Плейсхолдер для иконки */
+.icon-placeholder {
+    -fx-background-color: rgba(255,255,255,0.3);
+    -fx-background-radius: 5;
+}

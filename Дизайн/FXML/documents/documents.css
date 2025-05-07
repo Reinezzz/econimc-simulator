@@ -1,0 +1,61 @@
+/* === Топ-бар === */
+.top-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 0 1 0;
+}
+.exit-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 6 16;
+}
+
+/* === Контент === */
+.content-pane {
+    -fx-background-color: #F8F8F8;
+}
+
+/* === Таблица (GridPane) === */
+.table-container {
+    -fx-border-color: #C4C4C4;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: #FFFFFF;
+}
+
+.table-grid {
+    -fx-padding: 10;
+}
+
+.table-header {
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 4 8;
+}
+
+/* Стили для кнопки скачивания */
+.download-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 4 10;
+}
+
+/* === Нижние кнопки === */
+.bottom-buttons {
+    -fx-padding: 10 0 20 0;
+}
+.primary-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 8 20;
+}
+.danger-button {
+    -fx-background-color: #E53935;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 8 20;
+}

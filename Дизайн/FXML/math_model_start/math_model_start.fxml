@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1920" prefHeight="1080">
+
+    <!-- Подключаем тот же model.css -->
+    <stylesheets>
+        <URL value="@model.css"/>
+    </stylesheets>
+
+    <!-- 1) Top bar -->
+    <HBox styleClass="top-bar"
+          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
+        <Button text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <!-- 2) Основной HBox: левая панель / разделитель / правая панель -->
+    <HBox AnchorPane.topAnchor="60"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          spacing="20">
+
+        <!-- 2.a) Левая панель с тремя карточками-параметрами -->
+        <VBox styleClass="left-panel"
+              prefWidth="350"
+              spacing="20">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            <Label text="Параметры" styleClass="section-title"/>
+
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+        </VBox>
+
+        <!-- 2.b) Вертикальный разделитель -->
+        <Separator orientation="VERTICAL" styleClass="separator"/>
+
+        <!-- 2.c) Правая панель с единственной кнопкой -->
+        <VBox styleClass="right-panel"
+              alignment="CENTER"
+              spacing="20"
+              VBox.vgrow="ALWAYS">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            <Button text="Запуск"
+                    styleClass="primary-button"
+                    prefWidth="140"
+                    prefHeight="40"/>
+        </VBox>
+    </HBox>
+</AnchorPane>

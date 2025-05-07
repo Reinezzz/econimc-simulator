@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1920" prefHeight="1080">
+
+    <!-- Подключаем CSS -->
+    <stylesheets>
+        <URL value="@reports.css"/>
+    </stylesheets>
+
+    <!-- 1) Top bar -->
+    <HBox styleClass="top-bar"
+          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
+        <Button text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <!-- 2) Основной контент -->
+    <VBox AnchorPane.topAnchor="60"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          styleClass="content-pane"
+          spacing="20">
+        <padding><Insets top="20" left="40" right="40" bottom="20"/></padding>
+
+        <!-- 2.a) Выпадашка и заголовок -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <MenuButton text="Документ"
+                        styleClass="choice-box"
+                        mnemonicParsing="false">
+                <items>
+                    <MenuItem text="Отчеты"/>
+                    <!-- Другие пункты можно добавить здесь -->
+                </items>
+            </MenuButton>
+            <Label text="Сохраненные отчёты" styleClass="page-title"/>
+        </HBox>
+
+        <!-- 2.b) «Таблица» на GridPane с 5 строками-заглушками -->
+        <VBox styleClass="table-container" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToWidth="true"
+                        fitToHeight="true"
+                        styleClass="table-scroll"
+                        prefHeight="600">
+                <content>
+                    <GridPane fx:id="tableGrid"
+                              styleClass="table-grid"
+                              gridLinesVisible="true">
+                        <padding><Insets top="5" left="5" right="5" bottom="5"/></padding>
+                        <hgap>10</hgap>
+                        <vgap>5</vgap>
+
+                        <!-- Заголовки -->
+                        <Label text=""                             GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label text="Дата загрузки" styleClass="table-header" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="Наименование"  styleClass="table-header" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                        <Label text="Модель"         styleClass="table-header" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                        <Label text="Скачать"       styleClass="table-header" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+
+                        <!-- 5 строк-заглушек -->
+                        <!-- 1 -->
+                        <CheckBox selected="true"
+                                  GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label text="01.01.1970"    GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="Отчёт 1"       GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                        <Label text="Мат. модель"   GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                        <Button text="⤓"
+                                styleClass="download-button"
+                                GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+
+                        <!-- 2 -->
+                        <CheckBox                                  GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label text="01.01.1970"    GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <Label text="Отчёт 2"       GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                        <Label text="Им. модель"    GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                        <Button text="⤓"
+                                styleClass="download-button"
+                                GridPane.rowIndex="2" GridPane.columnIndex="4"/>
+
+                        <!-- 3 -->
+                        <CheckBox                                  GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label text="01.01.1970"    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        <Label text="Отчёт 3"       GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                        <Label text="Им. модель"    GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+                        <Button text="⤓"
+                                styleClass="download-button"
+                                GridPane.rowIndex="3" GridPane.columnIndex="4"/>
+
+                        <!-- 4 -->
+                        <CheckBox                                  GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <Label text="01.01.1970"    GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        <Label text="Отчёт 4"       GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+                        <Label text="Им. модель"    GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+                        <Button text="⤓"
+                                styleClass="download-button"
+                                GridPane.rowIndex="4" GridPane.columnIndex="4"/>
+
+                        <!-- 5 -->
+                        <CheckBox                                  GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <Label text="01.01.1970"    GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                        <Label text="Отчёт 5"       GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+                        <Label text="Им. модель"    GridPane.rowIndex="5" GridPane.columnIndex="3"/>
+                        <Button text="⤓"
+                                styleClass="download-button"
+                                GridPane.rowIndex="5" GridPane.columnIndex="4"/>
+                    </GridPane>
+                </content>
+            </ScrollPane>
+        </VBox>
+
+        <!-- 3) Кнопка «Удалить» по центру, вне «таблицы» -->
+        <HBox styleClass="bottom-buttons" alignment="CENTER">
+            <Button text="Удалить" styleClass="danger-button"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

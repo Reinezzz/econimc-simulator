@@ -1,0 +1,63 @@
+/* фон всего экрана */
+.background-pane {
+    -fx-background-color: #F8F8F8;
+}
+
+/* карточка */
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-padding: 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+/* заголовок */
+.title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E00D7;
+}
+
+/* подписи полей */
+.form-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+/* текстовые поля */
+.text-field {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #C4C4C4;
+    -fx-padding: 8 12;
+    -fx-prompt-text-fill: #A0A0A0;
+}
+
+/* фокус в поле */
+.text-field:focused {
+    -fx-border-color: #1E00D7;
+    -fx-faint-focus-color: transparent;
+}
+
+/* ссылки */
+.link {
+    -fx-text-fill: #1E00D7;
+    -fx-underline: false;
+}
+
+/* главная кнопка */
+.primary-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-font-size: 16px;
+}
+.primary-button:hover {
+    -fx-opacity: 0.9;
+}
+
+/* мелкий текст внизу */
+.footer-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}

@@ -1,0 +1,70 @@
+/* === Верхняя панель === */
+.top-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 0 1 0;
+}
+.exit-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 6 16;
+}
+
+/* === Контейнер контента === */
+.content-pane {
+    -fx-background-color: #F8F8F8;
+}
+
+/* Заголовок страницы */
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Выпадающий выбор (MenuButton) */
+.choice-box {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 4 12;
+}
+
+/* === «Таблица» через GridPane === */
+.table-container {
+    -fx-border-color: #C4C4C4;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: #FFFFFF;
+}
+
+.table-grid {
+    -fx-padding: 10;
+}
+
+.table-header {
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 4 8;
+}
+
+/* Кнопка скачивания в ячейке */
+.download-button {
+    -fx-background-color: #1E00D7;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 4 10;
+}
+
+/* === Нижняя кнопка === */
+.bottom-buttons {
+    -fx-padding: 10 0 20 0;
+}
+.danger-button {
+    -fx-background-color: #E53935;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-padding: 8 20;
+}
