@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1920" prefHeight="1080">
+
+    <!-- стили -->
+    <stylesheets>
+        <URL value="@environment.css"/>
+    </stylesheets>
+
+    <!-- 1) Top bar -->
+    <HBox styleClass="top-bar"
+          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
+        <Button text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <!-- 2) Основной контент -->
+    <HBox spacing="20"
+          AnchorPane.topAnchor="60"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.bottomAnchor="0">
+
+        <!-- 2.a) Список агентов -->
+        <VBox styleClass="left-panel"
+              prefWidth="350"
+              spacing="20">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            <Label text="Агенты" styleClass="section-title"/>
+
+            <!-- элемент 1 -->
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Имя"                       styleClass="text-field"/>
+                <TextField promptText="Описание поведения"        styleClass="text-field"/>
+                <TextField promptText="Начальные характеристики"  styleClass="text-field"/>
+            </VBox>
+
+            <!-- элемент 2 -->
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Имя"                       styleClass="text-field"/>
+                <TextField promptText="Описание поведения"        styleClass="text-field"/>
+                <TextField promptText="Начальные характеристики"  styleClass="text-field"/>
+            </VBox>
+        </VBox>
+
+        <!-- 2.b) Разделитель -->
+        <Separator orientation="VERTICAL" styleClass="separator"/>
+
+        <!-- 2.c) Описание среды -->
+        <VBox styleClass="right-panel"
+              spacing="20"
+              VBox.vgrow="ALWAYS">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+            <Label text="Описание среды" styleClass="page-title"/>
+
+            <!-- область вывода -->
+            <TextArea promptText="Описание среды"
+                      wrapText="true"
+                      styleClass="text-area"
+                      prefHeight="200"/>
+
+            <!-- запуск и период -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Запуск на"    styleClass="primary-button"/>
+                <MenuButton text="1 мес."   styleClass="choice-box" mnemonicParsing="false">
+                    <items>
+                        <MenuItem text="1 мес."/>
+                        <MenuItem text="3 мес."/>
+                        <MenuItem text="6 мес."/>
+                    </items>
+                </MenuButton>
+            </HBox>
+        </VBox>
+    </HBox>
+</AnchorPane>

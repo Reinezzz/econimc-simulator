@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1920" prefHeight="1080">
+
+    <!-- Подключаем стили -->
+    <stylesheets>
+        <URL value="@compare.css"/>
+    </stylesheets>
+
+    <!-- 1) Top bar -->
+    <HBox styleClass="top-bar"
+          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
+        <Button text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <!-- 2) Основной контент: левая / разделитель / средняя / разделитель / правая -->
+    <HBox spacing="20"
+          AnchorPane.topAnchor="60"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.bottomAnchor="80">
+
+        <!-- 2.a) Левая панель -->
+        <VBox styleClass="left-panel"
+              prefWidth="350"
+              spacing="20">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            <Label text="Параметры" styleClass="section-title"/>
+
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+            <VBox styleClass="param-card" spacing="8">
+                <TextField promptText="Обозначение" styleClass="text-field"/>
+                <TextField promptText="Описание"   styleClass="text-field"/>
+                <TextField promptText="Тип"         styleClass="text-field"/>
+            </VBox>
+
+            <Button text="Изменить" styleClass="primary-button"/>
+        </VBox>
+
+        <!-- 2.b) Разделитель -->
+        <Separator orientation="VERTICAL" styleClass="separator"/>
+
+        <!-- 2.c) Средняя панель -->
+        <VBox styleClass="middle-panel"
+              spacing="20"
+              VBox.vgrow="ALWAYS">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+            <Label text="Результат вычислений" styleClass="page-title"/>
+
+            <TextArea fx:id="calcResult"
+                      promptText="Результат"
+                      editable="false"
+                      wrapText="true"
+                      prefHeight="120"
+                      styleClass="text-area"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="График" styleClass="form-label"/>
+                <MenuButton text="Тип"
+                            styleClass="choice-box"
+                            mnemonicParsing="false">
+                    <items>
+                        <MenuItem text="Линейный"/>
+                        <MenuItem text="Столбчатый"/>
+                        <MenuItem text="Круговой"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+
+            <Pane fx:id="chartPane1"
+                  styleClass="chart-placeholder"
+                  prefHeight="200"/>
+        </VBox>
+
+        <!-- 2.d) Разделитель -->
+        <Separator orientation="VERTICAL" styleClass="separator"/>
+
+        <!-- 2.e) Правая панель -->
+        <VBox styleClass="right-panel"
+              spacing="20"
+              VBox.vgrow="ALWAYS">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+            <Label text="AI-результат" styleClass="page-title"/>
+
+            <TextArea fx:id="aiResult"
+                      promptText="AI-результат"
+                      editable="false"
+                      wrapText="true"
+                      prefHeight="120"
+                      styleClass="text-area"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="График" styleClass="form-label"/>
+                <MenuButton text="Тип"
+                            styleClass="choice-box"
+                            mnemonicParsing="false">
+                    <items>
+                        <MenuItem text="Линейный"/>
+                        <MenuItem text="Столбчатый"/>
+                        <MenuItem text="Круговой"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+
+            <Pane fx:id="chartPane2"
+                  styleClass="chart-placeholder"
+                  prefHeight="200"/>
+        </VBox>
+    </HBox>
+
+    <!-- 3) Кнопка «Сохранить отчёт» снизу по центру -->
+    <HBox styleClass="bottom-buttons"
+          alignment="CENTER"
+          spacing="20"
+          AnchorPane.bottomAnchor="20"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+        <Button text="Сохранить отчёт" styleClass="primary-button"/>
+    </HBox>
+</AnchorPane>
