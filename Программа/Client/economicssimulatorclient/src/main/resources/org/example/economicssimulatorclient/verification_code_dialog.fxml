@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.economicssimulatorclient.controller.VerificationCodeDialogController">
+
+    <content>
+        <VBox spacing="10">
+            <Label text="На ваш email отправлен шестизначный код."/>
+            <TextField fx:id="codeField" promptText="XXXXXX" prefWidth="200"/>
+            <Label fx:id="errorLabel" textFill="#d32f2f"/>
+        </VBox>
+    </content>
+
+    <!--  fx:id оставляем, чтобы контроллер мог сослаться -->
+    <ButtonType fx:id="okBtn"
+                text="Подтвердить"
+                buttonData="OK_DONE"/>
+    <ButtonType text="Отмена" buttonData="CANCEL_CLOSE"/>
+</DialogPane>

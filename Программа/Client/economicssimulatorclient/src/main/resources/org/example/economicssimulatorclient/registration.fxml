@@ -12,7 +12,8 @@
 
 <StackPane xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
-           prefWidth="1920" prefHeight="1080">
+           prefWidth="1920" prefHeight="1080"
+           fx:controller="org.example.economicssimulatorclient.controller.RegistrationController">
     <!-- Подключаем CSS -->
 <!--    <stylesheets>-->
 <!--        <URL value="@styles.css"/>-->
@@ -28,39 +29,45 @@
         <!-- Заголовок -->
         <Label text="Регистрация" styleClass="title"/>
 
+        <!-- Поле «Email» -->
+        <VBox spacing="8" prefWidth="400">
+            <Label text="Email" styleClass="form-label" fx:id="statusLabel"/>
+        </VBox>
+
         <!-- Поле «Имя» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="Имя" styleClass="form-label"/>
-            <TextField promptText="login123456" styleClass="text-field"/>
+            <TextField promptText="login123456" styleClass="text-field" fx:id="usernameField"/>
         </VBox>
 
         <!-- Поле «Email» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="Email" styleClass="form-label"/>
-            <TextField promptText="example@mail.ru" styleClass="text-field"/>
+            <TextField promptText="example@mail.ru" styleClass="text-field" fx:id="emailField"/>
         </VBox>
 
         <!-- Поле «Пароль» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="Пароль" styleClass="form-label"/>
-            <PasswordField promptText="password" styleClass="text-field"/>
+            <PasswordField promptText="password" styleClass="text-field" fx:id="passwordField"/>
         </VBox>
 
         <!-- Поле «Повтор пароля» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="Повтор пароля" styleClass="form-label"/>
-            <PasswordField promptText="password" styleClass="text-field"/>
+            <PasswordField promptText="password" styleClass="text-field" fx:id="repeatPasswordField"/>
         </VBox>
 
         <!-- Кнопка регистрации -->
-        <Button text="Зарегистрироваться"
+        <Button fx:id="registerButton"
+                text="Зарегистрироваться"
                 styleClass="primary-button"
-                prefWidth="240" prefHeight="40"/>
+                prefWidth="240" prefHeight="40" onAction="#doRegister"/>
 
         <!-- Нижняя строка с ссылкой на вход -->
         <HBox spacing="5" alignment="CENTER">
             <Label text="Уже есть аккаунт?" styleClass="footer-text"/>
-            <Hyperlink text="Войти" styleClass="link"/>
+            <Hyperlink fx:id="loginLink" text="Войти" styleClass="link" onAction="#openLogin"/>
         </HBox>
     </VBox>
 </StackPane>

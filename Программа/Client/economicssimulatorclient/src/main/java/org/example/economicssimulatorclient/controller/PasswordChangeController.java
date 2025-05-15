@@ -1,72 +1,103 @@
 package org.example.economicssimulatorclient.controller;
 
-import org.example.economicssimulatorclient.dto.PasswordResetConfirm;
-import org.example.economicssimulatorclient.dto.PasswordResetRequest;
-import org.example.economicssimulatorclient.service.AuthService;
-import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.util.Pair;
+import org.example.economicssimulatorclient.dto.*;
+import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.util.SceneManager;
+
+import java.util.Optional;
 
 public class PasswordChangeController {
 
     @FXML private TextField emailField;
-    @FXML private PasswordField newPasswordField;
-    @FXML private Button sendCodeButton;
-    @FXML private Button resetButton;
-    @FXML private Hyperlink backLink;
-    @FXML private Label statusLabel;
+    @FXML private Button    sendCodeButton;
+    @FXML private Button    resetButton;
+    @FXML private Label     statusLabel;
 
     private final AuthService auth = new AuthService();
-    private String lastEmail;          // для подтверждения
+    private boolean codeSent = false;
 
+    /* ---------- отправка кода ---------- */
     @FXML
-    private void initialize() {
-        sendCodeButton.setOnAction(e -> sendCode());
-        resetButton.setOnAction(e -> reset());
-        backLink.setOnAction(e -> SceneManager.switchTo("authorization.fxml"));
-    }
-
     private void sendCode() {
         statusLabel.setText("");
         String email = emailField.getText().trim();
-        if (email.isEmpty()) { statusLabel.setText("Enter email"); return; }
+        if (email.isEmpty()) {
+            statusLabel.setText("Укажите email");
+            return;
+        }
+
         sendCodeButton.setDisable(true);
         new Thread(() -> {
             try {
                 auth.resetPasswordRequest(new PasswordResetRequest(email));
-                lastEmail = email;
-                Platform.runLater(() -> statusLabel.setText("Code sent!"));
+                codeSent = true;
+                Platform.runLater(() -> statusLabel.setText("Код отправлен на email"));
             } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText("Error: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> sendCodeButton.setDisable(false));
             }
         }).start();
     }
 
+    @FXML
     private void reset() {
-        if (lastEmail == null) { statusLabel.setText("First send code"); return; }
-        String code = SceneManager.showInputDialog(
-                "Reset password", "Code sent to " + lastEmail, "Code:");
-        if (code == null) return;
-        String newPass = newPasswordField.getText();
-        if (newPass.isEmpty()) { statusLabel.setText("Enter new password"); return; }
+        statusLabel.setText("");
+        String email = emailField.getText().trim();
+        if (email.isEmpty())          { statusLabel.setText("Укажите email"); return; }
+        if (!codeSent)                { statusLabel.setText("Сначала отправьте код"); return; }
+
+        Pair<String,String> pair = showDialogAndGetData();
+        if (pair == null)             { statusLabel.setText("Отменено"); return; }
 
         resetButton.setDisable(true);
         new Thread(() -> {
             try {
                 auth.resetPasswordConfirm(
-                        new PasswordResetConfirm(lastEmail, code.trim(), newPass));
+                        new PasswordResetConfirm(email, pair.getKey(), pair.getValue()));
+
                 Platform.runLater(() -> {
-                    statusLabel.setText("Password updated!");
+                    statusLabel.setText("Пароль изменён — войдите заново");
                     SceneManager.switchTo("authorization.fxml");
                 });
             } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText("Error: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> resetButton.setDisable(false));
             }
         }).start();
+    }
+
+    @FXML
+    private void goBack() { SceneManager.switchTo("authorization.fxml"); }
+
+    private Pair<String,String> showDialogAndGetData() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/password_reset_dialog.fxml"));
+            Dialog<Pair<String,String>> dialog = new Dialog<>();
+            dialog.setTitle("Подтверждение сброса");
+            dialog.setDialogPane(loader.load());
+
+            PasswordResetDialogController ctrl = loader.getController();
+
+            dialog.setResultConverter(btn -> {
+                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                    return new Pair<>(ctrl.getCode(), ctrl.getPassword());
+                }
+                return null;
+            });
+
+            return dialog.showAndWait().orElse(null);
+
+        } catch (Exception ex) {
+            statusLabel.setText("Не удалось открыть диалог: " + ex.getMessage());
+            return null;
+        }
     }
 }

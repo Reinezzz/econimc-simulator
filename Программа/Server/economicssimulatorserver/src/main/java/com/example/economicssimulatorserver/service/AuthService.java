@@ -25,13 +25,15 @@ public class AuthService {
 
     @Transactional
     public ApiResponse register(RegistrationRequest req) {
-        User user = userService.findByEmail(req.email())
-                .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+        User user = userService.register(
+                req.username(),
+                req.email(),
+                req.password());
 
         String code = tokenService.createVerificationToken(user);
 
         /* было: mailService.sendPasswordResetEmail(user.getEmail(), code); */
-        mailService.sendPasswordResetEmail(
+        mailService.sendVerificationEmail(
                 user.getEmail(),
                 user.getUsername(),   // <‑‑‑ новый аргумент
                 code);

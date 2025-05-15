@@ -19,6 +19,7 @@ public final class SceneManager {
     private static Stage primary;
     private static final Map<String, Parent> cache = new HashMap<>();
     private static final Scene scene = new Scene(new javafx.scene.Group());
+    public static final String ROOT = "/org/example/economicssimulatorclient/";
 
     private SceneManager() {}
 
@@ -49,7 +50,7 @@ public final class SceneManager {
     /* ---------- private ---------- */
     private static Parent load(String fxml) {
         try {
-            return new FXMLLoader(SceneManager.class.getResource("/" + fxml)).load();
+            return new FXMLLoader(SceneManager.class.getResource(ROOT + fxml)).load();
         } catch (IOException e) {
             throw new RuntimeException("Cannot load " + fxml, e);
         }

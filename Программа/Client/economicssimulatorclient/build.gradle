@@ -26,7 +26,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'org.example.economicssimulatorclient'
-    mainClass = 'org.example.economicssimulatorclient.HelloApplication'
+    mainClass = 'org.example.economicssimulatorclient.MainApp'
 }
 
 javafx {

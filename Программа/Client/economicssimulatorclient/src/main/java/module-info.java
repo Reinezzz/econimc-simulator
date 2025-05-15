@@ -8,10 +8,12 @@ module org.example.economicssimulatorclient {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires eu.hansolo.tilesfx;
-    requires com.fasterxml.jackson.databind;
     requires java.net.http;
-    requires javafx.graphics;      // если не было
+    requires javafx.graphics;
+    requires com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.databind;      // если не было
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml;
+    opens org.example.economicssimulatorclient.dto to com.fasterxml.jackson.databind;
     exports org.example.economicssimulatorclient;
 }

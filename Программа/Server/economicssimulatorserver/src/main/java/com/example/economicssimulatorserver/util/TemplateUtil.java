@@ -15,7 +15,7 @@ public class TemplateUtil {
 
     @SneakyThrows
     public String render(String templateName, Map<String, String> vars) {
-        var resource = new ClassPathResource("templates/" + templateName);
+        var resource = new ClassPathResource(templateName);
         String html = new String(resource.getInputStream().readAllBytes(),
                 StandardCharsets.UTF_8);
 
