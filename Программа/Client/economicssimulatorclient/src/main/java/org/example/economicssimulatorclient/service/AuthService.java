@@ -16,6 +16,7 @@ import java.net.http.HttpResponse;
 public class AuthService {
 
     private static final String AUTH_PATH = "/auth";
+    private static final String AUTH_CANCEL_REGISTRATION = "cancel-registration";
     private final URI baseUri = URI.create(AppConfig.BASE_URL + AUTH_PATH + "/");
     private String accessToken;                      // память процесса
 
@@ -74,4 +75,14 @@ public class AuthService {
         // Можно парсить ошибку в ApiResponse, но пока бросим:
         throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
     }
+
+    public void cancelRegistration(String email) {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(baseUri + AUTH_CANCEL_REGISTRATION))
+                .POST(HttpRequest.BodyPublishers.ofString("{\"email\":\"" + email + "\"}"))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpClientProvider.instance().sendAsync(req, HttpResponse.BodyHandlers.discarding());
+    }
+
 }

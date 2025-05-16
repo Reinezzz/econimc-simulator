@@ -23,30 +23,6 @@ public class TokenService {
     private final PasswordResetTokenRepository resetRepo;
     private final Random rng = new Random();
 
-    /* ---------- Verification (E‑mail) ---------- */
-
-    @Transactional
-    public String createVerificationToken(User user) {
-        verifyRepo.deleteByUser(user);               // один активный
-        String code = randomCode();
-        VerificationToken token = VerificationToken.builder()
-                .user(user)
-                .code(code)
-                .expiresAt(LocalDateTime.now().plusMinutes(EXP_MINUTES))
-                .build();
-        verifyRepo.save(token);
-        return code;
-    }
-
-    @Transactional
-    public boolean validateVerificationCode(User user, String code) {
-        return verifyRepo.findByUser(user)
-                .filter(t -> t.getCode().equals(code))
-                .filter(t -> t.getExpiresAt().isAfter(LocalDateTime.now()))
-                .map(t -> { verifyRepo.delete(t); return true; })
-                .orElse(false);
-    }
-
     /* ---------- Password reset ---------- */
 
     @Transactional

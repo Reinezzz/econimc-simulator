@@ -2,14 +2,19 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.entity.User;
+import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -20,43 +25,78 @@ public class AuthService {
     private final MailService mailService;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
+    private final CacheManager cacheManager;
+    private final PasswordEncoder encoder;
+    private final UserRepository userRepo;
 
-    /* ---------- Регистрация ---------- */
+    private static final String REG_CACHE = "registrations";
 
+    /* ---------- Регистрация через Redis Cache ---------- */
     @Transactional
     public ApiResponse register(RegistrationRequest req) {
-        User user = userService.register(
+        // Проверить уникальность e-mail и username в users и кэше
+        if (userRepo.existsByEmail(req.email()))
+            throw new IllegalArgumentException("Email already registered");
+        if (userRepo.existsByUsername(req.username()))
+            throw new IllegalArgumentException("Username already registered");
+
+        var cache = cacheManager.getCache(REG_CACHE);
+        if (cache.get(req.email()) != null) {
+            cache.evict(req.email());
+            throw new IllegalArgumentException("Pending registration for this email already exists");
+        }
+
+        String code = String.format("%06d", (int)(Math.random()*1_000_000));
+        Instant expires = Instant.now().plusSeconds(15*60);
+
+        PendingRegistration pending = new PendingRegistration(
                 req.username(),
                 req.email(),
-                req.password());
+                encoder.encode(req.password()),
+                code,
+                expires
+        );
 
-        String code = tokenService.createVerificationToken(user);
+        cache.put(req.email(), pending);
+        mailService.sendVerificationEmail(req.email(), req.username(), code);
 
-        /* было: mailService.sendPasswordResetEmail(user.getEmail(), code); */
-        mailService.sendVerificationEmail(
-                user.getEmail(),
-                user.getUsername(),   // <‑‑‑ новый аргумент
-                code);
-
-        return new ApiResponse(true, "Reset code sent to email");
+        return new ApiResponse(true, "Verification code sent to email");
     }
 
-    /* ---------- Подтверждение e‑mail ---------- */
-
+    /* ---------- Подтверждение email ---------- */
     @Transactional
     public ApiResponse verifyEmail(VerificationRequest req) {
-        User user = userService.findByEmail(req.email())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        var cache = cacheManager.getCache(REG_CACHE);
+        PendingRegistration pending = cache.get(req.email(), PendingRegistration.class);
 
-        boolean ok = tokenService.validateVerificationCode(user, req.code());
-        if (!ok) throw new IllegalArgumentException("Invalid or expired code");
+        if (pending == null)
+            throw new IllegalArgumentException("No registration request found for this email");
 
-        userService.enableUser(user);
+        if (pending.expiresAt.isBefore(Instant.now())) {
+            cache.evict(req.email());
+            pending = null;
+            throw new IllegalArgumentException("Verification code expired");
+            //TODO: Обработка ошибок и отправка их на клиент
+        }
+
+        if (!pending.code.equals(req.code())) {
+            cache.evict(req.email());
+            pending = null;
+            throw new IllegalArgumentException("Incorrect verification code");
+        }
+
+        // Используем только единственный способ создания пользователя
+        userService.register(
+                pending.username,
+                pending.email,
+                pending.passwordHash
+        );
+
+        cache.evict(req.email());
         return new ApiResponse(true, "Email confirmed. You can now log in.");
     }
 
     /* ---------- Авторизация ---------- */
-
     public LoginResponse login(LoginRequest req) {
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
@@ -71,7 +111,6 @@ public class AuthService {
     }
 
     /* ---------- Сброс пароля ---------- */
-
     @Transactional
     public ApiResponse initiatePasswordReset(PasswordResetRequest req) {
         User user = userService.findByEmail(req.email())
@@ -79,15 +118,13 @@ public class AuthService {
 
         String code = tokenService.createPasswordResetToken(user);
 
-        /* было: mailService.sendPasswordResetEmail(user.getEmail(), code); */
         mailService.sendPasswordResetEmail(
                 user.getEmail(),
-                user.getUsername(),   // <‑‑‑ новый аргумент
+                user.getUsername(),
                 code);
 
         return new ApiResponse(true, "Reset code sent to email");
     }
-
 
     @Transactional
     public ApiResponse confirmPasswordReset(PasswordResetConfirm req) {
@@ -95,16 +132,13 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Email not found"));
         boolean ok = tokenService.validatePasswordResetCode(user, req.code());
         if (!ok) throw new IllegalArgumentException("Invalid or expired code");
-        // заменить пароль
-        user.setPasswordHash(
-                userService.loadUserByUsername(user.getUsername())  // получить encoder
-                        .getPassword()); // Здесь не нужен, упростим:
-        user.setPasswordHash(
-                ((org.springframework.security.crypto.password.PasswordEncoder)
-                        org.springframework.security.crypto.factory.PasswordEncoderFactories
-                                .createDelegatingPasswordEncoder())
-                        .encode(req.newPassword()));
+
+        // Корректно перехешируем пароль через сервис:
+        userService.updatePassword(user, req.newPassword());
 
         return new ApiResponse(true, "Password updated");
     }
+
+
+
 }

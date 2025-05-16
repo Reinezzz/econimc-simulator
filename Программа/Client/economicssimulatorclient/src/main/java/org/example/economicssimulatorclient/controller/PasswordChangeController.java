@@ -9,7 +9,6 @@ import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;
 
-import java.util.Optional;
 
 public class PasswordChangeController {
 
@@ -49,18 +48,18 @@ public class PasswordChangeController {
     private void reset() {
         statusLabel.setText("");
         String email = emailField.getText().trim();
-        if (email.isEmpty())          { statusLabel.setText("Укажите email"); return; }
-        if (!codeSent)                { statusLabel.setText("Сначала отправьте код"); return; }
 
-        Pair<String,String> pair = showDialogAndGetData();
-        if (pair == null)             { statusLabel.setText("Отменено"); return; }
+        if (email.isEmpty())      { statusLabel.setText("Укажите email"); return; }
+        if (!codeSent)            { statusLabel.setText("Сначала отправьте код"); return; }
+
+        Pair<String,String> pair = showDialogAndGetData();     // открываем в FX-потоке
+        if (pair == null)         { statusLabel.setText("Отменено"); return; }
 
         resetButton.setDisable(true);
         new Thread(() -> {
             try {
                 auth.resetPasswordConfirm(
                         new PasswordResetConfirm(email, pair.getKey(), pair.getValue()));
-
                 Platform.runLater(() -> {
                     statusLabel.setText("Пароль изменён — войдите заново");
                     SceneManager.switchTo("authorization.fxml");
@@ -73,31 +72,36 @@ public class PasswordChangeController {
         }).start();
     }
 
+
     @FXML
     private void goBack() { SceneManager.switchTo("authorization.fxml"); }
 
-    private Pair<String,String> showDialogAndGetData() {
+    private Pair<String, String> showDialogAndGetData() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/password_reset_dialog.fxml"));
-            Dialog<Pair<String,String>> dialog = new Dialog<>();
-            dialog.setTitle("Подтверждение сброса");
+                    getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"));
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            dialog.setTitle("Смена пароля");
             dialog.setDialogPane(loader.load());
-
+            //TODO: Пофиксить валидацию пароля
+            //TODO: Удалять токен при закрытии диалогового окна
             PasswordResetDialogController ctrl = loader.getController();
 
             dialog.setResultConverter(btn -> {
-                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                // OK: только если всё валидно
+                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE && ctrl.isValid()) {
                     return new Pair<>(ctrl.getCode(), ctrl.getPassword());
                 }
+                // Отмена или закрытие — вернёт null
                 return null;
             });
 
             return dialog.showAndWait().orElse(null);
 
-        } catch (Exception ex) {
-            statusLabel.setText("Не удалось открыть диалог: " + ex.getMessage());
+        } catch (Exception e) {
+            statusLabel.setText("Ошибка диалога");
             return null;
         }
     }
+
 }

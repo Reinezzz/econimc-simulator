@@ -3,8 +3,11 @@ package com.example.economicssimulatorserver.controller;
 import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final CacheManager cacheManager;
 
     /* ---------- REGISTRATION ---------- */
 
@@ -44,4 +48,15 @@ public class AuthController {
     public ApiResponse passwordResetConfirm(@RequestBody PasswordResetConfirm req) {
         return authService.confirmPasswordReset(req);
     }
+
+    @PostMapping("/cancel-registration")
+    public ApiResponse cancelRegistration(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        var cache = cacheManager.getCache("registrations");
+        if (cache != null && email != null) {
+            cache.evict(email);
+        }
+        return new ApiResponse(true, "Registration cancelled");
+    }
+
 }

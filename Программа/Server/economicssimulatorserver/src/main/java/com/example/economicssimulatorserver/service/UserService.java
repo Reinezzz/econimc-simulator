@@ -23,25 +23,13 @@ public class UserService implements UserDetailsService {
     /* ---------- CRUD‑утилиты ---------- */
 
     @Transactional
-    public User register(String username, String email, String rawPassword) {
-        if (userRepo.existsByUsername(username))
-            throw new IllegalArgumentException("Username already taken");
-        if (userRepo.existsByEmail(email))
-            throw new IllegalArgumentException("Email already registered");
-
-        User user = User.builder()
-                .username(username)
-                .email(email)
-                .passwordHash(encoder.encode(rawPassword))
-                .enabled(false)
-                .build();
+    public User register(String username, String email, String passwordHash) {
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPasswordHash(passwordHash);
+        user.setEnabled(true); // Email всегда подтвержден при создании
         return userRepo.save(user);
-    }
-
-    @Transactional
-    public void enableUser(User user) {
-        user.setEnabled(true);
-        userRepo.save(user);
     }
 
     public Optional<User> findByEmail(String email) {
@@ -68,6 +56,12 @@ public class UserService implements UserDetailsService {
                 .disabled(!user.isEnabled())            // если e‑mail не подтверждён
                 .authorities(Collections.emptyList())   // ролей нет
                 .build();
+    }
+
+    @Transactional
+    public void updatePassword(User user, String rawPassword) {
+        user.setPasswordHash(encoder.encode(rawPassword));
+        userRepo.save(user);
     }
 
 }

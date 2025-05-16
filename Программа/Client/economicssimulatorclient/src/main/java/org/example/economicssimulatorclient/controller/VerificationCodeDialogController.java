@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -8,26 +9,28 @@ public class VerificationCodeDialogController {
     @FXML private DialogPane dialogPane;
     @FXML private TextField  codeField;
     @FXML private Label      errorLabel;
-    @FXML private ButtonType okBtn;            // из FXML
-
-    private Button okButton;
+    @FXML private ButtonType okBtn;
+    @FXML private ButtonType cancelBtn;   // получаем из FXML
 
     @FXML
     private void initialize() {
-        // lookupButton НЕ null, т.к. ButtonTypes уже добавлены
-        okButton = (Button) dialogPane.lookupButton(okBtn);
-        validate();
+        /* lookupButton может быть ещё null внутри initialize,
+           поэтому откладываем до первого «pulse» JavaFX */
+        Platform.runLater(() -> {
+            Button okButton = (Button) dialogPane.lookupButton(okBtn);
+            okButton.setDisable(true);
+            Button cancelButton = (Button) dialogPane.lookupButton(cancelBtn);
 
-        codeField.textProperty().addListener((o,old,v) -> validate());
+            codeField.textProperty().addListener((obs, o, n) -> {
+                boolean empty = n.trim().isEmpty();
+                okButton.setDisable(empty);
+                cancelButton.setDisable(empty);
+                errorLabel.setText(empty ? "Код обязателен" : "");
+            });
+        });
     }
 
-    private void validate() {
-        boolean empty = codeField.getText().trim().isEmpty();
-        okButton.setDisable(empty);
-        errorLabel.setText(empty ? "Введите код" : "");
-    }
-
-    /* ---- геттер для вызывающего кода ---- */
+    /* для вызова из регистрационного контроллера */
     public String getCode() {
         return codeField.getText().trim();
     }

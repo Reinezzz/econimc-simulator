@@ -31,6 +31,11 @@
 
         <!-- Поле «Имя или Email» -->
         <VBox spacing="8" prefWidth="400">
+            <Label text="Авторизируйтесь" styleClass="form-label" fx:id="statusLabel"/>
+        </VBox>
+
+        <!-- Поле «Имя или Email» -->
+        <VBox spacing="8" prefWidth="400">
             <Label text="Имя или Email" styleClass="form-label"/>
             <TextField promptText="example@mail.ru" styleClass="text-field" fx:id="usernameEmailField"/>
         </VBox>

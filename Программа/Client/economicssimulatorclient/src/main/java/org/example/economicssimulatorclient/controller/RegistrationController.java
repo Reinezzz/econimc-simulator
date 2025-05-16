@@ -34,48 +34,47 @@ public class RegistrationController {
         String p2    = repeatPasswordField.getText();
 
         if (user.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-            statusLabel.setText("Заполните все поля");    return;
+            statusLabel.setText("Заполните все поля");   return;
         }
         if (!p1.equals(p2)) {
-            statusLabel.setText("Пароли не совпадают");   return;
+            statusLabel.setText("Пароли не совпадают");  return;
         }
 
         registerButton.setDisable(true);
 
-        runAsync(() -> {   // шаг-1: сеть, не блокируем UI
+        runAsync(() -> {                                     // фоновая сеть
             try {
                 auth.register(new RegistrationRequest(user, email, p1));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-            Platform.runLater(() -> {   // шаг-2: вернулись в FX-поток
+            Platform.runLater(() -> {                        // диалог — FX-поток
                 statusLabel.setText("Код отправлен на email");
-
-                String code = showVerificationDialog();   // теперь можно!
+                String code = showVerificationDialog();      // блокирует до OK/Cancel
                 if (code == null) {
                     statusLabel.setText("Ввод кода отменён");
                     registerButton.setDisable(false);
                     return;
                 }
 
-                // шаг-3: подтверждение снова в фоне
+                // второе сетевое обращение в фоне
                 runAsync(() -> {
                     try {
                         auth.verifyEmail(new VerificationRequest(email, code));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } catch (InterruptedException e) {
+                    } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                     Platform.runLater(() -> {
                         statusLabel.setText("Успешно! Войдите.");
                         SceneManager.switchTo("authorization.fxml");
                     });
-                });
+                }, ex -> Platform.runLater(() -> {
+                    statusLabel.setText("Ошибка: " + ex.getMessage());
+                    registerButton.setDisable(false);
+                }));
             });
+
         }, ex -> Platform.runLater(() -> {
             statusLabel.setText("Ошибка: " + ex.getMessage());
             registerButton.setDisable(false);
@@ -83,14 +82,12 @@ public class RegistrationController {
     }
 
     /* ==== маленькая утилита ==== */
-    private void runAsync(Runnable task) { runAsync(task, null); }
-    private void runAsync(Runnable task, java.util.function.Consumer<Throwable> onError) {
+    /* ---------- helper ---------- */
+    private void runAsync(Runnable task, java.util.function.Consumer<Throwable> onErr) {
         Thread t = new Thread(() -> {
-            try { task.run(); }
-            catch (Throwable ex) { if (onError != null) onError.accept(ex); }
+            try { task.run(); } catch (Throwable ex) { if (onErr != null) onErr.accept(ex); }
         }, "fx-bg");
-        t.setDaemon(true);
-        t.start();
+        t.setDaemon(true);  t.start();
     }
 
 
@@ -105,7 +102,6 @@ public class RegistrationController {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"));
-
             Dialog<String> dialog = new Dialog<>();
             dialog.setTitle("Подтверждение e-mail");
             dialog.setDialogPane(loader.load());
@@ -113,8 +109,11 @@ public class RegistrationController {
             VerificationCodeDialogController ctrl = loader.getController();
 
             dialog.setResultConverter(btn -> {
-                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                    return ctrl.getCode();          // читаем из контроллера
+                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE)
+                    return ctrl.getCode();
+                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                    auth.cancelRegistration(emailField.getText());
+                    return null;
                 }
                 return null;
             });
@@ -122,8 +121,7 @@ public class RegistrationController {
             return dialog.showAndWait().orElse(null);
 
         } catch (Exception ex) {
-            Platform.runLater(() -> statusLabel.setText("Не удалось открыть диалог"));
-            System.out.println(ex.getMessage());
+            statusLabel.setText("Не удалось открыть диалог");
             return null;
         }
     }
