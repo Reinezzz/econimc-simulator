@@ -12,43 +12,42 @@ public class PasswordResetDialogController {
     @FXML private Label errorLabel;
     @FXML private ButtonType okBtn;
 
-    private boolean valid = false;
-
+    // initialize() можно оставить пустым!
     @FXML
-    private void initialize() {
-        // Сохраняем оригинальный обработчик
+    private void initialize() { }
+
+    // Вызывать ЭТОТ МЕТОД из PasswordChangeController сразу после загрузки FXML!
+    public void setupValidation() {
+        // Гарантировано dialogPane уже не null!
         Button okButton = (Button) dialogPane.lookupButton(okBtn);
-        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            if (!validateAndShowError()) {
-                event.consume(); // блокируем закрытие окна!
+
+        Runnable validate = () -> {
+            String code = codeField.getText().trim();
+            String p1 = passField.getText();
+            String p2 = repeatField.getText();
+
+            boolean empty = code.isEmpty() || p1.isEmpty() || p2.isEmpty();
+            boolean mismatch = !p1.equals(p2);
+
+            if (empty) {
+                errorLabel.setText("");
+                okButton.setDisable(true);
+            } else if (mismatch) {
+                errorLabel.setText("Пароли не совпадают");
+                okButton.setDisable(true);
             } else {
-                valid = true;
+                errorLabel.setText("");
+                okButton.setDisable(false);
             }
-        });
+        };
+
+        codeField.textProperty().addListener((obs, ov, nv) -> validate.run());
+        passField.textProperty().addListener((obs, ov, nv) -> validate.run());
+        repeatField.textProperty().addListener((obs, ov, nv) -> validate.run());
+
+        validate.run(); // запуск валидации сразу после загрузки
     }
 
-    /**
-     * Валидирует поля и показывает ошибку, если что-то не так.
-     * @return true если поля валидны, иначе false.
-     */
-    private boolean validateAndShowError() {
-        String code = codeField.getText().trim();
-        String p1 = passField.getText();
-        String p2 = repeatField.getText();
-
-        if (code.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-            errorLabel.setText("Все поля обязательны");
-            return false;
-        }
-        if (!p1.equals(p2)) {
-            errorLabel.setText("Пароли не совпадают");
-            return false;
-        }
-        errorLabel.setText("");
-        return true;
-    }
-
-    public boolean isValid() { return valid; }
     public String getCode() { return codeField.getText().trim(); }
     public String getPassword() { return passField.getText(); }
 }

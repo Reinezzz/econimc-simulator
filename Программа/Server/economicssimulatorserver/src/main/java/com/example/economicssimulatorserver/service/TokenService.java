@@ -51,4 +51,11 @@ public class TokenService {
     private String randomCode() {
         return "%06d".formatted(rng.nextInt(1_000_000));
     }
+
+    @Transactional
+    public void evictPasswordResetToken(User user) {
+        // Или если токены в БД:
+        resetRepo.deleteByUser(user);
+    }
+
 }

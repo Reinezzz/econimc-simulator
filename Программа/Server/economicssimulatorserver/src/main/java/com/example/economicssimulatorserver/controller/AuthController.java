@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.controller;
 
 import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
@@ -58,5 +59,13 @@ public class AuthController {
         }
         return new ApiResponse(true, "Registration cancelled");
     }
+
+    @PostMapping("/cancel-password-reset")
+    public ApiResponse cancelPasswordReset(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        authService.cancelPasswordReset(email);
+        return new ApiResponse(true, "Password reset cancelled");
+    }
+
 
 }

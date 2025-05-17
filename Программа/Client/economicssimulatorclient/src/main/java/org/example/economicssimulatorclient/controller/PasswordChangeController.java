@@ -4,38 +4,38 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.util.Pair;
-import org.example.economicssimulatorclient.dto.*;
+import org.example.economicssimulatorclient.dto.PasswordResetConfirm;
+import org.example.economicssimulatorclient.dto.PasswordResetRequest;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;
-
+import javafx.util.Pair;
 
 public class PasswordChangeController {
 
     @FXML private TextField emailField;
-    @FXML private Button    sendCodeButton;
-    @FXML private Button    resetButton;
-    @FXML private Label     statusLabel;
+    @FXML private Button sendCodeButton;
+    @FXML private Label statusLabel;
 
     private final AuthService auth = new AuthService();
-    private boolean codeSent = false;
 
-    /* ---------- отправка кода ---------- */
     @FXML
     private void sendCode() {
         statusLabel.setText("");
         String email = emailField.getText().trim();
         if (email.isEmpty()) {
-            statusLabel.setText("Укажите email");
+            statusLabel.setText("Введите e-mail");
             return;
         }
 
         sendCodeButton.setDisable(true);
+
         new Thread(() -> {
             try {
                 auth.resetPasswordRequest(new PasswordResetRequest(email));
-                codeSent = true;
-                Platform.runLater(() -> statusLabel.setText("Код отправлен на email"));
+                Platform.runLater(() -> {
+                    statusLabel.setText("Код отправлен");
+                    openDialog(email); // Сразу открываем окно
+                });
             } catch (Exception ex) {
                 Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
             } finally {
@@ -44,64 +44,66 @@ public class PasswordChangeController {
         }).start();
     }
 
-    @FXML
-    private void reset() {
-        statusLabel.setText("");
-        String email = emailField.getText().trim();
+    // Открытие диалога
+    private void openDialog(String email) {
+        int[] attempts = {0};
+        boolean[] confirmed = {false};
 
-        if (email.isEmpty())      { statusLabel.setText("Укажите email"); return; }
-        if (!codeSent)            { statusLabel.setText("Сначала отправьте код"); return; }
-
-        Pair<String,String> pair = showDialogAndGetData();     // открываем в FX-потоке
-        if (pair == null)         { statusLabel.setText("Отменено"); return; }
-
-        resetButton.setDisable(true);
-        new Thread(() -> {
-            try {
-                auth.resetPasswordConfirm(
-                        new PasswordResetConfirm(email, pair.getKey(), pair.getValue()));
-                Platform.runLater(() -> {
-                    statusLabel.setText("Пароль изменён — войдите заново");
-                    SceneManager.switchTo("authorization.fxml");
-                });
-            } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
-            } finally {
-                Platform.runLater(() -> resetButton.setDisable(false));
-            }
-        }).start();
-    }
-
-
-    @FXML
-    private void goBack() { SceneManager.switchTo("authorization.fxml"); }
-
-    private Pair<String, String> showDialogAndGetData() {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"));
             Dialog<Pair<String, String>> dialog = new Dialog<>();
             dialog.setTitle("Смена пароля");
-            dialog.setDialogPane(loader.load());
-            //TODO: Пофиксить валидацию пароля
-            //TODO: Удалять токен при закрытии диалогового окна
-            PasswordResetDialogController ctrl = loader.getController();
+            DialogPane pane = loader.load();
+            dialog.setDialogPane(pane);
 
+            PasswordResetDialogController ctrl = loader.getController();
+            ctrl.setupValidation(); // <--- только теперь!
+
+            // Обработка подтверждения
             dialog.setResultConverter(btn -> {
-                // OK: только если всё валидно
-                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE && ctrl.isValid()) {
+                if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                     return new Pair<>(ctrl.getCode(), ctrl.getPassword());
                 }
-                // Отмена или закрытие — вернёт null
                 return null;
             });
 
-            return dialog.showAndWait().orElse(null);
+            // При закрытии/отмене — удаляем токен на сервере
+            dialog.setOnCloseRequest(ev -> {
+                if (dialog.getResult() == null) {
+                    new Thread(() -> auth.cancelPasswordReset(email)).start();
+                }
+            });
+
+            var result = dialog.showAndWait();
+            if (result.isPresent()) {
+                Pair<String, String> pair = result.get();
+                confirmReset(email, pair.getKey(), pair.getValue());
+            } else {
+                // После отмены ничего не делаем (или можно вернуть на экран авторизации)
+            }
 
         } catch (Exception e) {
-            statusLabel.setText("Ошибка диалога");
-            return null;
+            statusLabel.setText("Ошибка диалога" + e.getMessage());
         }
     }
 
+    @FXML
+    private void goBack() { SceneManager.switchTo("authorization.fxml"); }
+
+    // Смена пароля на сервере
+    private void confirmReset(String email, String code, String password) {
+        statusLabel.setText("");
+        new Thread(() -> {
+            try {
+                auth.resetPasswordConfirm(new PasswordResetConfirm(email, code, password));
+                Platform.runLater(() -> {
+                    statusLabel.setText("Пароль изменен — войдите заново");
+                    SceneManager.switchTo("authorization.fxml");
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+            }
+        }).start();
+    }
 }

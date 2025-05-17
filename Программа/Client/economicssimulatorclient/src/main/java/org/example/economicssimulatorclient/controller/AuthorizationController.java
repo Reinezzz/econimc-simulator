@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 
 public class AuthorizationController {
 
+    @FXML private Hyperlink forgotLink;
     @FXML private TextField   usernameEmailField;
     @FXML private PasswordField passwordField;
     @FXML private Button      loginButton;
@@ -37,6 +38,9 @@ public class AuthorizationController {
                     statusLabel.setText("Успешный вход");
                     SceneManager.switchTo("main.fxml");   // переход дальше
                 });
+            } catch (IllegalArgumentException ex) {
+                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+                Platform.runLater(() -> {passwordField.setText("");});
             } catch (Exception ex) {
                 Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
             } finally {

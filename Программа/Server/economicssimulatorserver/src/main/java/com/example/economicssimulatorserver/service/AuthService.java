@@ -36,9 +36,9 @@ public class AuthService {
     public ApiResponse register(RegistrationRequest req) {
         // Проверить уникальность e-mail и username в users и кэше
         if (userRepo.existsByEmail(req.email()))
-            throw new IllegalArgumentException("Email already registered");
+            throw new IllegalArgumentException("Email уже занят");
         if (userRepo.existsByUsername(req.username()))
-            throw new IllegalArgumentException("Username already registered");
+            throw new IllegalArgumentException("Имя пользователя уже занято");
 
         var cache = cacheManager.getCache(REG_CACHE);
         if (cache.get(req.email()) != null) {
@@ -46,8 +46,8 @@ public class AuthService {
             throw new IllegalArgumentException("Pending registration for this email already exists");
         }
 
-        String code = String.format("%06d", (int)(Math.random()*1_000_000));
-        Instant expires = Instant.now().plusSeconds(15*60);
+        String code = String.format("%06d", (int) (Math.random() * 1_000_000));
+        Instant expires = Instant.now().plusSeconds(15 * 60);
 
         PendingRegistration pending = new PendingRegistration(
                 req.username(),
@@ -82,7 +82,7 @@ public class AuthService {
         if (!pending.code.equals(req.code())) {
             cache.evict(req.email());
             pending = null;
-            throw new IllegalArgumentException("Incorrect verification code");
+            throw new IllegalArgumentException("Неверный код");
         }
 
         // Используем только единственный способ создания пользователя
@@ -106,7 +106,7 @@ public class AuthService {
             String access = jwtUtil.generateToken(userDetails);
             return new LoginResponse(access, "Bearer");
         } catch (AuthenticationException ex) {
-            throw new IllegalArgumentException("Bad credentials");
+            throw new IllegalArgumentException("Неверный логин, email или пароль");
         }
     }
 
@@ -114,7 +114,7 @@ public class AuthService {
     @Transactional
     public ApiResponse initiatePasswordReset(PasswordResetRequest req) {
         User user = userService.findByEmail(req.email())
-                .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
 
         String code = tokenService.createPasswordResetToken(user);
 
@@ -129,16 +129,24 @@ public class AuthService {
     @Transactional
     public ApiResponse confirmPasswordReset(PasswordResetConfirm req) {
         User user = userService.findByEmail(req.email())
-                .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
         boolean ok = tokenService.validatePasswordResetCode(user, req.code());
-        if (!ok) throw new IllegalArgumentException("Invalid or expired code");
+        if (!ok) {
+            throw new IllegalArgumentException("Неверный код, или код устарел");
+        }
 
-        // Корректно перехешируем пароль через сервис:
+
         userService.updatePassword(user, req.newPassword());
+        tokenService.evictPasswordResetToken(user);
 
         return new ApiResponse(true, "Password updated");
     }
 
+
+    public void cancelPasswordReset(String email) {
+        User user = userService.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Email не найден"));
+        tokenService.evictPasswordResetToken(user); // см. ниже!
+    }
 
 
 }
