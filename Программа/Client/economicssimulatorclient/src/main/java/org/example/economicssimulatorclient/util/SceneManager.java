@@ -8,7 +8,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Кэширует FXML и переключает root у единственного Scene —
@@ -39,7 +41,13 @@ public final class SceneManager {
     /* ---------- private ---------- */
     private static Parent load(String fxml) {
         try {
-            return new FXMLLoader(SceneManager.class.getResource(ROOT + fxml)).load();
+            I18n.setLocale(Locale.forLanguageTag("ru"));
+            Locale locale = I18n.getLocale();
+            ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(ROOT + fxml));
+            loader.setResources(bundle);
+            return loader.load();
+
         } catch (IOException e) {
             throw new RuntimeException("Cannot load " + fxml, e);
         }

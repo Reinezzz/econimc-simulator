@@ -1,16 +1,30 @@
 package org.example.economicssimulatorclient.util;
 
-import lombok.Setter;
+import lombok.Getter;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Универсальный менеджер локализации для всего приложения.
+ */
 public class I18n {
-    @Setter
-    private static Locale locale = Locale.getDefault(); // Можно явно задать ru/en
+    @Getter
+    private static Locale locale = Locale.ENGLISH;
+    public static ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
 
+    /** Установить локаль (например, Locale.ENGLISH или new Locale("ru")) */
+    public static void setLocale(Locale newLocale) {
+        locale = newLocale;
+        bundle = ResourceBundle.getBundle("messages", locale);
+    }
+
+    /** Перевести по ключу. Если ключ не найден — вернуть !key!. */
     public static String t(String key) {
-        ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
-        return bundle.getString(key);
+        if (bundle == null) setLocale(locale);
+        if (bundle.containsKey(key)) {
+            return bundle.getString(key);
+        }
+        return "!" + key + "!";
     }
 }

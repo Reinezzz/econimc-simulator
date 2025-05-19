@@ -13,15 +13,22 @@ import org.example.economicssimulatorclient.util.Validator;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
-public class RegistrationController {
+public class RegistrationController extends BaseController {
 
-    @FXML private TextField     usernameField;
-    @FXML private TextField     emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private PasswordField repeatPasswordField;
-    @FXML private Button        registerButton;
-    @FXML private Label         statusLabel;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField repeatPasswordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Label statusLabel;
 
     private final AuthService auth = new AuthService();
 
@@ -30,25 +37,27 @@ public class RegistrationController {
     private void doRegister() {
         statusLabel.setText("");
 
-        String user  = usernameField.getText().trim();
+        String user = usernameField.getText().trim();
         String email = emailField.getText().trim();
-        String p1    = passwordField.getText();
-        String p2    = repeatPasswordField.getText();
+        String p1 = passwordField.getText();
+        String p2 = repeatPasswordField.getText();
 
         if (!Validator.isValidEmail(email)) {
-            statusLabel.setText(I18n.t("msg.invalid_email"));
+            showError(statusLabel, "msg.invalid_email");
             return;
         }
         if (!Validator.isStrongPassword(p1)) {
-            statusLabel.setText(I18n.t("msg.weak_password"));
+            showError(statusLabel, "msg.weak_password");
             return;
         }
 
         if (user.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-            statusLabel.setText(I18n.t("msg.fill_all_fields"));   return;
+            showError(statusLabel, "msg.fill_all_fields");
+            return;
         }
         if (!p1.equals(p2)) {
-            statusLabel.setText(I18n.t("msg.passwords_mismatch"));  return;
+            showError(statusLabel, "msg.passwords_mismatch");
+            return;
         }
 
         registerButton.setDisable(true);
@@ -61,10 +70,11 @@ public class RegistrationController {
             }
 
             Platform.runLater(() -> {                        // диалог — FX-поток
-                statusLabel.setText(I18n.t("msg.code_sent"));
+                showSuccess(statusLabel, "msg.code_sent");
                 String code = showVerificationDialog();      // блокирует до OK/Cancel
                 if (code == null) {
-                    statusLabel.setText(I18n.t("reg.status_label.cancel_verification"));
+                    showError(statusLabel, "reg.status_label.cancel_verification");
+                    auth.cancelRegistration(email);
                     registerButton.setDisable(false);
                     return;
                 }
@@ -77,17 +87,17 @@ public class RegistrationController {
                         throw new RuntimeException(e);
                     }
                     Platform.runLater(() -> {
-                        statusLabel.setText(I18n.t("msg.registration_success"));
+                        showSuccess(statusLabel, "msg.registration_success");
                         SceneManager.switchTo("authorization.fxml");
                     });
                 }, ex -> Platform.runLater(() -> {
-                    statusLabel.setText(I18n.t("error.base") + ex.getMessage());
+                    showError(statusLabel, tr("error.base" + ex.getMessage()));
                     registerButton.setDisable(false);
                 }));
             });
 
         }, ex -> Platform.runLater(() -> {
-            statusLabel.setText(I18n.t("error.base") + ex.getMessage());
+            showError(statusLabel, tr("error.base" + ex.getMessage()));
             registerButton.setDisable(false);
         }));
     }
@@ -96,9 +106,14 @@ public class RegistrationController {
     /* ---------- helper ---------- */
     private void runAsync(Runnable task, java.util.function.Consumer<Throwable> onErr) {
         Thread t = new Thread(() -> {
-            try { task.run(); } catch (Throwable ex) { if (onErr != null) onErr.accept(ex); }
+            try {
+                task.run();
+            } catch (Throwable ex) {
+                if (onErr != null) onErr.accept(ex);
+            }
         }, "fx-bg");
-        t.setDaemon(true);  t.start();
+        t.setDaemon(true);
+        t.start();
     }
 
 
@@ -111,8 +126,9 @@ public class RegistrationController {
     /* =========== helper: диалог кода ============ */
     private String showVerificationDialog() {
         try {
+            ResourceBundle bundle = I18n.bundle;
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"));
+                    getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"), bundle);
             Dialog<String> dialog = new Dialog<>();
             dialog.setTitle(I18n.t("dialog.verification_code_title"));
             dialog.setDialogPane(loader.load());
@@ -136,6 +152,7 @@ public class RegistrationController {
             return null;
         }
     }
+
 
 
 }
