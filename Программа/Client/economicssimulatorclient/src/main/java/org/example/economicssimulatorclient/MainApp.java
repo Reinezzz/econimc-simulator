@@ -1,5 +1,7 @@
 package org.example.economicssimulatorclient;
 
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -12,7 +14,11 @@ public class MainApp extends Application {
         SceneManager.init(primaryStage);
         SceneManager.switchTo("authorization.fxml");     // первая сцена
         primaryStage.setTitle("Economics Simulator");
+        primaryStage.setResizable(true);
+        primaryStage.setMaximized(true);
         primaryStage.show();
+
+
     }
 
     public static void main(String[] args) {

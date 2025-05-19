@@ -8,10 +8,10 @@ public final class JsonUtil {
     private JsonUtil() {}
 
     public static String toJson(Object obj) throws JsonProcessingException {
-        return AppConfig.mapper().writeValueAsString(obj);
+        return AppConfig.objectMapper.writeValueAsString(obj);
     }
 
     public static <T> T fromJson(String json, Class<T> clz) throws JsonProcessingException {
-        return AppConfig.mapper().readValue(json, clz);
+        return AppConfig.objectMapper.readValue(json, clz);
     }
 }

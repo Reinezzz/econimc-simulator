@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;
+import org.example.economicssimulatorclient.util.Validator;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -32,6 +33,15 @@ public class RegistrationController {
         String email = emailField.getText().trim();
         String p1    = passwordField.getText();
         String p2    = repeatPasswordField.getText();
+
+        if (!Validator.isValidEmail(email)) {
+            statusLabel.setText("Некорректный e-mail");
+            return;
+        }
+        if (!Validator.isStrongPassword(p1)) {
+            statusLabel.setText("Слабый пароль. Используйте минимум 8 символов, цифру, буквы обоих регистров и спецсимвол");
+            return;
+        }
 
         if (user.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
             statusLabel.setText("Заполните все поля");   return;

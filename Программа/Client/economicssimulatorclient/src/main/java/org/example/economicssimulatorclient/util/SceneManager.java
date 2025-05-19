@@ -36,17 +36,6 @@ public final class SceneManager {
         }
     }
 
-    /** Показать модальное окно (исп. для ввода кода) */
-    public static String showInputDialog(String title, String header, String prompt) {
-        javafx.scene.control.TextInputDialog dlg = new javafx.scene.control.TextInputDialog();
-        dlg.initOwner(primary);
-        dlg.initModality(Modality.WINDOW_MODAL);
-        dlg.setTitle(title);
-        dlg.setHeaderText(header);
-        dlg.setContentText(prompt);
-        return dlg.showAndWait().orElse(null);
-    }
-
     /* ---------- private ---------- */
     private static Parent load(String fxml) {
         try {

@@ -102,6 +102,7 @@ public class PasswordChangeController {
                     SceneManager.switchTo("authorization.fxml");
                 });
             } catch (Exception ex) {
+                new Thread(() -> auth.cancelPasswordReset(email)).start();
                 Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
             }
         }).start();

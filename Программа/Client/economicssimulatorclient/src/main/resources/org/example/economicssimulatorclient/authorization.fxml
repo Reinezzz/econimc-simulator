@@ -12,7 +12,6 @@
 
 <StackPane xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
-           prefWidth="1920" prefHeight="1080"
             fx:controller="org.example.economicssimulatorclient.controller.AuthorizationController">
     <!-- Подключаем CSS -->
 <!--    <stylesheets>-->
@@ -20,8 +19,7 @@
 <!--    </stylesheets>-->
 
     <!-- Фоновый слой -->
-    <Pane styleClass="background-pane"
-          prefWidth="1920" prefHeight="1080"/>
+    <Pane styleClass="background-pane"/>
 
     <!-- Карточка входа -->
     <VBox styleClass="card"

@@ -14,6 +14,7 @@ module org.example.economicssimulatorclient {
     requires com.fasterxml.jackson.databind;      // если не было
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml;
+    opens org.example.economicssimulatorclient.config to javafx.fxml;
     opens org.example.economicssimulatorclient.dto to com.fasterxml.jackson.databind;
     exports org.example.economicssimulatorclient;
 }

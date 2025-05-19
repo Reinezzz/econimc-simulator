@@ -1,6 +1,8 @@
 package com.example.economicssimulatorserver.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record VerificationRequest(
-        String email,
-        String code           // шестизначный
+        @NotBlank String email,
+        @NotBlank String code           // шестизначный
 ) {}

@@ -1,24 +1,45 @@
 package org.example.economicssimulatorclient.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-/**
- * Глобальная конфигурация клиента: базовый URL и настроенный ObjectMapper.
- */
-public final class AppConfig {
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-    /** URL сервера (без завершающего /).  Измените при необходимости. */
-    public static final String BASE_URL = "http://localhost:8080";
+public class AppConfig {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new JavaTimeModule())            // поддержка Java Time
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final Properties props = new Properties();
+    public static final ObjectMapper objectMapper = createObjectMapper();
 
-    private AppConfig() {}   // utility – нет инстансов
-
-    public static ObjectMapper mapper() {
-        return MAPPER;
+    // Статический блок — один раз загружает конфиг при старте приложения
+    static {
+        try (InputStream in = AppConfig.class.getResourceAsStream("/org/example/economicssimulatorclient/app.properties")) {
+            if (in != null) {
+                props.load(in);
+            } else {
+                throw new RuntimeException("Не найден app.properties в ресурсах");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка загрузки app.properties", e);
+        }
     }
+
+    public static String getBaseUrl() {
+        return props.getProperty("baseUrl", "http://localhost:8080");
+    }
+
+    public static int getRequestTimeout() {
+        return Integer.parseInt(props.getProperty("request.timeout", "10000"));
+    }
+
+    private static ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
+
+    // Можно добавить геттеры для других параметров
 }

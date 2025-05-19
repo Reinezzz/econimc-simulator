@@ -1,7 +1,9 @@
 package com.example.economicssimulatorserver.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record PasswordResetConfirm(
-        String email,
-        String code,
-        String newPassword
+        @NotBlank String email,
+        @NotBlank String code,
+        @NotBlank String newPassword
 ) {}

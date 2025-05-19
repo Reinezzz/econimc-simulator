@@ -18,7 +18,7 @@ public class AuthService {
     private static final String AUTH_PATH = "/auth";
     private static final String AUTH_CANCEL_REGISTRATION = "cancel-registration";
     private static final String AUTH_CANCEL_PASSWORD_RESET = "cancel-password-reset";
-    private final URI baseUri = URI.create(AppConfig.BASE_URL + AUTH_PATH + "/");
+    private final URI baseUri = URI.create(AppConfig.getBaseUrl() + AUTH_PATH + "/");
     private String accessToken;                      // память процесса
 
     /* =================== Регистрация и верификация =================== */
