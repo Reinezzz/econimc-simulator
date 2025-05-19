@@ -25,40 +25,40 @@
     <VBox styleClass="card"
           spacing="20" alignment="CENTER">
         <!-- Заголовок -->
-        <Label text="Вход" styleClass="title"/>
+        <Label text="%auth.title" styleClass="title"/>
 
         <!-- Поле «Имя или Email» -->
         <VBox spacing="8" prefWidth="400">
-            <Label text="Авторизируйтесь" styleClass="form-label" fx:id="statusLabel"/>
+            <Label text="%common.status_field" styleClass="form-label" fx:id="statusLabel"/>
         </VBox>
 
         <!-- Поле «Имя или Email» -->
         <VBox spacing="8" prefWidth="400">
-            <Label text="Имя или Email" styleClass="form-label"/>
-            <TextField promptText="example@mail.ru" styleClass="text-field" fx:id="usernameEmailField"/>
+            <Label text="%auth.label.username_or_email" styleClass="form-label"/>
+            <TextField  styleClass="text-field" fx:id="usernameEmailField"/>
         </VBox>
 
         <!-- Поле «Пароль» + ссылка «Забыли пароль?» -->
         <VBox spacing="8" prefWidth="400">
-            <Label text="Пароль" styleClass="form-label"/>
-            <PasswordField promptText="password" styleClass="text-field" fx:id="passwordField"/>
+            <Label text="%auth.label.password" styleClass="form-label"/>
+            <PasswordField styleClass="text-field" fx:id="passwordField"/>
             <HBox alignment="CENTER_RIGHT">
-                <Hyperlink text="Забыли пароль?" styleClass="link"
+                <Hyperlink text="%auth.link.forgot" styleClass="link"
                            fx:id="forgotLink" onAction="#openReset"/>
             </HBox>
         </VBox>
 
         <!-- Кнопка входа -->
         <Button fx:id="loginButton"
-                text="Войти"
+                text="%auth.button.login"
                 styleClass="primary-button"
                 prefWidth="200" prefHeight="40"
         onAction="#doLogin"/>
 
         <!-- Нижняя строка с регистрацией -->
         <HBox spacing="5" alignment="CENTER">
-            <Label text="Нет аккаунта?" styleClass="footer-text"/>
-            <Hyperlink text="Регистрация" styleClass="link"
+            <Label text="%auth.label.no_account" styleClass="footer-text"/>
+            <Hyperlink text="%auth.link.register" styleClass="link"
                        onAction="#openRegister" fx:id="registerLink"/>
         </HBox>
     </VBox>

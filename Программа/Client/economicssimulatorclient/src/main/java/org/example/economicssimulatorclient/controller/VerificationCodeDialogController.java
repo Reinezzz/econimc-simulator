@@ -3,6 +3,7 @@ package org.example.economicssimulatorclient.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.example.economicssimulatorclient.util.I18n;
 
 public class VerificationCodeDialogController {
 
@@ -25,7 +26,7 @@ public class VerificationCodeDialogController {
                 boolean empty = n.trim().isEmpty();
                 okButton.setDisable(empty);
                 cancelButton.setDisable(empty);
-                errorLabel.setText(empty ? "Код обязателен" : "");
+                errorLabel.setText(empty ? I18n.t("dialog.status_label.code_required") : "");
             });
         });
     }

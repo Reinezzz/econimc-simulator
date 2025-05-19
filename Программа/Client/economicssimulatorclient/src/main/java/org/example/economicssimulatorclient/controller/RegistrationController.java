@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.util.Pair;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.Validator;
 
@@ -35,19 +36,19 @@ public class RegistrationController {
         String p2    = repeatPasswordField.getText();
 
         if (!Validator.isValidEmail(email)) {
-            statusLabel.setText("Некорректный e-mail");
+            statusLabel.setText(I18n.t("msg.invalid_email"));
             return;
         }
         if (!Validator.isStrongPassword(p1)) {
-            statusLabel.setText("Слабый пароль. Используйте минимум 8 символов, цифру, буквы обоих регистров и спецсимвол");
+            statusLabel.setText(I18n.t("msg.weak_password"));
             return;
         }
 
         if (user.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-            statusLabel.setText("Заполните все поля");   return;
+            statusLabel.setText(I18n.t("msg.fill_all_fields"));   return;
         }
         if (!p1.equals(p2)) {
-            statusLabel.setText("Пароли не совпадают");  return;
+            statusLabel.setText(I18n.t("msg.passwords_mismatch"));  return;
         }
 
         registerButton.setDisable(true);
@@ -60,10 +61,10 @@ public class RegistrationController {
             }
 
             Platform.runLater(() -> {                        // диалог — FX-поток
-                statusLabel.setText("Код отправлен на email");
+                statusLabel.setText(I18n.t("msg.code_sent"));
                 String code = showVerificationDialog();      // блокирует до OK/Cancel
                 if (code == null) {
-                    statusLabel.setText("Ввод кода отменён");
+                    statusLabel.setText(I18n.t("reg.status_label.cancel_verification"));
                     registerButton.setDisable(false);
                     return;
                 }
@@ -76,17 +77,17 @@ public class RegistrationController {
                         throw new RuntimeException(e);
                     }
                     Platform.runLater(() -> {
-                        statusLabel.setText("Успешно! Войдите.");
+                        statusLabel.setText(I18n.t("msg.registration_success"));
                         SceneManager.switchTo("authorization.fxml");
                     });
                 }, ex -> Platform.runLater(() -> {
-                    statusLabel.setText("Ошибка: " + ex.getMessage());
+                    statusLabel.setText(I18n.t("error.base") + ex.getMessage());
                     registerButton.setDisable(false);
                 }));
             });
 
         }, ex -> Platform.runLater(() -> {
-            statusLabel.setText("Ошибка: " + ex.getMessage());
+            statusLabel.setText(I18n.t("error.base") + ex.getMessage());
             registerButton.setDisable(false);
         }));
     }
@@ -113,7 +114,7 @@ public class RegistrationController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"));
             Dialog<String> dialog = new Dialog<>();
-            dialog.setTitle("Подтверждение e-mail");
+            dialog.setTitle(I18n.t("dialog.verification_code_title"));
             dialog.setDialogPane(loader.load());
 
             VerificationCodeDialogController ctrl = loader.getController();
@@ -131,7 +132,7 @@ public class RegistrationController {
             return dialog.showAndWait().orElse(null);
 
         } catch (Exception ex) {
-            statusLabel.setText("Не удалось открыть диалог");
+            statusLabel.setText(I18n.t("error.base") + ex.getMessage());
             return null;
         }
     }

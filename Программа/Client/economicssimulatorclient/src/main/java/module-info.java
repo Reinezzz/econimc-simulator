@@ -11,7 +11,8 @@ module org.example.economicssimulatorclient {
     requires java.net.http;
     requires javafx.graphics;
     requires com.fasterxml.jackson.datatype.jsr310;
-    requires com.fasterxml.jackson.databind;      // если не было
+    requires com.fasterxml.jackson.databind;
+    requires static lombok;      // если не было
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml;
     opens org.example.economicssimulatorclient.config to javafx.fxml;

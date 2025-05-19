@@ -15,7 +15,7 @@ public class AppConfig {
 
     // Статический блок — один раз загружает конфиг при старте приложения
     static {
-        try (InputStream in = AppConfig.class.getResourceAsStream("/org/example/economicssimulatorclient/app.properties")) {
+        try (InputStream in = AppConfig.class.getResourceAsStream("/app.properties")) {
             if (in != null) {
                 props.load(in);
             } else {

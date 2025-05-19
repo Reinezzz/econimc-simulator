@@ -8,15 +8,15 @@
 
     <content>
         <VBox spacing="12" alignment="CENTER">
-            <Label text="Введите шестизначный код из письма"/>
-            <TextField fx:id="codeField" promptText="XXXXXX" prefWidth="180"/>
+            <Label text="%dialog.verification_code"/>
+            <TextField fx:id="codeField" promptText="%prompt.code" prefWidth="180"/>
             <Label fx:id="errorLabel" textFill="#d32f2f"/>
         </VBox>
     </content>
 
     <buttonTypes>
         <!-- Оставляем собственный ButtonType и даём ему fx:id -->
-        <ButtonType fx:id="okBtn" text="Подтвердить" buttonData="OK_DONE"/>
-        <ButtonType fx:id="cancelBtn" text="Отмена"    buttonData="CANCEL_CLOSE"/>
+        <ButtonType fx:id="okBtn" text="%common.ok" buttonData="OK_DONE"/>
+        <ButtonType fx:id="cancelBtn" text="%common.cancel"    buttonData="CANCEL_CLOSE"/>
     </buttonTypes>
 </DialogPane>

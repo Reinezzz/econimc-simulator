@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import org.example.economicssimulatorclient.dto.PasswordResetConfirm;
 import org.example.economicssimulatorclient.dto.PasswordResetRequest;
 import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.util.Pair;
 
@@ -23,7 +24,7 @@ public class PasswordChangeController {
         statusLabel.setText("");
         String email = emailField.getText().trim();
         if (email.isEmpty()) {
-            statusLabel.setText("Введите e-mail");
+            statusLabel.setText(I18n.t("pass.status_label.enter_email"));
             return;
         }
 
@@ -33,11 +34,11 @@ public class PasswordChangeController {
             try {
                 auth.resetPasswordRequest(new PasswordResetRequest(email));
                 Platform.runLater(() -> {
-                    statusLabel.setText("Код отправлен");
+                    statusLabel.setText(I18n.t("msg.code_sent"));
                     openDialog(email); // Сразу открываем окно
                 });
             } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> sendCodeButton.setDisable(false));
             }
@@ -53,12 +54,12 @@ public class PasswordChangeController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"));
             Dialog<Pair<String, String>> dialog = new Dialog<>();
-            dialog.setTitle("Смена пароля");
+            dialog.setTitle(I18n.t("dialog.password_reset_title"));
             DialogPane pane = loader.load();
             dialog.setDialogPane(pane);
 
             PasswordResetDialogController ctrl = loader.getController();
-            ctrl.setupValidation(); // <--- только теперь!
+            ctrl.setupValidation();
 
             // Обработка подтверждения
             dialog.setResultConverter(btn -> {
@@ -84,7 +85,7 @@ public class PasswordChangeController {
             }
 
         } catch (Exception e) {
-            statusLabel.setText("Ошибка диалога" + e.getMessage());
+            statusLabel.setText(I18n.t("error.base") + e.getMessage());
         }
     }
 
@@ -98,12 +99,12 @@ public class PasswordChangeController {
             try {
                 auth.resetPasswordConfirm(new PasswordResetConfirm(email, code, password));
                 Platform.runLater(() -> {
-                    statusLabel.setText("Пароль изменен — войдите заново");
+                    statusLabel.setText(I18n.t("msg.password_changed"));
                     SceneManager.switchTo("authorization.fxml");
                 });
             } catch (Exception ex) {
                 new Thread(() -> auth.cancelPasswordReset(email)).start();
-                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
             }
         }).start();
     }

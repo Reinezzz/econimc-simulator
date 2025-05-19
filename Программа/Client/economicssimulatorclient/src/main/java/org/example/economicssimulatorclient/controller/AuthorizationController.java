@@ -2,6 +2,7 @@ package org.example.economicssimulatorclient.controller;
 
 import org.example.economicssimulatorclient.dto.LoginRequest;
 import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -26,7 +27,7 @@ public class AuthorizationController {
         String pass  = passwordField.getText();
 
         if (login.isEmpty() || pass.isEmpty()) {
-            statusLabel.setText("Введите логин и пароль");
+            statusLabel.setText(I18n.t("common.status_field"));
             return;
         }
 
@@ -35,14 +36,14 @@ public class AuthorizationController {
             try {
                 auth.login(new LoginRequest(login, pass));
                 Platform.runLater(() -> {
-                    statusLabel.setText("Успешный вход");
+                    statusLabel.setText(I18n.t("auth.status_label.successful"));
                     SceneManager.switchTo("main.fxml");   // переход дальше
                 });
             } catch (IllegalArgumentException ex) {
-                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
                 Platform.runLater(() -> {passwordField.setText("");});
             } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText("Ошибка: " + ex.getMessage()));
+                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> loginButton.setDisable(false));
             }
