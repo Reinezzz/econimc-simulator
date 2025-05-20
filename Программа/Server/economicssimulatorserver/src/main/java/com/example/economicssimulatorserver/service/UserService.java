@@ -2,6 +2,7 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.repository.UserRepository;
+import com.example.economicssimulatorserver.util.LocalizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -47,7 +48,7 @@ public class UserService implements UserDetailsService {
             throws UsernameNotFoundException {
 
         User user = findByUsernameOrEmail(usernameOrEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new LocalizedException("error.user_not_found"));
 
         /* Конструируем Spring‑овский UserDetails без ролей */
         return org.springframework.security.core.userdetails.User

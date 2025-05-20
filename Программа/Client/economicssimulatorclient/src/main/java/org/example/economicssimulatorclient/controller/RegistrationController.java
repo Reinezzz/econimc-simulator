@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.util.Pair;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.I18n;
@@ -12,7 +11,6 @@ import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.Validator;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class RegistrationController extends BaseController {
@@ -30,7 +28,7 @@ public class RegistrationController extends BaseController {
     @FXML
     private Label statusLabel;
 
-    private final AuthService auth = new AuthService();
+    private final AuthService auth = BaseController.get(AuthService.class);
 
     /* ---------------- регистрация ---------------- */
     @FXML
@@ -91,30 +89,17 @@ public class RegistrationController extends BaseController {
                         SceneManager.switchTo("authorization.fxml");
                     });
                 }, ex -> Platform.runLater(() -> {
-                    showError(statusLabel, tr("error.base" + ex.getMessage()));
+                    showError(statusLabel, tr("error.base") + ex.getMessage());
                     registerButton.setDisable(false);
                 }));
             });
 
         }, ex -> Platform.runLater(() -> {
-            showError(statusLabel, tr("error.base" + ex.getMessage()));
+            showError(statusLabel, tr("error.base") + ex.getMessage());
             registerButton.setDisable(false);
         }));
     }
 
-    /* ==== маленькая утилита ==== */
-    /* ---------- helper ---------- */
-    private void runAsync(Runnable task, java.util.function.Consumer<Throwable> onErr) {
-        Thread t = new Thread(() -> {
-            try {
-                task.run();
-            } catch (Throwable ex) {
-                if (onErr != null) onErr.accept(ex);
-            }
-        }, "fx-bg");
-        t.setDaemon(true);
-        t.start();
-    }
 
 
     /* ---------------- откр. логин ---------------- */
@@ -130,7 +115,7 @@ public class RegistrationController extends BaseController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"), bundle);
             Dialog<String> dialog = new Dialog<>();
-            dialog.setTitle(I18n.t("dialog.verification_code_title"));
+            dialog.setTitle(tr("dialog.verification_code_title"));
             dialog.setDialogPane(loader.load());
 
             VerificationCodeDialogController ctrl = loader.getController();
@@ -148,7 +133,7 @@ public class RegistrationController extends BaseController {
             return dialog.showAndWait().orElse(null);
 
         } catch (Exception ex) {
-            statusLabel.setText(I18n.t("error.base") + ex.getMessage());
+            showError(statusLabel, tr("error.base") + ex.getMessage());
             return null;
         }
     }

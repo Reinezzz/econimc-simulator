@@ -58,14 +58,14 @@ public class AuthController {
         if (cache != null && email != null) {
             cache.evict(email);
         }
-        return new ApiResponse(true, "Registration cancelled");
+        return new ApiResponse(true, "msg.registration_canceled");
     }
 
     @PostMapping("/cancel-password-reset")
     public ApiResponse cancelPasswordReset(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         authService.cancelPasswordReset(email);
-        return new ApiResponse(true, "Password reset cancelled");
+        return new ApiResponse(true, "msg.password_reset_canceled");
     }
 
 

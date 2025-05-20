@@ -11,20 +11,22 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.util.Pair;
 
-public class PasswordChangeController {
+import java.util.ResourceBundle;
+
+public class PasswordChangeController extends BaseController {
 
     @FXML private TextField emailField;
     @FXML private Button sendCodeButton;
     @FXML private Label statusLabel;
 
-    private final AuthService auth = new AuthService();
+    private final AuthService auth = BaseController.get(AuthService.class);
 
     @FXML
     private void sendCode() {
         statusLabel.setText("");
         String email = emailField.getText().trim();
         if (email.isEmpty()) {
-            statusLabel.setText(I18n.t("pass.status_label.enter_email"));
+            showError(statusLabel, "pass.status_label.enter_email");
             return;
         }
 
@@ -34,11 +36,11 @@ public class PasswordChangeController {
             try {
                 auth.resetPasswordRequest(new PasswordResetRequest(email));
                 Platform.runLater(() -> {
-                    statusLabel.setText(I18n.t("msg.code_sent"));
+                    showError(statusLabel, "msg.code_sent");
                     openDialog(email); // Сразу открываем окно
                 });
             } catch (Exception ex) {
-                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, tr("error.base") + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> sendCodeButton.setDisable(false));
             }
@@ -51,10 +53,11 @@ public class PasswordChangeController {
         boolean[] confirmed = {false};
 
         try {
+            ResourceBundle bundle = I18n.bundle;
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"));
+                    getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"), bundle);
             Dialog<Pair<String, String>> dialog = new Dialog<>();
-            dialog.setTitle(I18n.t("dialog.password_reset_title"));
+            dialog.setTitle(tr("dialog.password_reset_title"));
             DialogPane pane = loader.load();
             dialog.setDialogPane(pane);
 
@@ -84,8 +87,8 @@ public class PasswordChangeController {
                 // После отмены ничего не делаем (или можно вернуть на экран авторизации)
             }
 
-        } catch (Exception e) {
-            statusLabel.setText(I18n.t("error.base") + e.getMessage());
+        } catch (Exception ex) {
+            showError(statusLabel, tr("error.base") + ex.getMessage());
         }
     }
 
@@ -99,12 +102,12 @@ public class PasswordChangeController {
             try {
                 auth.resetPasswordConfirm(new PasswordResetConfirm(email, code, password));
                 Platform.runLater(() -> {
-                    statusLabel.setText(I18n.t("msg.password_changed"));
+                    showSuccess(statusLabel, "msg.password_changed");
                     SceneManager.switchTo("authorization.fxml");
                 });
             } catch (Exception ex) {
                 new Thread(() -> auth.cancelPasswordReset(email)).start();
-                Platform.runLater(() -> statusLabel.setText(I18n.t("error.base") + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, tr("error.base") + ex.getMessage()));
             }
         }).start();
     }

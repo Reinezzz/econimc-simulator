@@ -4,7 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.example.economicssimulatorclient.util.I18n;
 
-public class PasswordResetDialogController {
+public class PasswordResetDialogController extends BaseController {
 
     @FXML private DialogPane dialogPane;
     @FXML private TextField codeField;
@@ -34,7 +34,7 @@ public class PasswordResetDialogController {
                 errorLabel.setText("");
                 okButton.setDisable(true);
             } else if (mismatch) {
-                errorLabel.setText(I18n.t("msg.passwords_mismatch"));
+                showError(errorLabel, "msg.passwords_mismatch");
                 okButton.setDisable(true);
             } else {
                 errorLabel.setText("");

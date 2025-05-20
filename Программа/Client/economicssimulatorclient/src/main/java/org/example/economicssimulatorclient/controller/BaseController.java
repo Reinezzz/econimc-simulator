@@ -30,4 +30,38 @@ public abstract class BaseController {
         label.setText(!text.startsWith("!") ? text : msgOrKey);
         label.setStyle("-fx-text-fill: #27ae60;");
     }
+
+    protected void runAsync(Runnable task, java.util.function.Consumer<Throwable> onError) {
+        Thread t = new Thread(() -> {
+            try {
+                task.run();
+            } catch (Throwable ex) {
+                if (onError != null) onError.accept(ex);
+            }
+        }, "fx-bg");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    // ====== DI механика (по-простому, без внешних либ) ======
+
+    private static final java.util.Map<Class<?>, Object> SINGLETONS = new java.util.HashMap<>();
+
+    /**
+     * Зарегистрировать singleton сервис
+     */
+    public static <T> void provide(Class<T> type, T instance) {
+        SINGLETONS.put(type, instance);
+    }
+
+    /**
+     * Получить singleton сервис
+     */
+    public static <T> T get(Class<T> type) {
+        Object inst = SINGLETONS.get(type);
+        if (inst == null)
+            throw new IllegalStateException("No singleton provided for " + type);
+        return type.cast(inst);
+    }
+
 }

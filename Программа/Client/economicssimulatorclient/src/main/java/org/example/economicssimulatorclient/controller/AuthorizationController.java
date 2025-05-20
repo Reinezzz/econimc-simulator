@@ -20,7 +20,8 @@ public class AuthorizationController extends BaseController {
     @FXML
     private Label statusLabel;
 
-    private final AuthService auth = new AuthService();
+    private final AuthService auth = BaseController.get(AuthService.class);
+
 
     @FXML
     private void doLogin() {

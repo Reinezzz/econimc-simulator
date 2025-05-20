@@ -2,7 +2,6 @@ package org.example.economicssimulatorclient.service;
 
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.example.economicssimulatorclient.dto.*;
-import org.example.economicssimulatorclient.util.HttpClientProvider;
 import org.example.economicssimulatorclient.util.JsonUtil;
 
 import java.io.IOException;
@@ -13,39 +12,37 @@ import java.net.http.HttpResponse;
 /**
  * Выполняет HTTP‑запросы к /auth/* и хранит access‑token в памяти.
  */
-public class AuthService {
+public class AuthService extends BaseService {
 
     private static final String AUTH_PATH = "/auth";
     private static final String AUTH_CANCEL_REGISTRATION = "cancel-registration";
     private static final String AUTH_CANCEL_PASSWORD_RESET = "cancel-password-reset";
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + AUTH_PATH + "/");
-    private String accessToken;                      // память процесса
+    private String accessToken;
 
     /* =================== Регистрация и верификация =================== */
 
     public ApiResponse register(RegistrationRequest req) throws IOException, InterruptedException {
         try {
-            return post("register", req, ApiResponse.class, false);
+            return post(baseUri, "register", req, ApiResponse.class, false, null);
         } catch (Exception e) {
             throw new IllegalArgumentException(extractErrorMessage(e));
         }
-
     }
 
     public ApiResponse verifyEmail(VerificationRequest req) throws IOException, InterruptedException {
-        try{
-            return post("verify-email", req, ApiResponse.class, false);
+        try {
+            return post(baseUri, "verify-email", req, ApiResponse.class, false, null);
         } catch (Exception e) {
             throw new IllegalArgumentException(extractErrorMessage(e));
         }
-
     }
 
     /* =================== Авторизация =================== */
 
     public LoginResponse login(LoginRequest req) throws IOException, InterruptedException {
         try {
-            var resp = post("login", req, LoginResponse.class, false);
+            var resp = post(baseUri, "login", req, LoginResponse.class, false, null);
             this.accessToken = resp.accessToken();
             return resp;
         } catch (Exception ex) {
@@ -56,21 +53,19 @@ public class AuthService {
     /* =================== Сброс пароля =================== */
 
     public ApiResponse resetPasswordRequest(PasswordResetRequest req) throws IOException, InterruptedException {
-        try{
-            return post("password-reset", req, ApiResponse.class, false);
+        try {
+            return post(baseUri, "password-reset", req, ApiResponse.class, false, null);
         } catch (Exception e) {
             throw new IllegalArgumentException(extractErrorMessage(e));
         }
-
     }
 
     public ApiResponse resetPasswordConfirm(PasswordResetConfirm req) throws IOException, InterruptedException {
         try {
-            return post("password-reset/confirm", req, ApiResponse.class, false);
+            return post(baseUri, "password-reset/confirm", req, ApiResponse.class, false, null);
         } catch (Exception e) {
             throw new IllegalArgumentException(extractErrorMessage(e));
         }
-
     }
 
     /* =================== Вспомогательные =================== */
@@ -83,40 +78,24 @@ public class AuthService {
         return "Bearer " + accessToken;
     }
 
-    private <T> T post(String endpoint, Object body, Class<T> respType, boolean auth) throws IOException, InterruptedException {
-
-        HttpRequest.Builder builder = HttpRequest.newBuilder(baseUri.resolve(endpoint))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
-
-        if (auth) builder.header("Authorization", bearerHeader());
-
-        HttpResponse<String> resp = HttpClientProvider.instance()
-                .send(builder.build(), HttpResponse.BodyHandlers.ofString());
-
-        if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
-            return JsonUtil.fromJson(resp.body(), respType);
-        }
-        // Можно парсить ошибку в ApiResponse, но пока бросим:
-        throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
-    }
-
     public void cancelRegistration(String email) {
+        // POST /auth/cancel-registration с email в теле
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUri + AUTH_CANCEL_REGISTRATION))
+                .uri(baseUri.resolve(AUTH_CANCEL_REGISTRATION))
                 .POST(HttpRequest.BodyPublishers.ofString("{\"email\":\"" + email + "\"}"))
                 .header("Content-Type", "application/json")
                 .build();
-        HttpClientProvider.instance().sendAsync(req, HttpResponse.BodyHandlers.discarding());
+        httpClient.sendAsync(req, HttpResponse.BodyHandlers.discarding());
     }
 
     public void cancelPasswordReset(String email) {
+        // POST /auth/cancel-password-reset с email в теле
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUri + AUTH_CANCEL_PASSWORD_RESET))
+                .uri(baseUri.resolve(AUTH_CANCEL_PASSWORD_RESET))
                 .POST(HttpRequest.BodyPublishers.ofString("{\"email\":\"" + email + "\"}"))
                 .header("Content-Type", "application/json")
                 .build();
-        HttpClientProvider.instance().sendAsync(req, HttpResponse.BodyHandlers.discarding());
+        httpClient.sendAsync(req, HttpResponse.BodyHandlers.discarding());
     }
 
     private String extractErrorMessage(Exception ex) {
@@ -129,11 +108,10 @@ public class AuthService {
                 if (resp != null && resp.message() != null) {
                     return resp.message();
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
         // Вернуть исходное сообщение, если не получилось парсить JSON
         return msg;
     }
-
-
 }
