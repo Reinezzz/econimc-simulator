@@ -161,7 +161,7 @@ public class AuthService extends BaseService {
      * @param ex исключение, выброшенное при запросе
      * @return текст ошибки для пользователя
      */
-    private String extractErrorMessage(Exception ex) {
+    String extractErrorMessage(Exception ex) {
         String msg = ex.getMessage();
         if (msg != null && msg.contains("{") && msg.contains("message")) {
             try {

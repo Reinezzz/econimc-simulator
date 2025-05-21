@@ -9,12 +9,18 @@ import javafx.scene.control.*;
  */
 public class PasswordResetDialogController extends BaseController {
 
-    @FXML private DialogPane dialogPane;
-    @FXML private TextField codeField;
-    @FXML private PasswordField passField;
-    @FXML private PasswordField repeatField;
-    @FXML private Label errorLabel;
-    @FXML private ButtonType okBtn;
+    @FXML
+    DialogPane dialogPane;
+    @FXML
+    TextField codeField;
+    @FXML
+    PasswordField passField;
+    @FXML
+    PasswordField repeatField;
+    @FXML
+    Label errorLabel;
+    @FXML
+    ButtonType okBtn;
 
     /**
      * Инициализация JavaFX (по умолчанию ничего не делает).

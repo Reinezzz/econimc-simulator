@@ -10,11 +10,16 @@ import org.example.economicssimulatorclient.util.I18n;
  */
 public class VerificationCodeDialogController extends BaseController {
 
-    @FXML private DialogPane dialogPane;
-    @FXML private TextField codeField;
-    @FXML private Label errorLabel;
-    @FXML private ButtonType okBtn;
-    @FXML private ButtonType cancelBtn;
+    @FXML
+    DialogPane dialogPane;
+    @FXML
+    TextField codeField;
+    @FXML
+    Label errorLabel;
+    @FXML
+    ButtonType okBtn;
+    @FXML
+    ButtonType cancelBtn;
 
     /**
      * Инициализация диалога — настройка поведения кнопок.

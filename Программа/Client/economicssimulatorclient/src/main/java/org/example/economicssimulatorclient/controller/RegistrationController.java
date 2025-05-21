@@ -19,12 +19,18 @@ import java.util.ResourceBundle;
  */
 public class RegistrationController extends BaseController {
 
-    @FXML private TextField usernameField;
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private PasswordField repeatPasswordField;
-    @FXML private Button registerButton;
-    @FXML private Label statusLabel;
+    @FXML
+    TextField usernameField;
+    @FXML
+    TextField emailField;
+    @FXML
+    PasswordField passwordField;
+    @FXML
+    PasswordField repeatPasswordField;
+    @FXML
+    Button registerButton;
+    @FXML
+    Label statusLabel;
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
@@ -33,7 +39,7 @@ public class RegistrationController extends BaseController {
      * отправку кода и подтверждение email.
      */
     @FXML
-    private void doRegister() {
+    void doRegister() {
         statusLabel.setText("");
 
         String user = usernameField.getText().trim();
@@ -109,7 +115,7 @@ public class RegistrationController extends BaseController {
      * Открывает диалог подтверждения email-кода при регистрации.
      * @return введенный пользователем код, либо null при отмене
      */
-    private String showVerificationDialog() {
+    String showVerificationDialog() {
         try {
             ResourceBundle bundle = I18n.bundle;
             FXMLLoader loader = new FXMLLoader(

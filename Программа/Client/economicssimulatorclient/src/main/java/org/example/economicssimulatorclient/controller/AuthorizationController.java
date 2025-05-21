@@ -14,15 +14,15 @@ import javafx.scene.control.*;
 public class AuthorizationController extends BaseController {
 
     @FXML
-    private Hyperlink forgotLink;
+    Hyperlink forgotLink;
     @FXML
-    private TextField usernameEmailField;
+    TextField usernameEmailField;
     @FXML
-    private PasswordField passwordField;
+    PasswordField passwordField;
     @FXML
-    private Button loginButton;
+    Button loginButton;
     @FXML
-    private Label statusLabel;
+    Label statusLabel;
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
@@ -31,7 +31,7 @@ public class AuthorizationController extends BaseController {
      * Выполняет валидацию, асинхронный вызов сервиса и отображение результата.
      */
     @FXML
-    private void doLogin() {
+    void doLogin() {
         showError(statusLabel, ""); // очистка статуса
         String login = usernameEmailField.getText().trim();
         String pass = passwordField.getText();

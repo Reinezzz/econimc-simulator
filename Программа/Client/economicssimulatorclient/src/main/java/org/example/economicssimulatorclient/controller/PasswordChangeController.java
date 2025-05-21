@@ -19,9 +19,12 @@ import java.util.ResourceBundle;
  */
 public class PasswordChangeController extends BaseController {
 
-    @FXML private TextField emailField;
-    @FXML private Button sendCodeButton;
-    @FXML private Label statusLabel;
+    @FXML
+    TextField emailField;
+    @FXML
+    Button sendCodeButton;
+    @FXML
+    Label statusLabel;
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
@@ -30,7 +33,7 @@ public class PasswordChangeController extends BaseController {
      * Вызывает открытие диалога для подтверждения кода.
      */
     @FXML
-    private void sendCode() {
+    void sendCode() {
         statusLabel.setText("");
         String email = emailField.getText().trim();
         if (email.isEmpty()) {
@@ -59,7 +62,7 @@ public class PasswordChangeController extends BaseController {
      * Открывает диалог подтверждения сброса пароля (код + новый пароль).
      * @param email email пользователя
      */
-    private void openDialog(String email) {
+    void openDialog(String email) {
         try {
             ResourceBundle bundle = I18n.bundle;
             FXMLLoader loader = new FXMLLoader(
@@ -112,7 +115,7 @@ public class PasswordChangeController extends BaseController {
      * @param code  одноразовый код из письма
      * @param password новый пароль
      */
-    private void confirmReset(String email, String code, String password) {
+    void confirmReset(String email, String code, String password) {
         statusLabel.setText("");
         new Thread(() -> {
             try {
