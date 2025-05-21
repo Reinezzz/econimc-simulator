@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * Сервис для отправки email-писем с кодами подтверждения и сброса пароля.
+ */
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -18,8 +21,12 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final TemplateUtil templateUtil;
 
-    /* ---------- публичный API ---------- */
-
+    /**
+     * Отправляет письмо с кодом подтверждения email.
+     * @param to email получателя
+     * @param username имя пользователя
+     * @param code одноразовый код подтверждения
+     */
     public void sendVerificationEmail(String to, String username, String code) {
         String html = templateUtil.render(
                 "verification_email.html",
@@ -27,6 +34,12 @@ public class MailService {
         sendHtml(to, "Email verification", html);
     }
 
+    /**
+     * Отправляет письмо с кодом для сброса пароля.
+     * @param to email получателя
+     * @param username имя пользователя
+     * @param code одноразовый код сброса пароля
+     */
     public void sendPasswordResetEmail(String to, String username, String code) {
         String html = templateUtil.render(
                 "reset_password_email.html",
@@ -34,8 +47,13 @@ public class MailService {
         sendHtml(to, "Password reset code", html);
     }
 
-    /* ---------- внутренний SMTP ---------- */
-
+    /**
+     * Отправляет HTML-письмо через SMTP.
+     * @param to email получателя
+     * @param subject тема письма
+     * @param html содержимое письма в формате HTML
+     * @throws IllegalStateException если не удалось отправить письмо
+     */
     private void sendHtml(String to, String subject, String html) {
         try {
             MimeMessage mime = mailSender.createMimeMessage();

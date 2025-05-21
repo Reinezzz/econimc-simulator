@@ -7,6 +7,10 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+/**
+ * Контроллер экрана авторизации пользователя.
+ * Отвечает за обработку логина, переход к регистрации и сбросу пароля.
+ */
 public class AuthorizationController extends BaseController {
 
     @FXML
@@ -22,7 +26,10 @@ public class AuthorizationController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
-
+    /**
+     * Обрабатывает попытку входа пользователя по нажатию кнопки.
+     * Выполняет валидацию, асинхронный вызов сервиса и отображение результата.
+     */
     @FXML
     private void doLogin() {
         showError(statusLabel, ""); // очистка статуса
@@ -40,11 +47,11 @@ public class AuthorizationController extends BaseController {
                 auth.login(new LoginRequest(login, pass));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "auth.status_label.successful");
-//                    SceneManager.switchTo("main.fxml");
+                    // SceneManager.switchTo("main.fxml");
                 });
             } catch (IllegalArgumentException ex) {
                 Platform.runLater(() -> {
-                    showError(statusLabel, tr("error.base") + ex.getMessage()); // общий текст ошибки
+                    showError(statusLabel, tr("error.base") + ex.getMessage());
                     passwordField.setText("");
                 });
             } catch (Exception ex) {
@@ -55,11 +62,17 @@ public class AuthorizationController extends BaseController {
         }).start();
     }
 
+    /**
+     * Переход на экран регистрации.
+     */
     @FXML
     private void openRegister() {
         SceneManager.switchTo("registration.fxml");
     }
 
+    /**
+     * Переход на экран сброса пароля.
+     */
     @FXML
     private void openReset() {
         SceneManager.switchTo("password_change.fxml");

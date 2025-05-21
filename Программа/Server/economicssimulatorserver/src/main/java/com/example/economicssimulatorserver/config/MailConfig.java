@@ -11,8 +11,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 /**
- * Конфигурация SMTP‑отправки почты.
- * Настройки берутся из стандартного spring.mail.* в application.yml.
+ * Конфигурация отправки электронной почты по протоколу SMTP.
+ * <p>
+ * Настройки SMTP-сервера берутся из стандартных параметров {@code spring.mail.*} в файле конфигурации приложения.
+ * </p>
  */
 @Configuration
 @EnableConfigurationProperties(MailProperties.class)
@@ -21,6 +23,11 @@ public class MailConfig {
 
     private final MailProperties mailProperties;
 
+    /**
+     * Создает и настраивает бин {@link JavaMailSender} для отправки писем.
+     *
+     * @return настроенный экземпляр {@link JavaMailSender}
+     */
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();

@@ -2,7 +2,7 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.repository.UserRepository;
-import com.example.economicssimulatorserver.util.LocalizedException;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Optional;
 
+/**
+ * Сервис для работы с пользователями и интеграции с Spring Security.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -21,8 +24,14 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
 
-    /* ---------- CRUD‑утилиты ---------- */
-
+    /**
+     * Регистрирует нового пользователя и сохраняет его в БД.
+     * Email считается подтвержденным.
+     * @param username имя пользователя
+     * @param email email пользователя
+     * @param passwordHash хеш пароля пользователя
+     * @return созданный пользователь
+     */
     @Transactional
     public User register(String username, String email, String passwordHash) {
         User user = new User();
@@ -33,16 +42,31 @@ public class UserService implements UserDetailsService {
         return userRepo.save(user);
     }
 
+    /**
+     * Ищет пользователя по email.
+     * @param email email пользователя
+     * @return Optional с найденным пользователем или пустой, если не найден
+     */
     public Optional<User> findByEmail(String email) {
         return userRepo.findByEmail(email);
     }
 
+    /**
+     * Ищет пользователя по логину или email.
+     * @param login логин или email
+     * @return Optional с найденным пользователем или пустой, если не найден
+     */
     public Optional<User> findByUsernameOrEmail(String login) {
         return userRepo.findByUsernameOrEmail(login, login);
     }
 
-    /* ---------- UserDetailsService для Spring Security ---------- */
-
+    /**
+     * Загружает пользователя для Spring Security (по логину/email).
+     * Бросает исключение, если пользователь не найден.
+     * @param usernameOrEmail логин или email
+     * @return UserDetails пользователя без ролей
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail)
             throws UsernameNotFoundException {
@@ -50,19 +74,22 @@ public class UserService implements UserDetailsService {
         User user = findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(() -> new LocalizedException("error.user_not_found"));
 
-        /* Конструируем Spring‑овский UserDetails без ролей */
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPasswordHash())
-                .disabled(!user.isEnabled())            // если e‑mail не подтверждён
-                .authorities(Collections.emptyList())   // ролей нет
+                .disabled(!user.isEnabled())
+                .authorities(Collections.emptyList())
                 .build();
     }
 
+    /**
+     * Обновляет пароль пользователя, хеширует новый пароль.
+     * @param user пользователь
+     * @param rawPassword новый пароль в открытом виде
+     */
     @Transactional
     public void updatePassword(User user, String rawPassword) {
         user.setPasswordHash(encoder.encode(rawPassword));
         userRepo.save(user);
     }
-
 }

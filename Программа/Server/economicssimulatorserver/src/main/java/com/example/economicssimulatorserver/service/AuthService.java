@@ -4,7 +4,7 @@ import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.util.JwtUtil;
-import com.example.economicssimulatorserver.util.LocalizedException;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+/**
+ * Сервис для обработки регистрации, верификации email, аутентификации и сброса пароля.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -32,10 +35,13 @@ public class AuthService {
 
     private static final String REG_CACHE = "registrations";
 
-    /* ---------- Регистрация через Redis Cache ---------- */
+    /**
+     * Регистрирует нового пользователя, отправляет код подтверждения на email и сохраняет временные данные в кэше.
+     * @param req DTO с параметрами регистрации
+     * @return ApiResponse с результатом и сообщением
+     */
     @Transactional
     public ApiResponse register(RegistrationRequest req) {
-        // Проверить уникальность e-mail и username в users и кэше
         if (userRepo.existsByEmail(req.email()))
             throw new LocalizedException("error.email_taken");
         if (userRepo.existsByUsername(req.username()))
@@ -64,7 +70,11 @@ public class AuthService {
         return new ApiResponse(true, "msg.verification_code_sent");
     }
 
-    /* ---------- Подтверждение email ---------- */
+    /**
+     * Подтверждает регистрацию пользователя по коду из письма. Создает пользователя в системе.
+     * @param req DTO с email и кодом
+     * @return ApiResponse с результатом и сообщением
+     */
     @Transactional
     public ApiResponse verifyEmail(VerificationRequest req) {
         var cache = cacheManager.getCache(REG_CACHE);
@@ -75,18 +85,14 @@ public class AuthService {
 
         if (pending.expiresAt.isBefore(Instant.now())) {
             cache.evict(req.email());
-            pending = null;
             throw new LocalizedException("error.verification_code_expired");
-            //TODO: Обработка ошибок и отправка их на клиент
         }
 
         if (!pending.code.equals(req.code())) {
             cache.evict(req.email());
-            pending = null;
             throw new LocalizedException("error.wrong_verification_code");
         }
 
-        // Используем только единственный способ создания пользователя
         userService.register(
                 pending.username,
                 pending.email,
@@ -97,7 +103,11 @@ public class AuthService {
         return new ApiResponse(true, "msg.email_confirmed");
     }
 
-    /* ---------- Авторизация ---------- */
+    /**
+     * Аутентифицирует пользователя по логину/email и паролю.
+     * @param req DTO с учетными данными пользователя
+     * @return LoginResponse с access-токеном и типом токена
+     */
     public LoginResponse login(LoginRequest req) {
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
@@ -111,7 +121,11 @@ public class AuthService {
         }
     }
 
-    /* ---------- Сброс пароля ---------- */
+    /**
+     * Инициирует процедуру сброса пароля: создает токен и отправляет код на email пользователя.
+     * @param req DTO с email пользователя
+     * @return ApiResponse с результатом и сообщением
+     */
     @Transactional
     public ApiResponse initiatePasswordReset(PasswordResetRequest req) {
         User user = userService.findByEmail(req.email())
@@ -127,6 +141,11 @@ public class AuthService {
         return new ApiResponse(true, "msg.password_rest_code_sent");
     }
 
+    /**
+     * Подтверждает сброс пароля по email, коду и новому паролю.
+     * @param req DTO с email, кодом и новым паролем
+     * @return ApiResponse с результатом и сообщением
+     */
     @Transactional
     public ApiResponse confirmPasswordReset(PasswordResetConfirm req) {
         User user = userService.findByEmail(req.email())
@@ -136,18 +155,19 @@ public class AuthService {
             throw new LocalizedException("error.wrong_password_reset_code");
         }
 
-
         userService.updatePassword(user, req.newPassword());
         tokenService.evictPasswordResetToken(user);
 
         return new ApiResponse(true, "msg.password_updated");
     }
 
-
+    /**
+     * Отменяет активную сессию сброса пароля для указанного пользователя.
+     * @param email email пользователя
+     */
     public void cancelPasswordReset(String email) {
-        User user = userService.findByEmail(email).orElseThrow(() -> new LocalizedException("error.email_not_found"));
-        tokenService.evictPasswordResetToken(user); // см. ниже!
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new LocalizedException("error.email_not_found"));
+        tokenService.evictPasswordResetToken(user);
     }
-
-
 }

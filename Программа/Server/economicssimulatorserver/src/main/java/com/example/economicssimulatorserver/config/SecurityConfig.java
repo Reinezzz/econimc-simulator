@@ -27,7 +27,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Конфигурация Spring Security: stateless, JWT‑аутентификация.
+ * Основная конфигурация безопасности Spring Security для приложения:
+ * <ul>
+ *     <li>Stateless-сессии (без хранения сессий на сервере)</li>
+ *     <li>JWT-аутентификация</li>
+ *     <li>Разрешение анонимного доступа только к эндпоинтам /auth/**</li>
+ * </ul>
  */
 @Configuration
 @EnableWebSecurity
@@ -39,22 +44,35 @@ public class SecurityConfig {
     private final JwtConfig jwtConfig;
     private final UserDetailsService userDetailsService;
 
-    /* ---------- Beans ---------- */
-
-
-    /** AuthenticationManager берём из стандартного конфигуратора */
+    /**
+     * Получает стандартный {@link AuthenticationManager} из конфигурации Spring Security.
+     *
+     * @param configuration текущая конфигурация аутентификации
+     * @return бин {@link AuthenticationManager}
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    /** Главная security‑цепочка */
+    /**
+     * Основная цепочка фильтров безопасности приложения.
+     * <p>
+     * - Отключает CSRF<br>
+     * - Разрешает CORS по умолчанию<br>
+     * - Делает приложение stateless (без серверных сессий)<br>
+     * - Разрешает только эндпоинты /auth/** без аутентификации<br>
+     * - Вставляет фильтр JWT-аутентификации перед UsernamePasswordAuthenticationFilter
+     *
+     * @param http конфигуратор безопасности
+     * @return настроенная цепочка {@link SecurityFilterChain}
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})                    // default CORS настройка
+                .cors(cors -> {}) // дефолтные CORS-настройки
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -67,11 +85,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /* ---------- Внутренний JWT‑фильтр ---------- */
-
     /**
-     * One‑shot фильтр: достаёт токен из заголовка, валидирует, помещает
-     * Authentication в SecurityContext.
+     * JWT-фильтр (stateless): извлекает токен из заголовка, валидирует,
+     * и при успешной валидации помещает {@link org.springframework.security.core.Authentication}
+     * в {@link SecurityContextHolder}.
      */
     private static class JwtAuthenticationFilter extends OncePerRequestFilter {
 

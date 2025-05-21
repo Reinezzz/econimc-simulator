@@ -6,19 +6,34 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Настройки JWT считываются из application.yml (prefix = jwt).
+ * Конфигурация параметров для работы с JWT-токенами.
+ * <p>
+ * Значения параметров берутся из файла конфигурации приложения (application.properties или application.yml)
+ * с префиксом {@code jwt}.
+ * </p>
  */
 @Getter
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
 public class JwtConfig {
-    /** base64‑encoded секретный ключ (≥ 256‑бит для HS256) */
+    /**
+     * Base64-кодированный секретный ключ для подписи токенов (минимум 256 бит для HS256).
+     */
     private String secret;
-    /** время жизни access‑token, минут */
+
+    /**
+     * Время жизни access-токена в минутах.
+     */
     private long accessTokenExpirationMinutes = 15;
-    /** HTTP‑заголовок, в котором ищем токен (Authorization) */
+
+    /**
+     * Название HTTP-заголовка, в котором ожидается токен (обычно {@code Authorization}).
+     */
     private String header = "Authorization";
-    /** Префикс (Bearer ) */
+
+    /**
+     * Префикс токена в заголовке (например, {@code Bearer }).
+     */
     private String tokenPrefix = "Bearer ";
 }

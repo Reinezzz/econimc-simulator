@@ -13,24 +13,25 @@ import org.example.economicssimulatorclient.util.Validator;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана регистрации нового пользователя.
+ * Обеспечивает валидацию и логику пошаговой регистрации с подтверждением email.
+ */
 public class RegistrationController extends BaseController {
 
-    @FXML
-    private TextField usernameField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private PasswordField repeatPasswordField;
-    @FXML
-    private Button registerButton;
-    @FXML
-    private Label statusLabel;
+    @FXML private TextField usernameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private PasswordField repeatPasswordField;
+    @FXML private Button registerButton;
+    @FXML private Label statusLabel;
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
-    /* ---------------- регистрация ---------------- */
+    /**
+     * Обрабатывает попытку регистрации пользователя, валидацию полей,
+     * отправку кода и подтверждение email.
+     */
     @FXML
     private void doRegister() {
         statusLabel.setText("");
@@ -48,7 +49,6 @@ public class RegistrationController extends BaseController {
             showError(statusLabel, "msg.weak_password");
             return;
         }
-
         if (user.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
             showError(statusLabel, "msg.fill_all_fields");
             return;
@@ -60,24 +60,22 @@ public class RegistrationController extends BaseController {
 
         registerButton.setDisable(true);
 
-        runAsync(() -> {                                     // фоновая сеть
+        runAsync(() -> {
             try {
                 auth.register(new RegistrationRequest(user, email, p1));
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-            Platform.runLater(() -> {                        // диалог — FX-поток
+            Platform.runLater(() -> {
                 showSuccess(statusLabel, "msg.code_sent");
-                String code = showVerificationDialog();      // блокирует до OK/Cancel
+                String code = showVerificationDialog();
                 if (code == null) {
                     showError(statusLabel, "reg.status_label.cancel_verification");
                     auth.cancelRegistration(email);
                     registerButton.setDisable(false);
                     return;
                 }
-
-                // второе сетевое обращение в фоне
                 runAsync(() -> {
                     try {
                         auth.verifyEmail(new VerificationRequest(email, code));
@@ -93,22 +91,24 @@ public class RegistrationController extends BaseController {
                     registerButton.setDisable(false);
                 }));
             });
-
         }, ex -> Platform.runLater(() -> {
             showError(statusLabel, tr("error.base") + ex.getMessage());
             registerButton.setDisable(false);
         }));
     }
 
-
-
-    /* ---------------- откр. логин ---------------- */
+    /**
+     * Переход к экрану авторизации.
+     */
     @FXML
     private void openLogin() {
         SceneManager.switchTo("authorization.fxml");
     }
 
-    /* =========== helper: диалог кода ============ */
+    /**
+     * Открывает диалог подтверждения email-кода при регистрации.
+     * @return введенный пользователем код, либо null при отмене
+     */
     private String showVerificationDialog() {
         try {
             ResourceBundle bundle = I18n.bundle;
@@ -137,7 +137,4 @@ public class RegistrationController extends BaseController {
             return null;
         }
     }
-
-
-
 }

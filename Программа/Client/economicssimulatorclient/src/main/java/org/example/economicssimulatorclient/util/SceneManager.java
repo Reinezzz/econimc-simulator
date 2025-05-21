@@ -13,22 +13,46 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Кэширует FXML и переключает root у единственного Scene —
- * благодаря этому окно не перерисовывается целиком, «мелькания» нет.
+ * Кэширует FXML и переключает root у Scene — без мелькания окна.
+ * Управляет загрузкой и переключением сцен приложения.
  */
 public final class SceneManager {
 
+    /**
+     * Главный Stage приложения.
+     */
     private static Stage primary;
+    /**
+     * Кэш для загруженных FXML-деревьев.
+     */
     private static final Map<String, Parent> cache = new HashMap<>();
+    /**
+     * Главная сцена.
+     */
     private static final Scene scene = new Scene(new javafx.scene.Group());
+    /**
+     * Префикс пути к FXML-файлам.
+     */
     public static final String ROOT = "/org/example/economicssimulatorclient/";
 
+    /**
+     * Приватный конструктор для запрета создания экземпляров.
+     */
     private SceneManager() {}
 
-    /** Вызывается один раз из MainApp */
-    public static void init(Stage stage) { primary = stage; primary.setScene(scene); }
+    /**
+     * Инициализация менеджера сцен (один раз из MainApp).
+     * @param stage основной Stage приложения
+     */
+    public static void init(Stage stage) {
+        primary = stage;
+        primary.setScene(scene);
+    }
 
-    /** Переключиться на fxml (из resources) */
+    /**
+     * Переключиться на заданный FXML (из ресурсов).
+     * @param fxml имя FXML-файла
+     */
     public static void switchTo(String fxml) {
         try {
             Parent root = cache.computeIfAbsent(fxml, SceneManager::load);
@@ -38,7 +62,11 @@ public final class SceneManager {
         }
     }
 
-    /* ---------- private ---------- */
+    /**
+     * Загружает и локализует FXML-файл.
+     * @param fxml имя файла
+     * @return {@link Parent} корневой элемент сцены
+     */
     private static Parent load(String fxml) {
         try {
             I18n.setLocale(Locale.forLanguageTag("ru"));
@@ -47,7 +75,6 @@ public final class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(ROOT + fxml));
             loader.setResources(bundle);
             return loader.load();
-
         } catch (IOException e) {
             throw new RuntimeException("Cannot load " + fxml, e);
         }

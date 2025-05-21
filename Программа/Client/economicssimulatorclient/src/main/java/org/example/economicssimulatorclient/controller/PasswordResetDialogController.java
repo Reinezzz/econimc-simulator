@@ -2,8 +2,11 @@ package org.example.economicssimulatorclient.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.example.economicssimulatorclient.util.I18n;
 
+/**
+ * Контроллер диалога подтверждения сброса пароля (код + новый пароль).
+ * Включает валидацию и методы доступа к данным.
+ */
 public class PasswordResetDialogController extends BaseController {
 
     @FXML private DialogPane dialogPane;
@@ -13,13 +16,17 @@ public class PasswordResetDialogController extends BaseController {
     @FXML private Label errorLabel;
     @FXML private ButtonType okBtn;
 
-    // initialize() можно оставить пустым!
+    /**
+     * Инициализация JavaFX (по умолчанию ничего не делает).
+     */
     @FXML
     private void initialize() { }
 
-    // Вызывать ЭТОТ МЕТОД из PasswordChangeController сразу после загрузки FXML!
+    /**
+     * Включает и настраивает валидацию полей формы.
+     * Должен быть вызван сразу после загрузки FXML из внешнего контроллера.
+     */
     public void setupValidation() {
-        // Гарантировано dialogPane уже не null!
         Button okButton = (Button) dialogPane.lookupButton(okBtn);
 
         Runnable validate = () -> {
@@ -46,9 +53,22 @@ public class PasswordResetDialogController extends BaseController {
         passField.textProperty().addListener((obs, ov, nv) -> validate.run());
         repeatField.textProperty().addListener((obs, ov, nv) -> validate.run());
 
-        validate.run(); // запуск валидации сразу после загрузки
+        validate.run();
     }
 
-    public String getCode() { return codeField.getText().trim(); }
-    public String getPassword() { return passField.getText(); }
+    /**
+     * Получить введенный пользователем код.
+     * @return код
+     */
+    public String getCode() {
+        return codeField.getText().trim();
+    }
+
+    /**
+     * Получить введенный пользователем новый пароль.
+     * @return новый пароль
+     */
+    public String getPassword() {
+        return passField.getText();
+    }
 }

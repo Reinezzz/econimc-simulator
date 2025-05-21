@@ -5,18 +5,22 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.example.economicssimulatorclient.util.I18n;
 
+/**
+ * Контроллер диалога ввода кода подтверждения email.
+ */
 public class VerificationCodeDialogController extends BaseController {
 
     @FXML private DialogPane dialogPane;
-    @FXML private TextField  codeField;
-    @FXML private Label      errorLabel;
+    @FXML private TextField codeField;
+    @FXML private Label errorLabel;
     @FXML private ButtonType okBtn;
-    @FXML private ButtonType cancelBtn;   // получаем из FXML
+    @FXML private ButtonType cancelBtn;
 
+    /**
+     * Инициализация диалога — настройка поведения кнопок.
+     */
     @FXML
     private void initialize() {
-        /* lookupButton может быть ещё null внутри initialize,
-           поэтому откладываем до первого «pulse» JavaFX */
         Platform.runLater(() -> {
             Button okButton = (Button) dialogPane.lookupButton(okBtn);
             okButton.setDisable(true);
@@ -31,7 +35,10 @@ public class VerificationCodeDialogController extends BaseController {
         });
     }
 
-    /* для вызова из регистрационного контроллера */
+    /**
+     * Получает введённый пользователем код.
+     * @return код подтверждения
+     */
     public String getCode() {
         return codeField.getText().trim();
     }
