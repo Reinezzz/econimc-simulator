@@ -2,21 +2,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<DialogPane xmlns="http://javafx.com/javafx"
+<DialogPane styleClass="dialog-card"
+            fx:id="dialogPane"
+            xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.economicssimulatorclient.controller.VerificationCodeDialogController">
+            fx:controller="org.example.economicssimulatorclient.controller.VerificationCodeDialogController"
+            stylesheets="@verification_code_dialog.css">
 
     <content>
         <VBox spacing="12" alignment="CENTER">
-            <Label text="%dialog.verification_code"/>
-            <TextField fx:id="codeField" promptText="%prompt.code" prefWidth="180"/>
-            <Label fx:id="errorLabel" textFill="#d32f2f"/>
+            <Label styleClass="dialog-title" text="%dialog.verification_code_title"/>
+
+            <Label styleClass="dialog-label" text="%dialog.verification_code"/>
+            <TextField styleClass="dialog-field" fx:id="codeField" promptText="%prompt.code"/>
+            <Label styleClass="dialog-status" fx:id="errorLabel" />
         </VBox>
     </content>
 
     <buttonTypes>
-        <!-- Оставляем собственный ButtonType и даём ему fx:id -->
         <ButtonType fx:id="okBtn" text="%common.ok" buttonData="OK_DONE"/>
-        <ButtonType fx:id="cancelBtn" text="%common.cancel"    buttonData="CANCEL_CLOSE"/>
+        <ButtonType fx:id="cancelBtn" text="%common.cancel" buttonData="CANCEL_CLOSE"/>
     </buttonTypes>
 </DialogPane>

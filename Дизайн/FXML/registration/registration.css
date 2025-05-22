@@ -1,63 +1,207 @@
-/* фон всего экрана */
-.background-pane {
-    -fx-background-color: #F8F8F8;
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+* {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0px;
+  height: 100%;
+}
+/* a blue color as a generic focus style */
+button:focus-visible {
+  outline: 2px solid #4a90e2 !important;
+  outline: -webkit-focus-ring-color auto 5px !important;
+}
+a {
+  text-decoration: none;
+}
+.screen {
+  background-color: #faf8f8;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
 }
 
-/* карточка */
-.card {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 10;
-    -fx-padding: 40;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+.screen .overlap-wrapper {
+  background-color: #faf8f8;
+  width: 1920px;
+  height: 1080px;
 }
 
-/* заголовок */
-.title {
-    -fx-font-size: 28px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1E00D7;
+.screen .overlap {
+  position: relative;
+  width: 720px;
+  height: 870px;
+  top: 105px;
+  left: 600px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0px 0px 98.6px -14px #cacaca4f;
 }
 
-/* подписи полей */
-.form-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #333333;
+.screen .view {
+  position: absolute;
+  width: 392px;
+  height: 83px;
+  top: 672px;
+  left: 167px;
 }
 
-/* текстовые поля */
-.text-field {
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-border-color: #C4C4C4;
-    -fx-padding: 8 12;
-    -fx-prompt-text-fill: #A0A0A0;
+.screen .frame {
+  display: inline-flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 43px;
+  background-color: #1e0acb;
+  align-items: center;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-/* фокус в поле */
-.text-field:focused {
-    -fx-border-color: #1E00D7;
-    -fx-faint-focus-color: transparent;
+.screen .text-wrapper {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Segoe UI-Semibold", Helvetica;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
 }
 
-/* ссылки */
-.link {
-    -fx-text-fill: #1E00D7;
-    -fx-underline: false;
+.screen .div {
+  position: absolute;
+  top: 49px;
+  left: 177px;
+  font-family: "Segoe UI-Semibold", Helvetica;
+  color: #1e0acb;
+  font-size: 64px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
 }
 
-/* главная кнопка */
-.primary-button {
-    -fx-background-color: #1E00D7;
-    -fx-text-fill: #FFFFFF;
-    -fx-background-radius: 5;
-    -fx-font-size: 16px;
-}
-.primary-button:hover {
-    -fx-opacity: 0.9;
+.screen .overlap-group-wrapper {
+  position: absolute;
+  width: 312px;
+  height: 32px;
+  top: 788px;
+  left: 192px;
 }
 
-/* мелкий текст внизу */
-.footer-text {
-    -fx-font-size: 14px;
-    -fx-text-fill: #333333;
+.screen .overlap-group {
+  position: relative;
+  width: 308px;
+  height: 32px;
+}
+
+.screen .text-wrapper-2 {
+  position: absolute;
+  width: 78px;
+  top: 0;
+  left: 230px;
+  font-family: "Actor-Regular", Helvetica;
+  color: #1e0acb;
+  font-size: 24px;
+  text-decoration: underline;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .text-wrapper-3 {
+  position: absolute;
+  width: 235px;
+  top: 0;
+  left: 0;
+  font-family: "Actor-Regular", Helvetica;
+  color: #000000;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .group {
+  top: 176px;
+  position: absolute;
+  width: 532px;
+  height: 107px;
+  left: 95px;
+}
+
+.screen .email {
+  position: absolute;
+  width: 530px;
+  height: 72px;
+  top: 35px;
+  left: 0;
+}
+
+.screen .div-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 530px;
+  gap: 10px 10px;
+  padding: 20px 29px;
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #000000;
+  align-items: center;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.screen .text-wrapper-4 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Segoe UI-Semilight", Helvetica;
+  font-weight: 400;
+  color: #000000;
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .text-wrapper-5 {
+  position: absolute;
+  top: 0;
+  left: 19px;
+  font-family: "Actor-Regular", Helvetica;
+  color: #000000;
+  font-size: 20px;
+  white-space: nowrap;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .group-2 {
+  top: 295px;
+  position: absolute;
+  width: 532px;
+  height: 107px;
+  left: 95px;
+}
+
+.screen .group-3 {
+  top: 414px;
+  position: absolute;
+  width: 532px;
+  height: 107px;
+  left: 95px;
+}
+
+.screen .group-4 {
+  top: 533px;
+  position: absolute;
+  width: 532px;
+  height: 107px;
+  left: 95px;
 }

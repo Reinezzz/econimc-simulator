@@ -1,0 +1,101 @@
+
+/* --- Центрированная карточка диалога --- */
+.dialog-card {
+    -fx-background-color: #fff;
+    -fx-padding: 32 24 24 24;
+    -fx-spacing: 16;
+    -fx-alignment: center;
+    -fx-max-width: 450;
+    -fx-max-height: 400;
+    -fx-min-width: 400;
+    -fx-min-height: 400;
+    /* Можно добавить отступ сверху для центрирования */
+    -fx-translate-y: 20;
+}
+
+/* --- Заголовок диалога --- */
+.dialog-title {
+    -fx-font-family: "Segoe UI Semibold", "Helvetica", sans-serif;
+    -fx-font-size: 26px;
+    -fx-text-fill: #1e0acb;
+    -fx-padding: 0 0 16 0;
+    -fx-alignment: center;
+}
+
+/* --- Подписи к полям --- */
+.dialog-label {
+    -fx-font-family: "Actor Regular", "Segoe UI", sans-serif;
+    -fx-font-size: 16px;
+    -fx-text-fill: #111;
+    -fx-padding: 0 0 2 4;
+    -fx-alignment: center-left;
+}
+
+/* --- Текстовые поля --- */
+.dialog-field {
+    -fx-background-color: #fff;
+    -fx-border-color: #00000022;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 16px;
+    -fx-padding: 8 12 8 12;
+    -fx-pref-height: 38px;
+    -fx-effect: dropshadow(gaussian, #ececec20, 2, 0, 0, 2);
+}
+
+.dialog-field:focused {
+    -fx-border-color: #1e0acb;
+    -fx-border-width: 2;
+}
+
+/* --- Сообщение об ошибке --- */
+.dialog-status {
+    -fx-font-size: 14px;
+    -fx-text-fill: #e74c3c;
+    -fx-padding: 4 0 6 0;
+    -fx-alignment: center;
+}
+
+/* --- Кнопки диалога --- */
+#okBtn{
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 12;
+    -fx-font-family: "Segoe UI Semibold", "Helvetica", sans-serif;
+    -fx-font-size: 18px;
+    -fx-text-fill: #fff;
+    -fx-pref-height: 36px;
+    -fx-pref-width: 130px;
+    -fx-cursor: hand;
+    -fx-padding: 6 0 6 0;
+    -fx-effect: dropshadow(gaussian, #cacaca77, 12, 0.28, 0, 1);
+    -fx-border-color: transparent;
+}
+
+#cancelBtn {
+    -fx-background-color: #dd0e0e;
+    -fx-background-radius: 12;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 18px;
+    -fx-text-fill: #fff;
+    -fx-pref-height: 36px;
+    -fx-pref-width: 130px;
+    -fx-cursor: hand;
+    -fx-alignment: center-right;
+}
+
+#okBtn:hover {
+    -fx-background-color: #2d20e0;
+}
+#okBtn:pressed {
+    -fx-background-color: #17038e;
+}
+
+
+#cancelBtn:hover {
+    -fx-background-color: #ececec;
+}
+#cancelBtn:pressed {
+    -fx-background-color: #e0e0e0;
+}
+
+

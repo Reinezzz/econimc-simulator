@@ -12,11 +12,9 @@
 
 <StackPane xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="org.example.economicssimulatorclient.controller.RegistrationController">
-    <!-- Подключаем CSS -->
-<!--    <stylesheets>-->
-<!--        <URL value="@styles.css"/>-->
-<!--    </stylesheets>-->
+           fx:controller="org.example.economicssimulatorclient.controller.RegistrationController"
+           stylesheets="@registration.css">
+
 
     <!-- Фон -->
     <Pane styleClass="background-pane"/>

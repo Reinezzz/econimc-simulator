@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.I18n;
@@ -121,8 +122,10 @@ public class RegistrationController extends BaseController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/verification_code_dialog.fxml"), bundle);
             Dialog<String> dialog = new Dialog<>();
-            dialog.setTitle(tr("dialog.verification_code_title"));
             dialog.setDialogPane(loader.load());
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.setIconified(false);
+            stage.setResizable(false);
 
             VerificationCodeDialogController ctrl = loader.getController();
 

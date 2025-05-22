@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.example.economicssimulatorclient.dto.PasswordResetConfirm;
 import org.example.economicssimulatorclient.dto.PasswordResetRequest;
 import org.example.economicssimulatorclient.service.AuthService;
@@ -68,9 +70,11 @@ public class PasswordChangeController extends BaseController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/org/example/economicssimulatorclient/password_reset_dialog.fxml"), bundle);
             Dialog<Pair<String, String>> dialog = new Dialog<>();
-            dialog.setTitle(tr("dialog.password_reset_title"));
             DialogPane pane = loader.load();
             dialog.setDialogPane(pane);
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.setIconified(false);
+            stage.setResizable(false);
 
             PasswordResetDialogController ctrl = loader.getController();
             ctrl.setupValidation();

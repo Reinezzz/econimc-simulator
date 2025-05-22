@@ -30,6 +30,8 @@ public class VerificationCodeDialogController extends BaseController {
             Button okButton = (Button) dialogPane.lookupButton(okBtn);
             okButton.setDisable(true);
             Button cancelButton = (Button) dialogPane.lookupButton(cancelBtn);
+            okButton.setId("okBtn");
+            cancelButton.setId("cancelBtn");
 
             codeField.textProperty().addListener((obs, o, n) -> {
                 boolean empty = n.trim().isEmpty();

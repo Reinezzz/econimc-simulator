@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 public class PasswordResetDialogController extends BaseController {
 
     @FXML
+    ButtonType cancelBtn;
+    @FXML
     DialogPane dialogPane;
     @FXML
     TextField codeField;
@@ -34,6 +36,9 @@ public class PasswordResetDialogController extends BaseController {
      */
     public void setupValidation() {
         Button okButton = (Button) dialogPane.lookupButton(okBtn);
+        Button cancelButton = (Button) dialogPane.lookupButton(cancelBtn);
+        okButton.setId("okBtn");
+        cancelButton.setId("cancelBtn");
 
         Runnable validate = () -> {
             String code = codeField.getText().trim();

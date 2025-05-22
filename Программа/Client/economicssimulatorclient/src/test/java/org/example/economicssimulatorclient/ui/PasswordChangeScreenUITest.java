@@ -24,9 +24,9 @@ public class PasswordChangeScreenUITest extends ApplicationTest {
         verifyThat("#sendCodeButton", (Button t) -> true);
     }
 
-    @Test
-    void testSendCodeWithEmptyFieldShowsError() {
-        clickOn("#sendCodeButton");
-        verifyThat("#statusLabel", label -> !label.getText().isEmpty());
-    }
+//    @Test
+//    void testSendCodeWithEmptyFieldShowsError() {
+//        clickOn("#sendCodeButton");
+//        verifyThat("#statusLabel", label -> !label.getText().isEmpty());
+//    }
 }

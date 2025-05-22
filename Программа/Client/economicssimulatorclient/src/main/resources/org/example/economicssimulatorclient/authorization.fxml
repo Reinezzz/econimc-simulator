@@ -10,13 +10,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 
-<StackPane xmlns="http://javafx.com/javafx/8"
+<?import java.net.URL?>
+<StackPane
+           xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.economicssimulatorclient.controller.AuthorizationController">
-    <!-- Подключаем CSS -->
-<!--    <stylesheets>-->
-<!--        <URL value="@authorization.css"/>-->
-<!--    </stylesheets>-->
+           fx:controller="org.example.economicssimulatorclient.controller.AuthorizationController"
+            stylesheets="@authorization.css">
+
+
 
     <!-- Фоновый слой -->
     <Pane styleClass="background-pane"/>

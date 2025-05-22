@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.controller;
 
+import javafx.scene.layout.StackPane;
 import org.example.economicssimulatorclient.dto.LoginRequest;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;

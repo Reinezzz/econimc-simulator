@@ -17,24 +17,24 @@ a {
   text-decoration: none;
 }
 .screen {
-  background-color: #faf8f8;
+  background-color: #faf7f7;
   display: flex;
   flex-direction: row;
   justify-content: center;
   width: 100%;
 }
 
-.screen .overlap-wrapper {
-  background-color: #faf8f8;
+.screen .overlap-group-wrapper {
+  background-color: #faf7f7;
   width: 1920px;
   height: 1080px;
 }
 
-.screen .overlap {
+.screen .overlap-group {
   position: relative;
   width: 720px;
   height: 870px;
-  top: 105px;
+  top: 119px;
   left: 600px;
   background-color: #ffffff;
   border-radius: 20px;
@@ -44,7 +44,7 @@ a {
 .screen .text-wrapper {
   position: absolute;
   top: 49px;
-  left: 145px;
+  left: 287px;
   font-family: "Segoe UI-Semibold", Helvetica;
   color: #1e0acb;
   font-size: 64px;
@@ -53,96 +53,15 @@ a {
   line-height: normal;
 }
 
-.screen .div {
-  position: absolute;
-  width: 470px;
-  top: 184px;
-  left: 125px;
-  font-family: "Segoe UI-Semilight", Helvetica;
-  font-weight: 400;
-  color: #434343;
-  font-size: 24px;
-  text-align: center;
-  letter-spacing: 0;
-  line-height: normal;
-}
-
-.screen .frame {
-  display: inline-flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px 107px;
-  position: absolute;
-  top: 647px;
-  left: 173px;
-  background-color: #1e0acb;
-  align-items: center;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.screen .text-wrapper-2 {
-  position: relative;
-  width: fit-content;
-  margin-top: -1.00px;
-  font-family: "Segoe UI-Semibold", Helvetica;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-}
-
-.screen .overlap-group-wrapper {
-  position: absolute;
-  width: 510px;
-  height: 32px;
-  top: 788px;
-  left: 126px;
-}
-
-.screen .overlap-group {
-  position: relative;
-  width: 506px;
-  height: 32px;
-}
-
-.screen .text-wrapper-3 {
-  position: absolute;
-  width: 191px;
-  top: 0;
-  left: 315px;
-  font-family: "Actor-Regular", Helvetica;
-  color: #1e0acb;
-  font-size: 24px;
-  text-decoration: underline;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-}
-
-.screen .text-wrapper-4 {
-  position: absolute;
-  width: 332px;
-  top: 0;
-  left: 0;
-  font-family: "Actor-Regular", Helvetica;
-  color: #000000;
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-}
-
 .screen .group {
-  top: 261px;
   position: absolute;
   width: 532px;
   height: 107px;
+  top: 176px;
   left: 95px;
 }
 
-.screen .email {
+.screen .div-wrapper {
   position: absolute;
   width: 530px;
   height: 72px;
@@ -150,7 +69,7 @@ a {
   left: 0;
 }
 
-.screen .div-wrapper {
+.screen .frame {
   display: flex;
   flex-wrap: wrap;
   width: 530px;
@@ -165,7 +84,7 @@ a {
   overflow: hidden;
 }
 
-.screen .text-wrapper-5 {
+.screen .div {
   position: relative;
   width: fit-content;
   margin-top: -1.00px;
@@ -177,7 +96,7 @@ a {
   line-height: normal;
 }
 
-.screen .text-wrapper-6 {
+.screen .text-wrapper-2 {
   position: absolute;
   top: 0;
   left: 19px;
@@ -190,18 +109,92 @@ a {
   white-space: nowrap;
 }
 
-.screen .group-2 {
-  top: 380px;
+.screen .group-wrapper {
   position: absolute;
-  width: 532px;
+  width: 530px;
   height: 107px;
+  top: 295px;
   left: 95px;
 }
 
-.screen .group-3 {
-  top: 499px;
-  position: absolute;
+.screen .group-2 {
+  position: relative;
   width: 532px;
   height: 107px;
-  left: 95px;
+}
+
+.screen .email {
+  height: 72px;
+}
+
+.screen .div-2 {
+  position: absolute;
+  width: 363px;
+  height: 32px;
+  top: 783px;
+  left: 197px;
+}
+
+.screen .text-wrapper-3 {
+  position: absolute;
+  width: 177px;
+  top: 0;
+  left: 182px;
+  font-family: "Actor-Regular", Helvetica;
+  color: #1e0acb;
+  font-size: 24px;
+  text-decoration: underline;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .text-wrapper-4 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: "Actor-Regular", Helvetica;
+  color: #000000;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .text-wrapper-5 {
+  position: absolute;
+  top: 413px;
+  left: 445px;
+  font-family: "Actor-Regular", Helvetica;
+  color: #1e0acb;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.screen .frame-2 {
+  display: inline-flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 107px;
+  position: absolute;
+  top: 494px;
+  left: 207px;
+  background-color: #1e0acb;
+  align-items: center;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.screen .text-wrapper-6 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Segoe UI-Semibold", Helvetica;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
 }
