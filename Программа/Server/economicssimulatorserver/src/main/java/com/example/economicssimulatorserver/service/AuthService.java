@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.entity.RefreshToken;
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.util.JwtUtil;
@@ -114,7 +115,13 @@ public class AuthService {
                     req.usernameOrEmail(), req.password());
             var auth = authManager.authenticate(authToken);
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
-            String access = jwtUtil.generateToken(userDetails);
+            String accessToken = jwtUtil.generateToken(userDetails);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+            return new LoginResponse(
+                    accessToken,
+                    refreshToken.getToken(),
+                    jwtUtil.getJwtExpirationMs()
+            );
             return new LoginResponse(access, "Bearer");
         } catch (AuthenticationException ex) {
             throw new LocalizedException("error.wrong_credentials");
