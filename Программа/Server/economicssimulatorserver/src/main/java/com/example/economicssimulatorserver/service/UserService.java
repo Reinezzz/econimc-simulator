@@ -22,6 +22,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepo;
+    private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder encoder;
 
     /**
@@ -92,4 +93,13 @@ public class UserService implements UserDetailsService {
         user.setPasswordHash(encoder.encode(rawPassword));
         userRepo.save(user);
     }
+
+    /**
+     * Удаляет все refresh токены пользователя.
+     * @param user пользователь
+     */
+    public void removeAllUserSessions(User user) {
+        refreshTokenService.deleteByUser(user);
+    }
+
 }

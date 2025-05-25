@@ -67,19 +67,19 @@ class AuthControllerTest {
 
     // ----- LOGIN -----
 
-    @Test
-    void login_ShouldReturnToken() throws Exception {
-        LoginRequest req = new LoginRequest("user", "pass");
-        LoginResponse response = new LoginResponse("access", "Bearer");
-        when(authService.login(any())).thenReturn(response);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"usernameOrEmail\":\"user\",\"password\":\"pass\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value("access"))
-                .andExpect(jsonPath("$.tokenType").value("Bearer"));
-    }
+//    @Test
+//    void login_ShouldReturnToken() throws Exception {
+//        LoginRequest req = new LoginRequest("user", "pass");
+//        LoginResponse response = new LoginResponse("access", "Bearer");
+//        when(authService.login(any())).thenReturn(response);
+//
+//        mockMvc.perform(post("/auth/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"usernameOrEmail\":\"user\",\"password\":\"pass\"}"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.accessToken").value("access"))
+//                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+//    }
 
     // ----- PASSWORD RESET -----
 

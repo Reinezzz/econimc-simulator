@@ -19,11 +19,11 @@ class UserServiceTest {
     @Mock private org.springframework.security.crypto.password.PasswordEncoder encoder;
     @InjectMocks private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        userService = new UserService(userRepo, encoder);
-    }
+//    @BeforeEach
+//    void setUp() {
+//        MockitoAnnotations.openMocks(this);
+//        userService = new UserService(userRepo, encoder);
+//    }
 
     @Test
     void register_ShouldSaveUser() {

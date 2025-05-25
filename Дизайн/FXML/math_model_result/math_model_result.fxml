@@ -5,110 +5,88 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1"
-            prefWidth="1920" prefHeight="1080">
+<AnchorPane prefHeight="1080" prefWidth="1920" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- стили -->
     <stylesheets>
-        <URL value="@result.css"/>
+        <URL value="@result.css" />
     </stylesheets>
 
     <!-- 1) Top bar -->
-    <HBox styleClass="top-bar"
-          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
-        <Button text="Назад" styleClass="exit-button"/>
-        <Pane HBox.hgrow="ALWAYS"/>
-        <Button text="Главная" styleClass="exit-button"/>
+    <HBox styleClass="top-bar" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <padding><Insets bottom="10" left="20" right="20" top="10" /></padding>
+        <Button styleClass="exit-button" text="Назад" />
+        <Pane HBox.hgrow="ALWAYS" />
+        <Button styleClass="exit-button" text="Главная" />
     </HBox>
 
     <!-- 2) Основной контент -->
-    <HBox AnchorPane.topAnchor="60"
-          AnchorPane.leftAnchor="0"
-          AnchorPane.rightAnchor="0"
-          AnchorPane.bottomAnchor="0"
-          spacing="20">
+    <HBox spacing="20" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="60">
 
         <!-- 2.a) Левая панель -->
-        <VBox styleClass="left-panel"
-              prefWidth="350"
-              spacing="20">
-            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
-            <Label text="Параметры" styleClass="section-title"/>
+        <VBox prefWidth="350" spacing="20" styleClass="left-panel">
+            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+            <Label styleClass="section-title" text="Параметры" />
 
-            <VBox styleClass="param-card" spacing="8">
-                <TextField promptText="Обозначение" styleClass="text-field"/>
-                <TextField promptText="Описание"   styleClass="text-field"/>
-                <TextField promptText="Тип"         styleClass="text-field"/>
+            <VBox spacing="8" styleClass="param-card">
+                <TextField promptText="Обозначение" styleClass="text-field" />
+                <TextField promptText="Описание" styleClass="text-field" text="Описание" />
+                <TextField promptText="Тип" styleClass="text-field" text="Значение" />
             </VBox>
-            <VBox styleClass="param-card" spacing="8">
-                <TextField promptText="Обозначение" styleClass="text-field"/>
-                <TextField promptText="Описание"   styleClass="text-field"/>
-                <TextField promptText="Тип"         styleClass="text-field"/>
+            <VBox spacing="8" styleClass="param-card">
+                <TextField promptText="Обозначение" styleClass="text-field" />
+                <TextField promptText="Описание" styleClass="text-field" />
+                <TextField promptText="Тип" styleClass="text-field" text="Значение" />
             </VBox>
-            <VBox styleClass="param-card" spacing="8">
-                <TextField promptText="Обозначение" styleClass="text-field"/>
-                <TextField promptText="Описание"   styleClass="text-field"/>
-                <TextField promptText="Тип"         styleClass="text-field"/>
+            <VBox spacing="8" styleClass="param-card">
+                <TextField promptText="Обозначение" styleClass="text-field" />
+                <TextField promptText="Описание" styleClass="text-field" />
+                <TextField promptText="Тип" styleClass="text-field" text="Значение" />
             </VBox>
 
-            <Button text="Изменить" styleClass="primary-button"/>
+            <Button styleClass="primary-button" text="Изменить" />
         </VBox>
 
         <!-- 2.b) Разделитель -->
-        <Separator orientation="VERTICAL" styleClass="separator"/>
+        <Separator orientation="VERTICAL" styleClass="separator" />
 
         <!-- 2.c) Правая панель -->
-        <VBox styleClass="right-panel"
-              spacing="20"
-              VBox.vgrow="ALWAYS">
-            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+        <VBox spacing="20" styleClass="right-panel" VBox.vgrow="ALWAYS">
+            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-            <Label text="Результат" styleClass="page-title"/>
+            <Label styleClass="page-title" text="Результат" />
 
             <!-- 2.c.1) Поле вывода результата -->
-            <TextArea fx:id="resultArea"
-                      text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero."
-                      editable="false"
-                      wrapText="true"
-                      prefHeight="140"
-                      styleClass="text-area"/>
+            <TextArea fx:id="resultArea" editable="false" prefHeight="140" styleClass="text-area" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero." wrapText="true" />
 
             <!-- 2.c.2) Меню выбора типа графика -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="График" styleClass="form-label"/>
-                <MenuButton text="Тип"
-                            styleClass="choice-box"
-                            mnemonicParsing="false">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label styleClass="form-label" text="График" />
+                <MenuButton mnemonicParsing="false" styleClass="choice-box" text="Тип">
                     <items>
-                        <MenuItem text="Линейный"/>
-                        <MenuItem text="Столбчатый"/>
-                        <MenuItem text="Круговой"/>
+                        <MenuItem text="Линейный" />
+                        <MenuItem text="Столбчатый" />
+                        <MenuItem text="Круговой" />
                     </items>
                 </MenuButton>
             </HBox>
 
             <!-- 2.c.3) Плейсхолдер для графиков -->
-            <Pane fx:id="chartPane"
-                  styleClass="chart-placeholder"
-                  prefHeight="250"/>
+            <Pane fx:id="chartPane" prefHeight="250" styleClass="chart-placeholder" />
 
             <!-- 3) Нижние кнопки -->
-            <HBox styleClass="bottom-buttons" alignment="CENTER" spacing="20">
-                <Button text="AI-анализ"      styleClass="primary-button"/>
-                <Button text="Сохранить отчёт" styleClass="primary-button"/>
-                <Button text="Повторить"      styleClass="primary-button"/>
+            <HBox alignment="CENTER" spacing="20" styleClass="bottom-buttons">
+                <Button styleClass="primary-button" text="AI-анализ" />
+                <Button styleClass="primary-button" text="Сохранить отчёт" />
+                <Button styleClass="primary-button" text="Повторить" />
             </HBox>
         </VBox>
     </HBox>

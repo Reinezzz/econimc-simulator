@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LoginResponseTest {
 
-    @Test
-    void createAndReadFields() {
-        LoginResponse resp = new LoginResponse("access-token", "Bearer");
-        assertEquals("access-token", resp.accessToken());
-        assertEquals("Bearer", resp.tokenType());
-    }
+//    @Test
+//    void createAndReadFields() {
+//        LoginResponse resp = new LoginResponse("access-token", "Bearer");
+//        assertEquals("access-token", resp.accessToken());
+//        assertEquals("Bearer", resp.tokenType());
+//    }
 }

@@ -7,10 +7,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Кэширует FXML и переключает root у Scene — без мелькания окна.
@@ -35,6 +32,11 @@ public final class SceneManager {
      */
     public static final String ROOT = "/org/example/economicssimulatorclient/";
 
+    // Добавить в класс SceneManager
+    private static final Deque<String> history = new ArrayDeque<>();
+    private static String currentFxml = null;
+
+
     /**
      * Приватный конструктор для запрета создания экземпляров.
      */
@@ -57,6 +59,7 @@ public final class SceneManager {
         try {
             Parent root = cache.computeIfAbsent(fxml, SceneManager::load);
             scene.setRoot(root);
+            currentFxml = fxml;
         } catch (RuntimeException ex) {
             ex.printStackTrace();
         }
@@ -79,4 +82,38 @@ public final class SceneManager {
             throw new RuntimeException("Cannot load " + fxml, e);
         }
     }
+    /**
+     * Переключиться на заданный FXML с передачей контроллеру инициализирующей функции.
+     * Не ломает кэш, работает с root-сценой.
+     * Не кэширует такие сцены!
+     * @param fxml имя FXML-файла
+     * @param controllerConsumer действие с контроллером
+     * @param <T> тип контроллера
+     */
+    public static <T> void switchToWithController(String fxml, java.util.function.Consumer<T> controllerConsumer) {
+        try {
+            I18n.setLocale(Locale.forLanguageTag("ru"));
+            Locale locale = I18n.getLocale();
+            ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(ROOT + fxml));
+            loader.setResources(bundle);
+            Parent root = loader.load();
+            T controller = loader.getController();
+            controllerConsumer.accept(controller);
+            scene.setRoot(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void back() {
+        if (!history.isEmpty()) {
+            String prevFxml = history.pop();
+            Parent root = cache.computeIfAbsent(prevFxml, SceneManager::load);
+            scene.setRoot(root);
+            currentFxml = prevFxml;
+        }
+    }
+
+
 }

@@ -1,7 +1,9 @@
 package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.entity.RefreshToken;
 import com.example.economicssimulatorserver.entity.User;
+import com.example.economicssimulatorserver.repository.RefreshTokenRepository;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.util.JwtUtil;
 import com.example.economicssimulatorserver.exception.LocalizedException;
@@ -27,6 +29,7 @@ public class AuthService {
     private final UserService userService;
     private final TokenService tokenService;
     private final MailService mailService;
+    private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final CacheManager cacheManager;
@@ -104,9 +107,10 @@ public class AuthService {
     }
 
     /**
-     * Аутентифицирует пользователя по логину/email и паролю.
-     * @param req DTO с учетными данными пользователя
-     * @return LoginResponse с access-токеном и типом токена
+     * Авторизует пользователя, возвращает access и refresh токены.
+     * @param req DTO с логином и паролем
+     * @return DTO с access и refresh токеном
+     * @throws LocalizedException если логин или пароль неверные
      */
     public LoginResponse login(LoginRequest req) {
         try {
@@ -114,12 +118,16 @@ public class AuthService {
                     req.usernameOrEmail(), req.password());
             var auth = authManager.authenticate(authToken);
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
             String access = jwtUtil.generateToken(userDetails);
-            return new LoginResponse(access, "Bearer");
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails);
+
+            return new LoginResponse(access, refreshToken.getToken(), "Bearer");
         } catch (AuthenticationException ex) {
             throw new LocalizedException("error.wrong_credentials");
         }
     }
+
 
     /**
      * Инициирует процедуру сброса пароля: создает токен и отправляет код на email пользователя.
@@ -169,5 +177,41 @@ public class AuthService {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new LocalizedException("error.email_not_found"));
         tokenService.evictPasswordResetToken(user);
+    }
+
+    /**
+     * Генерирует новые access и refresh токены по действующему refresh токену.
+     * @param request DTO с refresh токеном
+     * @return DTO с access и refresh токенами
+     * @throws LocalizedException если refresh токен невалиден/просрочен
+     */
+    public RefreshTokenResponse refreshTokens(RefreshTokenRequest request) {
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.refreshToken());
+        User user = refreshToken.getUser();
+
+        // Удаляем старый токен и создаём новый (best practice — ротация)
+        refreshTokenService.deleteByToken(refreshToken.getToken());
+
+        // Создаём UserDetails как при логине
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPasswordHash())
+                .authorities("USER")
+                .build();
+
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userDetails);
+
+        String accessToken = jwtUtil.generateToken(userDetails);
+
+        return new RefreshTokenResponse(accessToken, newRefreshToken.getToken());
+    }
+
+
+    /**
+     * Удаляет refresh токен (logout).
+     * @param request DTO с refresh токеном
+     */
+    public void logout(LogoutRequest request) {
+        refreshTokenService.deleteByToken(request.refreshToken());
     }
 }

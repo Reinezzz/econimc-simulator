@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient;
 
+import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import org.example.economicssimulatorclient.controller.BaseController;
@@ -8,6 +9,7 @@ import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.economicssimulatorclient.util.SessionManager;
 
 /**
  * Главный класс JavaFX-приложения Economics Simulator.
@@ -24,7 +26,32 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         BaseController.provide(AuthService.class, new AuthService());
         SceneManager.init(primaryStage);
-        SceneManager.switchTo("authorization.fxml");     // первая сцена
+        String refreshToken = SessionManager.getInstance().getRefreshToken();
+        if (refreshToken != null) {
+            // Пытаемся обновить accessToken асинхронно при наличии refreshToken
+            new Thread(() -> {
+                boolean refreshed = false;
+                try {
+                    refreshed = AuthService.getInstance().refreshTokens();
+                } catch (Exception ex) {
+                    // Можно залогировать ошибку обновления токена
+                }
+                boolean finalRefreshed = refreshed;
+                Platform.runLater(() -> {
+                    if (finalRefreshed) {
+                        // Если refresh прошёл успешно — открываем основной экран
+                        SceneManager.switchTo("main.fxml");
+                    } else {
+                        // Иначе открываем форму входа
+                        SceneManager.switchTo("authorization.fxml");
+                    }
+                });
+            }).start();
+        } else {
+            // Нет refreshToken — открываем форму входа
+            SceneManager.switchTo("authorization.fxml");
+        }
+
         primaryStage.setTitle("Economics Simulator");
         primaryStage.setResizable(true);
         primaryStage.setMaximized(true);

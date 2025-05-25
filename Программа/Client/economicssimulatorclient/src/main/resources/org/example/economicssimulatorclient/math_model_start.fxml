@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.economicssimulatorclient.controller.MathModelStartController"
+            prefWidth="1000" prefHeight="700">
+
+    <!-- Верхний тулбар -->
+    <HBox AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          styleClass="top-bar">
+        <padding><Insets top="10" left="20" bottom="10" right="20"/></padding>
+        <Button fx:id="backButton" text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button fx:id="mainButton" text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <HBox AnchorPane.topAnchor="60" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" spacing="20">
+        <!-- Левая панель параметров -->
+        <VBox prefWidth="340" spacing="16" styleClass="left-panel">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            <Label text="Параметры" styleClass="section-title"/>
+            <ScrollPane fx:id="paramsScroll" fitToWidth="true" prefHeight="540">
+                <VBox fx:id="paramsVBox" spacing="10"/>
+            </ScrollPane>
+        </VBox>
+
+        <Separator orientation="VERTICAL" styleClass="separator"/>
+
+        <!-- Центральная панель только с кнопкой -->
+        <VBox spacing="36" alignment="CENTER" styleClass="right-panel" VBox.vgrow="ALWAYS">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/>
+            </padding>
+            <Button fx:id="runButton" text="Запуск" styleClass="primary-button" minWidth="180" minHeight="48"/>
+        </VBox>
+    </HBox>
+</AnchorPane>

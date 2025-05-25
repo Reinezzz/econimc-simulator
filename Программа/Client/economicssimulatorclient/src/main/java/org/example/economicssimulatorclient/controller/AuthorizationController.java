@@ -48,7 +48,7 @@ public class AuthorizationController extends BaseController {
                 auth.login(new LoginRequest(login, pass));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "auth.status_label.successful");
-                    // SceneManager.switchTo("main.fxml");
+                     SceneManager.switchTo("main.fxml");
                 });
             } catch (IllegalArgumentException ex) {
                 Platform.runLater(() -> {

@@ -1,9 +1,11 @@
 package org.example.economicssimulatorclient.service;
 
+import lombok.Getter;
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.JsonUtil;
+import org.example.economicssimulatorclient.util.SessionManager;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +22,15 @@ public class AuthService extends BaseService {
     private static final String AUTH_CANCEL_REGISTRATION = "cancel-registration";
     private static final String AUTH_CANCEL_PASSWORD_RESET = "cancel-password-reset";
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + AUTH_PATH + "/");
+
+    private static final AuthService INSTANCE = new AuthService();
+    /**
+     * -- GETTER --
+     *  Возвращает текущий access токен пользователя.
+     *
+     * @return access токен (JWT) или null, если не авторизован.
+     */
+    @Getter
     private String accessToken;
 
     /* =================== Регистрация и верификация =================== */
@@ -59,9 +70,9 @@ public class AuthService extends BaseService {
     /* =================== Авторизация =================== */
 
     /**
-     * Выполняет вход пользователя (логин/email и пароль).
+     * Выполняет вход пользователя (логин/email и пароль) и сохраняет токены.
      * @param req DTO с логином/email и паролем
-     * @return LoginResponse с access-токеном
+     * @return LoginResponse с accessToken, refreshToken, tokenType
      * @throws IOException ошибка ввода-вывода при запросе
      * @throws InterruptedException если поток прерван
      * @throws IllegalArgumentException если сервер вернул ошибку авторизации
@@ -69,12 +80,15 @@ public class AuthService extends BaseService {
     public LoginResponse login(LoginRequest req) throws IOException, InterruptedException {
         try {
             var resp = post(baseUri, "login", req, LoginResponse.class, false, null);
+            // Сохраняем оба токена
+            SessionManager.getInstance().saveTokens(resp.accessToken(), resp.refreshToken());
             this.accessToken = resp.accessToken();
             return resp;
         } catch (Exception ex) {
             throw new IllegalArgumentException(extractErrorMessage(ex));
         }
     }
+
 
     /* =================== Сброс пароля =================== */
 
@@ -175,4 +189,59 @@ public class AuthService extends BaseService {
         }
         return msg;
     }
+
+    /**
+     * Выполняет выход пользователя: отправляет refreshToken на сервер и очищает локальное хранилище токенов.
+     * @throws IOException ошибка ввода-вывода при запросе
+     * @throws InterruptedException если поток прерван
+     */
+    public void logout() throws IOException, InterruptedException {
+        String refreshToken = SessionManager.getInstance().getRefreshToken();
+        if (refreshToken != null) {
+            try {
+                var req = new RefreshTokenRequest(refreshToken);
+                post(baseUri, "logout", req, ApiResponse.class, false, null);
+            } catch (Exception ex) {
+                // Игнорируем ошибку выхода (например, если refreshToken уже невалиден)
+            }
+        }
+        SessionManager.getInstance().logout();
+        this.accessToken = null;
+    }
+
+    /**
+     * Обновляет access и refresh токены по refreshToken.
+     * @return true, если токены успешно обновлены, false если refreshToken невалиден
+     * @throws IOException ошибка запроса
+     * @throws InterruptedException если поток прерван
+     */
+    public boolean refreshTokens() throws IOException, InterruptedException {
+        String refreshToken = SessionManager.getInstance().getRefreshToken();
+        if (refreshToken == null) return false;
+
+        try {
+            var req = new RefreshTokenRequest(refreshToken);
+            var resp = post(baseUri, "refresh", req, RefreshTokenResponse.class, false, null);
+            if (resp != null && resp.accessToken() != null && resp.refreshToken() != null) {
+                SessionManager.getInstance().saveTokens(resp.accessToken(), resp.refreshToken());
+                this.accessToken = resp.accessToken();
+                return true;
+            }
+        } catch (Exception ex) {
+            // Если сервер сообщил об ошибке refreshToken — считаем, что refreshToken невалиден, удаляем сессию
+            SessionManager.getInstance().logout();
+            this.accessToken = null;
+        }
+        return false;
+    }
+
+    /**
+     * Получить singleton‑инстанс AuthService.
+     * @return экземпляр AuthService
+     */
+    public static AuthService getInstance() {
+        return INSTANCE;
+    }
+
+
 }
