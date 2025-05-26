@@ -102,8 +102,7 @@ public class MathModelServiceImpl implements MathModelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MathModelDto> getMathModelsByUser(String accessToken) {
-        String username = jwtUtil.extractUsername(accessToken);
+    public List<MathModelDto> getMathModelsByUser(String username) {
         User user = userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new LocalizedException("error.user_not_found"));
         List<MathModel> models = mathModelRepository.findByUserId(user.getId());
@@ -122,7 +121,6 @@ public class MathModelServiceImpl implements MathModelService {
         param.setParamType(paramDto.paramType());
         param.setValue(paramDto.value());
         param.setDescription(paramDto.description());
-        param.setRequired(paramDto.required());
         return param;
     }
 
@@ -134,7 +132,6 @@ public class MathModelServiceImpl implements MathModelService {
         param.setParamType(paramDto.paramType());
         param.setValue(paramDto.value());
         param.setDescription(paramDto.description());
-        param.setRequired(paramDto.required());
         return param;
     }
 
@@ -160,8 +157,7 @@ public class MathModelServiceImpl implements MathModelService {
                 param.getName(),
                 param.getParamType(),
                 param.getValue(),
-                param.getDescription(),
-                param.isRequired()
+                param.getDescription()
         );
     }
 }

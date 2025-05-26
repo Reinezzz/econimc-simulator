@@ -37,6 +37,10 @@ public class ModelParameter {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
+
+
     /**
      * Тип параметра (double, int, string, boolean, array).
      */
@@ -51,13 +55,6 @@ public class ModelParameter {
     @Column(nullable = false)
     private String value;
 
-    /**
-     * Обязателен ли данный параметр для вычислений.
-     */
-    @Column(nullable = false)
-    private boolean required;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
 
 }

@@ -10,9 +10,6 @@ public class ComputationService extends MainService {
     private static final String MAIN_ENDPOINT = "/api/computation";
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + MAIN_ENDPOINT);
 
-    public ComputationService(AuthService authService) {
-        super(authService);
-    }
 
     /**
      * Запустить вычисление по id математической модели.

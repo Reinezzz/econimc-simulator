@@ -97,7 +97,7 @@ public class MathModelViewController {
                 desc.setEditable(false);
                 desc.setPromptText("Описание");
                 desc.getStyleClass().add("text-field");
-                TextField type = new TextField(param.type());
+                TextField type = new TextField(param.paramType());
                 type.setEditable(false);
                 type.setPromptText("Тип");
                 type.getStyleClass().add("text-field");

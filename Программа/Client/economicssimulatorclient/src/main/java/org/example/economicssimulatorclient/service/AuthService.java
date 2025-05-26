@@ -24,14 +24,7 @@ public class AuthService extends BaseService {
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + AUTH_PATH + "/");
 
     private static final AuthService INSTANCE = new AuthService();
-    /**
-     * -- GETTER --
-     *  Возвращает текущий access токен пользователя.
-     *
-     * @return access токен (JWT) или null, если не авторизован.
-     */
-    @Getter
-    private String accessToken;
+
 
     /* =================== Регистрация и верификация =================== */
 
@@ -82,7 +75,6 @@ public class AuthService extends BaseService {
             var resp = post(baseUri, "login", req, LoginResponse.class, false, null);
             // Сохраняем оба токена
             SessionManager.getInstance().saveTokens(resp.accessToken(), resp.refreshToken());
-            this.accessToken = resp.accessToken();
             return resp;
         } catch (Exception ex) {
             throw new IllegalArgumentException(extractErrorMessage(ex));
@@ -124,23 +116,6 @@ public class AuthService extends BaseService {
         }
     }
 
-    /* =================== Вспомогательные =================== */
-
-    /**
-     * Проверяет, авторизован ли пользователь (access-токен не null).
-     * @return true, если пользователь авторизован
-     */
-    public boolean isAuthenticated() {
-        return accessToken != null;
-    }
-
-    /**
-     * Возвращает access-токен в формате для Authorization-заголовка.
-     * @return строка "Bearer ..." или только "Bearer "
-     */
-    public String bearerHeader() {
-        return "Bearer " + accessToken;
-    }
 
     /**
      * Отменяет незавершённую регистрацию пользователя по email (асинхронно, без ожидания ответа).
@@ -206,7 +181,6 @@ public class AuthService extends BaseService {
             }
         }
         SessionManager.getInstance().logout();
-        this.accessToken = null;
     }
 
     /**
@@ -224,13 +198,12 @@ public class AuthService extends BaseService {
             var resp = post(baseUri, "refresh", req, RefreshTokenResponse.class, false, null);
             if (resp != null && resp.accessToken() != null && resp.refreshToken() != null) {
                 SessionManager.getInstance().saveTokens(resp.accessToken(), resp.refreshToken());
-                this.accessToken = resp.accessToken();
                 return true;
             }
         } catch (Exception ex) {
             // Если сервер сообщил об ошибке refreshToken — считаем, что refreshToken невалиден, удаляем сессию
             SessionManager.getInstance().logout();
-            this.accessToken = null;
+
         }
         return false;
     }

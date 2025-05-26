@@ -28,9 +28,7 @@ public class CreateMathModelController {
     @FXML private ComboBox<String> typeComboBox;
     @FXML private TextArea formulaArea;
 
-    private final AuthService auth = BaseController.get(AuthService.class);
-
-    private final MathModelService mathModelService = new MathModelService(auth);
+    private final MathModelService mathModelService = new MathModelService();
 
     // Если редактируем, сюда придёт существующая модель
     private MathModelDto editModel = null;
@@ -82,7 +80,7 @@ public class CreateMathModelController {
         paramsVBox.getChildren().clear();
         if (editModel.parameters() != null) {
             for (ModelParameterDto param : editModel.parameters()) {
-                addParamCard(param.name(), param.description(), param.type());
+                addParamCard(param.name(), param.description(), param.paramType());
             }
         }
     }
@@ -159,7 +157,8 @@ public class CreateMathModelController {
                 params.add(new ModelParameterCreateDto(
                         n.getText().trim(),
                         d.getText().trim(),
-                        t.getText().trim()
+                        t.getText().trim(),
+                        null
                 ));
             }
         }
@@ -185,7 +184,7 @@ public class CreateMathModelController {
                         editModel.id(),
                         name, formula, modelType,
                         params.stream()
-                                .map(p -> new ModelParameterUpdateDto(null, p.name(), p.description(), p.type(),null))
+                                .map(p -> new ModelParameterUpdateDto(null, p.name(), p.description(), p.paramType(),null))
                                 .collect(Collectors.toList())
                 );
                 mathModelService.updateModel(dto);

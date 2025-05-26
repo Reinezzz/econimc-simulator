@@ -11,9 +11,6 @@ public class MathModelService extends MainService {
     private static final String MAIN_ENDPOINT = "/api/models";
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + MAIN_ENDPOINT);
 
-    public MathModelService(AuthService authService) {
-        super(authService);
-    }
 
     /**
      * Получить все модели пользователя.

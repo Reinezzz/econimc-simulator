@@ -4,6 +4,8 @@ import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.service.MathModelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,11 +66,13 @@ public class MathModelController {
 
     /**
      * Получает список моделей пользователя.
-     * @param accessToken идентификатор пользователя
+
      * @return список моделей
      */
     @GetMapping
-    public ResponseEntity<List<MathModelDto>> getModelsByUser(@RequestParam("userId") String accessToken) {
-        return ResponseEntity.ok(mathModelService.getMathModelsByUser(accessToken));
+    public ResponseEntity<List<MathModelDto>> getModelsByUser(@AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        return ResponseEntity.ok(mathModelService.getMathModelsByUser(username));
     }
+
 }

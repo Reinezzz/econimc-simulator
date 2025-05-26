@@ -36,9 +36,8 @@ public class MathModelResultController {
     private MathModelDto mathModel;
     private ComputationResultDto computationResult;
     private Map<String, String> paramValues; // Имя -> значение
-    private final AuthService auth = BaseController.get(AuthService.class);
 
-    private final ComputationService computationService = new ComputationService(auth);
+    private final ComputationService computationService = new ComputationService();
 
     // Пример типов графиков (можно добавить любые три универсальных)
     private static final List<String> chartTypes = List.of("Линейный график", "Гистограмма", "Точечная диаграмма");

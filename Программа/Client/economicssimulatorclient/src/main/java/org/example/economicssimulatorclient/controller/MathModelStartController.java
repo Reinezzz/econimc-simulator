@@ -21,10 +21,8 @@ public class MathModelStartController {
     @FXML private Button runButton;
     @FXML private VBox paramsVBox;
 
-    private final AuthService auth = BaseController.get(AuthService.class);
-
     private MathModelDto mathModel;
-    private final ComputationService computationService = new ComputationService(auth);
+    private final ComputationService computationService = new ComputationService();
 
     // Храним текущие значения параметров (name -> значение)
     private final Map<String, TextField> valueFields = new HashMap<>();
@@ -54,7 +52,7 @@ public class MathModelStartController {
             name.setEditable(false);
             name.getStyleClass().add("text-field");
 
-            TextField type = new TextField(param.type());
+            TextField type = new TextField(param.paramType());
             type.setPromptText("Тип");
             type.setEditable(false);
             type.getStyleClass().add("text-field");

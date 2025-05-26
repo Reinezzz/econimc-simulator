@@ -44,8 +44,8 @@ public interface MathModelService {
     /**
      * Возвращает список моделей для пользователя.
      *
-     * @param accessToken идентификатор пользователя
+     * @param username идентификатор пользователя
      * @return список DTO моделей
      */
-    List<MathModelDto> getMathModelsByUser(String accessToken);
+    List<MathModelDto> getMathModelsByUser(String username);
 }

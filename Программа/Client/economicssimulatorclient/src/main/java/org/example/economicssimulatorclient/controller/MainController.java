@@ -35,9 +35,8 @@ public class MainController {
     @FXML
     private Pane iconLastModel;
 
-    private final AuthService auth = BaseController.get(AuthService.class);
 
-    private final MathModelService mathModelService = new MathModelService(auth);
+    private final MathModelService mathModelService = new MathModelService();
 
     private MathModelDto lastOpenedModel = null;
 
