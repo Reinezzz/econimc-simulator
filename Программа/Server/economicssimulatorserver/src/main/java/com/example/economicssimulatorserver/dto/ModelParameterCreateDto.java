@@ -11,7 +11,7 @@ import com.example.economicssimulatorserver.enums.ParameterType;
  */
 public record ModelParameterCreateDto(
         String name,
-        ParameterType paramType,
         String description,
+        String paramType,
         String value
 ) {}

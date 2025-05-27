@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.ComputationResultDto;
+import com.example.economicssimulatorserver.entity.ModelParameter;
 import com.example.economicssimulatorserver.enums.ComputationStatus;
 import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.entity.ComputationResult;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Реализация сервиса вычислений по математическим моделям.
@@ -35,9 +38,18 @@ public class ComputationServiceImpl implements ComputationService {
      */
     @Override
     @Transactional
-    public ComputationResultDto compute(Long mathModelId) {
+    public ComputationResultDto compute(Long mathModelId, Map<String, String> values) {
         MathModel model = mathModelRepository.findById(mathModelId)
                 .orElseThrow(() -> new LocalizedException("error.model_not_found"));
+
+        Map<Long, String> valuesToSolve = new HashMap<>();
+
+        for (ModelParameter p : model.getParameters()) {
+            if (values.containsKey(p.getId().toString())) {
+                p.setValue(values.get(p.getId().toString()));
+                valuesToSolve.put(p.getId(), p.getValue());
+            }
+        }
 
         ComputationResult result = new ComputationResult();
         result.setMathModel(model);
@@ -48,8 +60,8 @@ public class ComputationServiceImpl implements ComputationService {
         try {
             // Получаем вычислитель через фабрику и запускаем расчёт
             SolverResult solverResult = solverFactory
-                    .getSolver(model.getModelType())
-                    .solve(model);
+                    .getSolver(model)
+                    .solve(model, valuesToSolve);
 
             result.setFinishedAt(LocalDateTime.now());
             result.setStatus(ComputationStatus.SUCCESS);

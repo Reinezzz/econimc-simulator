@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * REST-контроллер для запуска вычислений и получения результатов.
  */
@@ -22,8 +24,8 @@ public class ComputationController {
      * @return результат вычислений
      */
     @PostMapping("/run/{mathModelId}")
-    public ResponseEntity<ComputationResultDto> runComputation(@PathVariable("mathModelId") Long mathModelId) {
-        return ResponseEntity.ok(computationService.compute(mathModelId));
+    public ResponseEntity<ComputationResultDto> runComputation(@PathVariable("mathModelId") Long mathModelId, @RequestBody Map<String, String> values) {
+        return ResponseEntity.ok(computationService.compute(mathModelId, values));
     }
 
     /**

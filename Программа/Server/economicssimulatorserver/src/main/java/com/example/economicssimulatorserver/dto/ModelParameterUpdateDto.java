@@ -13,7 +13,7 @@ import com.example.economicssimulatorserver.enums.ParameterType;
 public record ModelParameterUpdateDto(
         Long id,
         String name,
-        ParameterType paramType,
+        String paramType,
         String description,
         String value
 ) {}
