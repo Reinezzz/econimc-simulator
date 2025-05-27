@@ -25,8 +25,8 @@ public class MathModelStartController {
     private final ComputationService computationService = new ComputationService();
 
     // Храним текущие значения параметров (name -> значение)
-    private final Map<String, TextField> valueFields = new HashMap<>();
-
+    private final Map<Long, TextField> valueFields = new HashMap<>();
+    private final Map<Long, String > idToName = new HashMap<>();
     public void setMathModel(MathModelDto model) {
         this.mathModel = model;
         fillParams();
@@ -63,16 +63,17 @@ public class MathModelStartController {
 
             card.getChildren().addAll(name, type, value);
             paramsVBox.getChildren().add(card);
-            valueFields.put(param.name(), value);
+            valueFields.put(param.id(), value);
+            idToName.put(param.id(), param.name());
         }
     }
 
     private void onRun() {
         // Собираем значения параметров
-        Map<String, String> values = new HashMap<>();
+        Map<Long, String> values = new HashMap<>();
         boolean valid = true;
-        for (Map.Entry<String, TextField> entry : valueFields.entrySet()) {
-            String paramName = entry.getKey();
+        for (Map.Entry<Long, TextField> entry : valueFields.entrySet()) {
+            Long paramId = entry.getKey();
             TextField field = entry.getValue();
             String val = field.getText().trim();
             if (val.isEmpty()) {
@@ -80,7 +81,7 @@ public class MathModelStartController {
                 highlight(field);
             } else {
                 resetHighlight(field);
-                values.put(paramName, val);
+                values.put(paramId, val);
             }
         }
 
@@ -95,13 +96,13 @@ public class MathModelStartController {
             try {
                 // Предполагается, что параметры передавать не требуется — только id модели
                 // Если нужно передавать значения параметров — доработай ComputationService и сервер
-                ComputationResultDto result = computationService.runComputation(mathModel.id());
+                ComputationResultDto result = computationService.runComputation(mathModel.id(), values);
                 Platform.runLater(() -> {
                     runButton.setDisable(false);
                     // Передаём модель и значения на экран результатов, если требуется
                     SceneManager.switchToWithController("math_model_result.fxml", ctrl -> {
                         if (ctrl instanceof MathModelResultController c) {
-                            c.setComputationResult(result, mathModel, values);
+                            c.setComputationResult(result, mathModel, values, idToName);
                         }
                     });
                 });

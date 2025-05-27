@@ -11,7 +11,7 @@ package org.example.economicssimulatorclient.dto;
 public record ModelParameterUpdateDto(
         Long id,
         String name,
-        String description,
         String paramType,
+        String description,
         String value
 ) {}

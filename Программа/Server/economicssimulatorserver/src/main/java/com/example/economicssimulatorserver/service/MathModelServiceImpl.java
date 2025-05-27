@@ -5,6 +5,7 @@ import com.example.economicssimulatorserver.entity.MathModel;
 import com.example.economicssimulatorserver.entity.ModelParameter;
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.enums.ModelType;
+import com.example.economicssimulatorserver.enums.ParameterType;
 import com.example.economicssimulatorserver.repository.MathModelRepository;
 import com.example.economicssimulatorserver.repository.ModelParameterRepository;
 import com.example.economicssimulatorserver.repository.UserRepository;
@@ -43,6 +44,7 @@ public class MathModelServiceImpl implements MathModelService {
                 .orElseThrow(() -> new LocalizedException("error.user_not_found"));
         model.setUserId(user.getId());
         model.setName(dto.name());
+        model.setFormula(dto.formula());
         model.setModelType(ModelType.valueOf(dto.type()));
 
         MathModel savedModel = mathModelRepository.save(model);
@@ -65,23 +67,48 @@ public class MathModelServiceImpl implements MathModelService {
                 .orElseThrow(() -> new LocalizedException("error.model_not_found"));
 
         model.setName(dto.name());
+        model.setFormula(dto.formula());
         model.setModelType(ModelType.valueOf(dto.type()));
 
+        List<ModelParameterUpdateDto> paramDtos = dto.parameters() != null ? dto.parameters() : List.of();
+        List<ModelParameter> existingParams = modelParameterRepository.findByMathModelId(modelId);
 
-        modelParameterRepository.deleteAll(model.getParameters());
-        if (dto.parameters() != null) {
-            List<ModelParameter> parameters = dto.parameters().stream()
-                    .map(paramDto -> toEntity(paramDto, model))
-                    .collect(Collectors.toList());
-            modelParameterRepository.saveAll(parameters);
-            model.setParameters(parameters);
-        } else {
-            model.getParameters().clear();
+        // 1. Удаление параметров, которых больше нет в dto
+        List<Long> newIds = paramDtos.stream()
+                .filter(p -> p.id() != null)
+                .map(ModelParameterUpdateDto::id)
+                .toList();
+
+        existingParams.removeIf(p -> !newIds.contains(p.getId()));
+        // orphanRemoval=true сделает удаление
+
+        // 2. Обновить существующие, добавить новые
+        for (ModelParameterUpdateDto paramDto : paramDtos) {
+            if (paramDto.id() != null) {
+                // Обновить существующий параметр
+                ModelParameter existing = existingParams.stream()
+                        .filter(p -> p.getId().equals(paramDto.id()))
+                        .findFirst().orElse(null);
+
+                if (existing != null) {
+                    existing.setName(paramDto.name());
+                    existing.setDescription(paramDto.description());
+                    existing.setParamType(ParameterType.valueOf(paramDto.paramType()));
+                    existing.setValue(paramDto.value());
+                }
+            } else {
+                // Новый параметр
+                ModelParameter newParam = toEntity(paramDto, model);
+                existingParams.add(newParam);
+            }
         }
 
-        MathModel updated = mathModelRepository.save(model);
-        return toDto(updated);
+        mathModelRepository.save(model);
+        modelParameterRepository.saveAll(existingParams);
+        return toDto(model);
     }
+
+
 
     @Override
     @Transactional
@@ -118,7 +145,7 @@ public class MathModelServiceImpl implements MathModelService {
         ModelParameter param = new ModelParameter();
         param.setMathModel(model);
         param.setName(paramDto.name());
-        param.setParamType(paramDto.paramType());
+        param.setParamType(ParameterType.valueOf(paramDto.paramType()));
         param.setValue(paramDto.value());
         param.setDescription(paramDto.description());
         return param;
@@ -129,7 +156,7 @@ public class MathModelServiceImpl implements MathModelService {
         param.setId(paramDto.id());
         param.setMathModel(model);
         param.setName(paramDto.name());
-        param.setParamType(paramDto.paramType());
+        param.setParamType(ParameterType.valueOf(paramDto.paramType()));
         param.setValue(paramDto.value());
         param.setDescription(paramDto.description());
         return param;
@@ -142,8 +169,8 @@ public class MathModelServiceImpl implements MathModelService {
         return new MathModelDto(
                 model.getId(),
                 model.getName(),
-                model.getModelType().name(),
                 model.getFormula(),
+                model.getModelType().name(),
                 paramDtos,
                 model.getUserId()
 
@@ -155,9 +182,10 @@ public class MathModelServiceImpl implements MathModelService {
                 param.getId(),
                 param.getMathModel().getId(),
                 param.getName(),
-                param.getParamType(),
-                param.getValue(),
-                param.getDescription()
+                param.getDescription(),
+                param.getParamType().name(),
+                param.getValue()
+
         );
     }
 }

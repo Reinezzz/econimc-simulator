@@ -27,17 +27,18 @@ public class MathModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Владелец модели (идентификатор пользователя).
-     */
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
 
     /**
      * Название модели.
      */
     @Column(nullable = false)
     private String name;
+
+    /**
+     * Формула модели.
+     */
+    @Column
+    private String formula;
 
     /**
      * Тип математической модели.
@@ -47,15 +48,16 @@ public class MathModel {
     private ModelType modelType;
 
     /**
-     * Формула модели.
-     */
-    @Column
-    private String formula;
-
-    /**
      * Список параметров модели.
      */
     @OneToMany(mappedBy = "mathModel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ModelParameter> parameters = new ArrayList<>();
+
+    /**
+     * Владелец модели (идентификатор пользователя).
+     */
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
 
 }

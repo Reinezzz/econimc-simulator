@@ -50,7 +50,7 @@ public class CreateMathModelController {
 
         backButton.setOnAction(e -> SceneManager.back());
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml"));
-        addParamButton.setOnAction(e -> addParamCard(null, null, null));
+        addParamButton.setOnAction(e -> addParamCard(null,null, null, null));
         saveButton.setOnAction(e -> onSave());
 
         // если это создание, поля оставляем пустыми
@@ -80,13 +80,13 @@ public class CreateMathModelController {
         paramsVBox.getChildren().clear();
         if (editModel.parameters() != null) {
             for (ModelParameterDto param : editModel.parameters()) {
-                addParamCard(param.name(), param.description(), param.paramType());
+                addParamCard(param.id(), param.name(), param.description(), param.paramType());
             }
         }
     }
 
     /** Добавить пустую карточку параметра (или заполненную для редактирования) */
-    private void addParamCard(String name, String desc, String type) {
+    private void addParamCard(Long id, String name, String desc, String type) {
         HBox card = new HBox(8);
 
         TextField nameField = new TextField(name == null ? "" : name);
@@ -95,6 +95,8 @@ public class CreateMathModelController {
         descField.setPromptText("Описание");
         TextField typeField = new TextField(type == null ? "" : type);
         typeField.setPromptText("Тип");
+
+        card.setUserData(id);
 
         Button removeBtn = new Button("✕");
         removeBtn.setOnAction(e -> paramsVBox.getChildren().remove(card));
@@ -180,12 +182,22 @@ public class CreateMathModelController {
                 );
                 mathModelService.createModel(dto);
             } else { // обновление
+                List<ModelParameterUpdateDto> paramDtos = new ArrayList<>();
+                for (javafx.scene.Node node : paramsVBox.getChildren()) {
+                    if (node instanceof HBox card) {
+                        TextField n = (TextField) card.getChildren().get(0);
+                        TextField d = (TextField) card.getChildren().get(1);
+                        TextField t = (TextField) card.getChildren().get(2);
+                        Long id = (Long) card.getUserData();
+                        paramDtos.add(new ModelParameterUpdateDto(
+                                id, n.getText().trim(), t.getText().trim(), d.getText().trim(), null
+                        ));
+                    }
+                }
                 MathModelUpdateDto dto = new MathModelUpdateDto(
                         editModel.id(),
                         name, formula, modelType,
-                        params.stream()
-                                .map(p -> new ModelParameterUpdateDto(null, p.name(), p.description(), p.paramType(),null))
-                                .collect(Collectors.toList())
+                        paramDtos
                 );
                 mathModelService.updateModel(dto);
             }

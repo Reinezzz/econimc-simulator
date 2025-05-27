@@ -15,7 +15,7 @@ public record ModelParameterDto(
         Long id,
         Long mathModelId,
         String name,
-        ParameterType paramType,
         String description,
+        String paramType,
         String value
 ) {}

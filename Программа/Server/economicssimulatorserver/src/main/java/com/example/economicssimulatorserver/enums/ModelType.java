@@ -5,27 +5,27 @@ package com.example.economicssimulatorserver.enums;
  */
 public enum ModelType {
     /**
-     * Решение системы линейных уравнений.
+     * Линейное уравнение.
      */
-    LINEAR_SYSTEM,
+    ALGEBRAIC_EQUATION,
 
     /**
-     * Линейная регрессия.
+     * Эконометрические модели.
      */
-    LINEAR_REGRESSION,
+    ECONOMETRIC,
 
     /**
-     * Экспоненциальное сглаживание.
+     * Оптимизация.
      */
-    EXP_SMOOTHING,
+    OPTIMIZATION,
 
     /**
-     * Поиск минимума функции.
+     * Множественная линейная регрессия.
      */
-    FIND_MINIMUM,
+    REGRESSION,
 
     /**
-     * Решение квадратного уравнения.
+     * Система уравнений.
      */
-    QUADRATIC_EQUATION
+    SYSTEM_OF_EQUATIONS
 }

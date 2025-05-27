@@ -2,8 +2,10 @@ package org.example.economicssimulatorclient.service;
 
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.example.economicssimulatorclient.dto.ComputationResultDto;
+import org.example.economicssimulatorclient.util.JsonUtil;
 
 import java.net.URI;
+import java.util.Map;
 
 public class ComputationService extends MainService {
 
@@ -16,9 +18,9 @@ public class ComputationService extends MainService {
      * Сервер получает только id модели, параметры вычислений он определяет сам (или из параметров модели).
      * Возвращает ComputationResultDto (startedAt/finishedAt придут в ответе, но клиент их не отправляет).
      */
-    public ComputationResultDto runComputation(Long mathModelId) throws Exception {
-        // POST-запрос без тела (или с пустым телом, если сервер так ожидает)
-        return post(baseUri, MAIN_ENDPOINT + "/run/" + mathModelId, null, ComputationResultDto.class, true, null);
+    public ComputationResultDto runComputation(Long mathModelId, Map<Long, String> paramValues) throws Exception {
+
+        return post(baseUri, MAIN_ENDPOINT + "/run/" + mathModelId, paramValues, ComputationResultDto.class, true, null);
     }
 
     /**
