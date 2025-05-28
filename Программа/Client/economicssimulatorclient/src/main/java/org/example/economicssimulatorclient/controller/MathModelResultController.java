@@ -12,6 +12,8 @@ import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.service.ComputationService;
 import org.example.economicssimulatorclient.service.MathModelService;
 import org.example.economicssimulatorclient.util.SceneManager;
+import org.example.economicssimulatorclient.visualization.Visualizer;
+import org.example.economicssimulatorclient.visualization.VisualizerFactory;
 
 import java.util.*;
 
@@ -52,7 +54,9 @@ public class MathModelResultController {
     private final ComputationService computationService = new ComputationService();
 
     // Пример типов графиков (можно добавить любые три универсальных)
-    private static final List<String> chartTypes = List.of("Линейный график", "Гистограмма", "Точечная диаграмма");
+    private Visualizer visualizer;
+    private List<String> supportedCharts = new ArrayList<>();
+
 
     @FXML
     private void initialize() {
@@ -66,8 +70,6 @@ public class MathModelResultController {
         editParamsButton.setOnAction(e -> onEditParams());
         repeatButton.setOnAction(e -> onRepeat());
 
-        chartTypeComboBox.getItems().addAll(chartTypes);
-        chartTypeComboBox.setValue(chartTypes.get(0));
         chartTypeComboBox.setOnAction(e -> showChart());
     }
 
@@ -80,7 +82,19 @@ public class MathModelResultController {
         this.paramValues = new HashMap<>(setDisplayValues(values, idToName));
         fillParams();
         fillResult();
-        showChart();
+        // Получаем визуализатор через фабрику
+        this.visualizer = VisualizerFactory.getVisualizer(model);
+        if (visualizer != null) {
+            this.supportedCharts = visualizer.getSupportedCharts(model);
+            chartTypeComboBox.getItems().setAll(supportedCharts);
+            if (!supportedCharts.isEmpty()) {
+                chartTypeComboBox.setValue(supportedCharts.get(0));
+            }
+            chartTypeComboBox.setVisible(supportedCharts.size() > 1);
+            showChart();
+        } else {
+            chartTypeComboBox.setVisible(false);
+        }
         setParamsEditable(false);
     }
 
@@ -201,82 +215,12 @@ public class MathModelResultController {
      */
     private void showChart() {
         chartPane.getChildren().clear();
-        String type = chartTypeComboBox.getValue();
-        if (type == null || computationResult == null) return;
-
-        // Демонстрационный график — подбери преобразование resultData или paramValues под свои данные!
-        Chart chart = null;
-        if (type.equals("Линейный график")) {
-            chart = buildLineChart();
-        } else if (type.equals("Гистограмма")) {
-            chart = buildBarChart();
-        } else if (type.equals("Точечная диаграмма")) {
-            chart = buildScatterChart();
-        }
-        if (chart != null) {
-            chart.setPrefHeight(240);
-            chart.setPrefWidth(460);
-            chartPane.getChildren().add(chart);
+        String chartType = chartTypeComboBox.getValue();
+        if (visualizer != null && chartType != null) {
+            visualizer.visualize(mathModel, computationResult, chartPane, chartType);
         }
     }
 
-    private LineChart<String, Number> buildLineChart() {
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Map.Entry<Long, TextField> entry : valueFields.entrySet()) {
-            Long paramId = entry.getKey();
-            String paramName = idToName.get(paramId); // отображаемое имя
-            String value = entry.getValue().getText();
-            try {
-                double val = Double.parseDouble(value);
-                series.getData().add(new XYChart.Data<>(paramName, val));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        lineChart.getData().add(series);
-        return lineChart;
-    }
-
-
-    private BarChart<String, Number> buildBarChart() {
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        final BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Map.Entry<Long, TextField> entry : valueFields.entrySet()) {
-            Long paramId = entry.getKey();
-            String paramName = idToName.get(paramId); // отображаемое имя
-            String value = entry.getValue().getText();
-            try {
-                double val = Double.parseDouble(value);
-                series.getData().add(new XYChart.Data<>(paramName, val));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        barChart.getData().add(series);
-        return barChart;
-    }
-
-    private ScatterChart<String, Number> buildScatterChart() {
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        final ScatterChart<String, Number> scatterChart = new ScatterChart<>(xAxis, yAxis);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Map.Entry<Long, TextField> entry : valueFields.entrySet()) {
-            Long paramId = entry.getKey();
-            String paramName = idToName.get(paramId); // отображаемое имя
-            String value = entry.getValue().getText();
-            try {
-                double val = Double.parseDouble(value);
-                series.getData().add(new XYChart.Data<>(paramName, val));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        scatterChart.getData().add(series);
-        return scatterChart;
-    }
 
     private void highlight(Control ctrl) {
         ctrl.setStyle("-fx-border-color: red;");

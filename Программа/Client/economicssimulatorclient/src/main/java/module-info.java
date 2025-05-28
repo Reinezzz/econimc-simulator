@@ -14,10 +14,12 @@ module org.example.economicssimulatorclient {
     requires com.fasterxml.jackson.databind;
     requires static lombok;
     requires java.prefs;
-    requires org.json;      // если не было
+    requires org.json;
+    requires exp4j;      // если не было
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml;
     opens org.example.economicssimulatorclient.config to javafx.fxml;
     opens org.example.economicssimulatorclient.dto to com.fasterxml.jackson.databind;
     exports org.example.economicssimulatorclient;
+    opens org.example.economicssimulatorclient.enums to com.fasterxml.jackson.databind;
 }
