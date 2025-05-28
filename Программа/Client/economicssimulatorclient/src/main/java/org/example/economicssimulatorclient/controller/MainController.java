@@ -43,7 +43,6 @@ public class MainController {
     @FXML
     private void initialize() {
         // Загрузить список моделей при инициализации
-        loadModels();
 
         addButton.setOnAction(e -> {
             // Переход на экран создания модели
@@ -72,7 +71,7 @@ public class MainController {
     /**
      * Загрузка списка моделей и формирование кнопок в modelList.
      */
-    private void loadModels() {
+    public void loadModels() {
         modelList.getChildren().clear();
 
         new Thread(() -> {
@@ -80,6 +79,7 @@ public class MainController {
                 List<MathModelDto> models = mathModelService.getAllModels();
                 Platform.runLater(() -> {
                     for (MathModelDto model : models) {
+                        System.out.println("Model: id=" + model.id() + ", name=" + model.name());
                         Button btn = new Button(model.name());
                         btn.setMaxWidth(Double.MAX_VALUE);
                         btn.getStyleClass().add("model-list-btn");

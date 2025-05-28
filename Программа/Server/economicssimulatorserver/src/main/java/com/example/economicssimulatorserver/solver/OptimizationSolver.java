@@ -9,16 +9,12 @@ import org.springframework.stereotype.Component;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Solver для оптимизационных задач: одномерных и двумерных.
- * Для одномерных задач — метод золотого сечения.
- * Для двумерных — градиентный спуск (простой вариант).
- */
 @Component
 public class OptimizationSolver implements Solver {
 
@@ -26,9 +22,29 @@ public class OptimizationSolver implements Solver {
     private static final double EPS = 1e-7;
     private static final double GRAD_STEP = 1e-5;
     private static final double LEARNING_RATE = 0.1;
+    private static final double DEFAULT_MIN = -1000.0;
+    private static final double DEFAULT_MAX = 1000.0;
 
     @Override
     public SolverResult solve(MathModel model, Map<Long, String> parameterValues) throws LocalizedException {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<SolverResult> future = executor.submit(() -> solveInternal(model, parameterValues));
+        try {
+            // 20 секунд на решение задачи
+            return future.get(20, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new LocalizedException("solver.timeout_exceeded", "Время решения задачи превысило 20 секунд. Попробуйте уменьшить диапазон поиска или упростить формулу.");
+        } catch (Exception e) {
+            if (e.getCause() instanceof LocalizedException) throw (LocalizedException) e.getCause();
+            throw new LocalizedException("solver.unknown_error", e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    // Основная логика Solver-а здесь
+    private SolverResult solveInternal(MathModel model, Map<Long, String> parameterValues) throws LocalizedException {
         if (!supports(model)) {
             throw new LocalizedException("solver.unsupported_model_type");
         }
@@ -39,18 +55,61 @@ public class OptimizationSolver implements Solver {
         }
 
         List<ModelParameter> params = model.getParameters();
-        if (params == null || params.isEmpty()) {
-            throw new LocalizedException("solver.no_parameters_in_model");
+        if (params == null) throw new LocalizedException("solver.no_parameters_in_model");
+
+        // Собираем параметры-коэффициенты: имя → значение
+        Map<String, Double> paramValues = params.stream()
+                .collect(Collectors.toMap(
+                        ModelParameter::getName,
+                        p -> parseParamValue(p, parameterValues)
+                ));
+
+        Set<String> allVars = new HashSet<>();
+        Matcher matcher = Pattern.compile("\\b[a-zA-Z_]\\w*\\b").matcher(formula);
+        while (matcher.find()) {
+            String var = matcher.group();
+            // Можно добавить фильтр по функциям exp4j, если хочешь
+            allVars.add(var);
         }
 
-        // Выделяем параметры-оптимизируемые переменные
+        // Переменные оптимизации — те, которых нет среди параметров
+        List<String> optVars = allVars.stream()
+                .filter(var -> !paramValues.containsKey(var))
+                .toList();
 
-        if (params.size() == 1) {
-            // Одномерная оптимизация
-            return solveOneDimensional(formula, params, parameterValues, params.get(0));
-        } else if (params.size() == 2) {
-            // Двумерная оптимизация
-            return solveTwoDimensional(formula, params, parameterValues, params.get(0), params.get(1));
+        if (optVars.size() == 1) {
+            String var = optVars.get(0);
+            double min = paramValues.getOrDefault("min" + var, DEFAULT_MIN);
+            double max = paramValues.getOrDefault("max" + var, DEFAULT_MAX);
+
+            double resultX = goldenSectionMax(
+                    x -> evalExpression(formula, var, x, paramValues),
+                    min, max, EPS, MAX_ITER
+            );
+            double resultY = evalExpression(formula, var, resultX, paramValues);
+
+            return new SolverResult(var + "=" + resultX + "; value=" + resultY);
+
+        } else if (optVars.size() == 2) {
+            String var1 = optVars.get(0);
+            String var2 = optVars.get(1);
+
+            double min1 = paramValues.getOrDefault("min" + var1, DEFAULT_MIN);
+            double max1 = paramValues.getOrDefault("max" + var1, DEFAULT_MAX);
+            double min2 = paramValues.getOrDefault("min" + var2, DEFAULT_MIN);
+            double max2 = paramValues.getOrDefault("max" + var2, DEFAULT_MAX);
+
+            double[] result = gradientDescentMax(
+                    (x, y) -> evalExpression(formula, var1, x, var2, y, paramValues),
+                    (min1 + max1) / 2,
+                    (min2 + max2) / 2,
+                    min1, max1, min2, max2,
+                    EPS, MAX_ITER
+            );
+
+            double maxVal = evalExpression(formula, var1, result[0], var2, result[1], paramValues);
+            return new SolverResult(var1 + "=" + result[0] + "; " + var2 + "=" + result[1] + "; value=" + maxVal);
+
         } else {
             throw new LocalizedException("solver.optimization.unsupported_variables_count");
         }
@@ -61,74 +120,36 @@ public class OptimizationSolver implements Solver {
         return model.getModelType() == ModelType.OPTIMIZATION;
     }
 
-    private SolverResult solveOneDimensional(String formula,
-                                             List<ModelParameter> params,
-                                             Map<Long, String> parameterValues,
-                                             ModelParameter variable)
-            throws LocalizedException {
+    // --- Вспомогательные методы оптимизации ---
 
-        String varName = variable.getName();
-
-        // Диапазон поиска (можно задать minX, maxX, иначе дефолт)
-        double lower = getBoundary("min" + varName, params, parameterValues, -1000.0);
-        double upper = getBoundary("max" + varName, params, parameterValues, 1000.0);
-
-        // Подставляем все параметры (кроме оптимизируемого)
-        Map<String, Double> fixedParams = params.stream()
-                .filter(p -> !p.getName().equals(varName))
-                .collect(Collectors.toMap(
-                        ModelParameter::getName,
-                        p -> parseParamValue(p, parameterValues)
-                ));
-
-        // Метод золотого сечения для поиска максимума
-        double resultX = goldenSectionMax(
-                x -> evalExpression(formula, varName, x, fixedParams),
-                lower, upper, EPS, MAX_ITER
-        );
-        double resultY = evalExpression(formula, varName, resultX, fixedParams);
-
-        return new SolverResult(varName + "=" + resultX + "; value=" + resultY);
+    private double evalExpression(String formula, String varName, double value, Map<String, Double> fixedParams) throws LocalizedException {
+        Map<String, Double> variables = new HashMap<>(fixedParams);
+        variables.put(varName, value);
+        return evalExpression(formula, variables);
     }
 
-    private SolverResult solveTwoDimensional(String formula,
-                                             List<ModelParameter> params,
-                                             Map<Long, String> parameterValues,
-                                             ModelParameter v1,
-                                             ModelParameter v2)
-            throws LocalizedException {
-
-        String name1 = v1.getName();
-        String name2 = v2.getName();
-
-        double lower1 = getBoundary("min" + name1, params, parameterValues, -1000.0);
-        double upper1 = getBoundary("max" + name1, params, parameterValues, 1000.0);
-        double lower2 = getBoundary("min" + name2, params, parameterValues, -1000.0);
-        double upper2 = getBoundary("max" + name2, params, parameterValues, 1000.0);
-
-        Map<String, Double> fixedParams = params.stream()
-                .filter(p -> !p.getName().equals(name1) && !p.getName().equals(name2))
-                .collect(Collectors.toMap(
-                        ModelParameter::getName,
-                        p -> parseParamValue(p, parameterValues)
-                ));
-
-        // Градиентный спуск (максимум)
-        double[] result = gradientDescentMax(
-                (x, y) -> evalExpression(formula, name1, x, name2, y, fixedParams),
-                (upper1 + lower1) / 2,
-                (upper2 + lower2) / 2,
-                lower1, upper1, lower2, upper2,
-                EPS, MAX_ITER
-        );
-
-        double maxVal = evalExpression(formula, name1, result[0], name2, result[1], fixedParams);
-        return new SolverResult(name1 + "=" + result[0] + "; " + name2 + "=" + result[1] + "; value=" + maxVal);
+    private double evalExpression(String formula, String var1, double value1, String var2, double value2, Map<String, Double> fixedParams) throws LocalizedException {
+        Map<String, Double> variables = new HashMap<>(fixedParams);
+        variables.put(var1, value1);
+        variables.put(var2, value2);
+        return evalExpression(formula, variables);
     }
 
-    // ----- Алгебра/оптимизация -----
+    private double evalExpression(String formula, Map<String, Double> variables) throws LocalizedException {
+        try {
+            Expression expression = new ExpressionBuilder(formula)
+                    .variables(variables.keySet())
+                    .build()
+                    .setVariables(variables);
+            double val = expression.evaluate();
+            if (Double.isNaN(val) || Double.isInfinite(val))
+                throw new LocalizedException("solver.result_invalid");
+            return val;
+        } catch (Exception ex) {
+            throw new LocalizedException("solver.evaluation_error", ex);
+        }
+    }
 
-    // Золотое сечение для поиска максимума
     private double goldenSectionMax(UnaryFunction f, double a, double b, double eps, int maxIter) throws LocalizedException {
         final double phi = (1 + Math.sqrt(5)) / 2;
         double x1 = b - (b - a) / phi;
@@ -155,26 +176,21 @@ public class OptimizationSolver implements Solver {
         return (a + b) / 2;
     }
 
-    // Простой градиентный спуск для поиска максимума (двумерный)
     private double[] gradientDescentMax(BiFunction f, double x0, double y0,
                                         double minX, double maxX, double minY, double maxY,
                                         double eps, int maxIter) throws LocalizedException {
         double x = x0, y = y0;
         int iter = 0;
         while (iter < maxIter) {
-            // Производные по x и y
             double gradX = (f.apply(x + GRAD_STEP, y) - f.apply(x - GRAD_STEP, y)) / (2 * GRAD_STEP);
             double gradY = (f.apply(x, y + GRAD_STEP) - f.apply(x, y - GRAD_STEP)) / (2 * GRAD_STEP);
 
-            // Обновление (максимизация!)
             double newX = x + LEARNING_RATE * gradX;
             double newY = y + LEARNING_RATE * gradY;
 
-            // Ограничение по диапазону
             newX = Math.max(minX, Math.min(maxX, newX));
             newY = Math.max(minY, Math.min(maxY, newY));
 
-            // Проверка сходимости
             if (Math.abs(newX - x) < eps && Math.abs(newY - y) < eps) {
                 break;
             }
@@ -185,50 +201,6 @@ public class OptimizationSolver implements Solver {
         return new double[]{x, y};
     }
 
-    // --- Вспомогательные методы ---
-
-    private double evalExpression(String formula, String varName, double value, Map<String, Double> fixedParams) throws LocalizedException {
-        Map<String, Double> variables = new java.util.HashMap<>(fixedParams);
-        variables.put(varName, value);
-        return evalExpression(formula, variables);
-    }
-
-    private double evalExpression(String formula, String var1, double value1, String var2, double value2, Map<String, Double> fixedParams) throws LocalizedException {
-        Map<String, Double> variables = new java.util.HashMap<>(fixedParams);
-        variables.put(var1, value1);
-        variables.put(var2, value2);
-        return evalExpression(formula, variables);
-    }
-
-    private double evalExpression(String formula, Map<String, Double> variables) throws LocalizedException {
-        try {
-            Expression expression = new ExpressionBuilder(formula)
-                    .variables(variables.keySet())
-                    .build()
-                    .setVariables(variables);
-            double val = expression.evaluate();
-            if (Double.isNaN(val) || Double.isInfinite(val))
-                throw new LocalizedException("solver.result_invalid");
-            return val;
-        } catch (Exception ex) {
-            throw new LocalizedException("solver.evaluation_error", ex);
-        }
-    }
-
-    private double getBoundary(String name, List<ModelParameter> params, Map<Long, String> values, double def) {
-        return params.stream()
-                .filter(p -> p.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .map(p -> {
-                    try {
-                        return Double.parseDouble(values.get(p.getId()));
-                    } catch (Exception e) {
-                        return def;
-                    }
-                })
-                .orElse(def);
-    }
-
     private double parseParamValue(ModelParameter p, Map<Long, String> values) {
         try {
             return Double.parseDouble(values.get(p.getId()));
@@ -237,15 +209,6 @@ public class OptimizationSolver implements Solver {
         }
     }
 
-    private String getParamNameById(List<ModelParameter> params, Long id) {
-        return params.stream()
-                .filter(p -> p.getId().equals(id))
-                .map(ModelParameter::getName)
-                .findFirst()
-                .orElse("");
-    }
-
-    // Безопасное вычисление функции с обработкой ошибок
     private double safeEval(UnaryFunction f, double x) throws LocalizedException {
         try {
             return f.apply(x);
@@ -254,7 +217,6 @@ public class OptimizationSolver implements Solver {
         }
     }
 
-    // --- Функциональные интерфейсы ---
     @FunctionalInterface
     private interface UnaryFunction { double apply(double x) throws LocalizedException; }
     @FunctionalInterface

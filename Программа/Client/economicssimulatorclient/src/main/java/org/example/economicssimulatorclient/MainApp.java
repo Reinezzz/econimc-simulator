@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import org.example.economicssimulatorclient.controller.BaseController;
+import org.example.economicssimulatorclient.controller.MainController;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Application;
@@ -40,7 +41,7 @@ public class MainApp extends Application {
                 Platform.runLater(() -> {
                     if (finalRefreshed) {
                         // Если refresh прошёл успешно — открываем основной экран
-                        SceneManager.switchTo("main.fxml");
+                        SceneManager.switchToWithController("main.fxml", MainController::loadModels);
                     } else {
                         // Иначе открываем форму входа
                         SceneManager.switchTo("authorization.fxml");

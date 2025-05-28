@@ -36,11 +36,10 @@ public class CreateMathModelController {
     // Для соответствия Enum (отображение <-> значение)
     private static final LinkedHashMap<String, String> typeMap = new LinkedHashMap<>();
     static {
-        typeMap.put("Система линейных уравнений", "LINEAR_SYSTEM");
-        typeMap.put("Линейная регрессия", "LINEAR_REGRESSION");
-        typeMap.put("Экспоненциальное сглаживание", "EXP_SMOOTHING");
-        typeMap.put("Поиск минимума функции", "FIND_MINIMUM");
-        typeMap.put("Решение квадратного уравнения", "QUADRATIC_EQUATION");
+        typeMap.put("Линейное уравнение", "ALGEBRAIC_EQUATION");
+        typeMap.put("Оптимизационная модель", "OPTIMIZATION");
+        typeMap.put("Множественная линейная регрессия", "REGRESSION");
+        typeMap.put("Система уравнений", "SYSTEM_OF_EQUATIONS");
     }
 
     @FXML
@@ -49,7 +48,7 @@ public class CreateMathModelController {
         typeComboBox.getItems().addAll(typeMap.keySet());
 
         backButton.setOnAction(e -> SceneManager.back());
-        mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml"));
+        mainButton.setOnAction(e -> SceneManager.switchToWithController("main.fxml", MainController::loadModels));
         addParamButton.setOnAction(e -> addParamCard(null,null, null, null));
         saveButton.setOnAction(e -> onSave());
 
@@ -201,7 +200,11 @@ public class CreateMathModelController {
                 );
                 mathModelService.updateModel(dto);
             }
-            Platform.runLater(() -> SceneManager.switchTo("main.fxml"));
+            Platform.runLater(() ->
+                    // <-- обязательно!
+                    SceneManager.switchToWithController("main.fxml", MainController::loadModels)
+            );
+
         } catch (Exception e) {
             showAlert("Ошибка", "Не удалось сохранить модель:\n" + e.getMessage());
         }

@@ -9,10 +9,6 @@ public enum ModelType {
      */
     ALGEBRAIC_EQUATION,
 
-    /**
-     * Эконометрические модели.
-     */
-    ECONOMETRIC,
 
     /**
      * Оптимизация.

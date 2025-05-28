@@ -57,7 +57,7 @@ public class MathModelResultController {
     @FXML
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.back());
-        mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml"));
+        mainButton.setOnAction(e -> SceneManager.switchToWithController("main.fxml", MainController::loadModels));
         aiButton.setOnAction(e -> {
         }); // Не реализовано
         saveReportButton.setOnAction(e -> {

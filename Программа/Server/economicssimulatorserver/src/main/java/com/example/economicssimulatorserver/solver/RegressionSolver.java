@@ -4,7 +4,6 @@ import com.example.economicssimulatorserver.entity.MathModel;
 import com.example.economicssimulatorserver.entity.ModelParameter;
 import com.example.economicssimulatorserver.enums.ModelType;
 import com.example.economicssimulatorserver.exception.LocalizedException;
-
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,9 +12,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Solver для регрессионных моделей (множественная линейная регрессия).
- * Принимает данные для X1...Xn и Y в виде строк с разделителем ";".
- * Все параметры в модели считаются переменными регрессии, последний — зависимая.
+ * Универсальный Solver для линейной/множественной регрессии (OLS).
+ * Принимает наблюдения (X, Y или X1, X2, ..., Y) как строки вида "1;2;3".
+ * Всегда последний параметр — зависимая переменная Y, остальные — независимые.
  */
 @Component
 public class RegressionSolver implements Solver {
@@ -31,9 +30,10 @@ public class RegressionSolver implements Solver {
             throw new LocalizedException("solver.regression.not_enough_parameters");
         }
 
-        // Последний параметр — Y, остальные — X1, X2, ...
         int nVars = params.size() - 1;
         List<String> paramNames = params.stream().map(ModelParameter::getName).collect(Collectors.toList());
+
+        // Последний параметр — зависимая переменная Y
         String yName = paramNames.get(nVars);
 
         // Собираем данные
@@ -80,21 +80,14 @@ public class RegressionSolver implements Solver {
 
     @Override
     public boolean supports(MathModel model) {
+        // Универсально для двух типов:
         return model.getModelType() == ModelType.REGRESSION;
     }
 
-    /**
-     * Решение множественной линейной регрессии методом OLS (см. EconometricSolver).
-     * @param x — матрица независимых переменных (N x K)
-     * @param y — вектор зависимой переменной (N)
-     * @return коэффициенты b (K+1), включая свободный член
-     * @throws LocalizedException если невозможно вычислить коэффициенты
-     */
     private double[] calculateOLS(double[][] x, double[] y) throws LocalizedException {
         int n = x.length;
         int k = x[0].length;
 
-        // Добавляем столбец единиц (для свободного члена)
         double[][] xMat = new double[n][k + 1];
         for (int i = 0; i < n; i++) {
             xMat[i][0] = 1.0;
@@ -152,8 +145,16 @@ public class RegressionSolver implements Solver {
                 a[i][j] /= pivot;
                 b[i][j] /= pivot;
             }
-            for (int k = 0; k < n; k++) {
-                if (k == i) continue;
+            for (int k = i + 1; k < n; k++) {
+                double factor = a[k][i];
+                for (int j = 0; j < n; j++) {
+                    a[k][j] -= factor * a[i][j];
+                    b[k][j] -= factor * b[i][j];
+                }
+            }
+        }
+        for (int i = n - 1; i >= 0; i--) {
+            for (int k = 0; k < i; k++) {
                 double factor = a[k][i];
                 for (int j = 0; j < n; j++) {
                     a[k][j] -= factor * a[i][j];

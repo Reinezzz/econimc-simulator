@@ -35,7 +35,7 @@ public class MathModelStartController {
     @FXML
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.back());
-        mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml"));
+        mainButton.setOnAction(e -> SceneManager.switchToWithController("main.fxml", MainController::loadModels));
         runButton.setOnAction(e -> onRun());
     }
 

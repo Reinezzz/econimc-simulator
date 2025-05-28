@@ -9,37 +9,48 @@ import org.springframework.stereotype.Component;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public class AlgebraicEquationSolver implements Solver {
 
+    private static final int MAX_ITER = 1000;
+    private static final double EPS = 1e-8;
+
     @Override
     public SolverResult solve(MathModel model, Map<Long, String> parameterValues) throws LocalizedException {
-        // Проверка типа модели
         if (!supports(model)) {
             throw new LocalizedException("solver.unsupported_model_type");
         }
-        // Получаем формулу
+
         String formula = model.getFormula();
         if (formula == null || formula.isBlank()) {
             throw new LocalizedException("solver.formula_is_blank");
         }
 
-        // Собираем параметры из модели
         List<ModelParameter> params = model.getParameters();
         if (params == null || params.isEmpty()) {
             throw new LocalizedException("solver.no_parameters_in_model");
         }
 
-        // Сопоставляем имена параметров с их значениями по id
-        // (exp4j требует имена переменных, не id)
-        Map<String, Double> variables = params.stream()
+        // Ожидаем уравнение в виде "выражение = число"
+        String[] parts = formula.split("=");
+        if (parts.length != 2) {
+            throw new LocalizedException("solver.invalid_equation_format");
+        }
+        String leftExpr = parts[0].trim();
+        String rightExpr = parts[1].trim();
+
+        // Сопоставляем параметры: коэффициенты, правая часть
+        Map<String, Double> paramValues = params.stream()
                 .collect(Collectors.toMap(
-                        ModelParameter::getName, // переменная по имени
+                        ModelParameter::getName,
                         p -> {
                             String valueStr = parameterValues.get(p.getId());
                             if (valueStr == null) {
@@ -53,35 +64,76 @@ public class AlgebraicEquationSolver implements Solver {
                         }
                 ));
 
-        // Строим выражение
-        Expression expression;
-        try {
-            expression = new ExpressionBuilder(formula)
-                    .variables(variables.keySet())
-                    .build()
-                    .setVariables(variables);
-        } catch (Exception ex) {
-            throw new LocalizedException("solver.invalid_formula_syntax", ex);
+        // Получаем все переменные из выражения (без передачи .variables(...))
+        Set<String> variablesInExpr = new HashSet<>();
+        Matcher matcher = Pattern.compile("\\b[a-zA-Z_]\\w*\\b").matcher(leftExpr);
+        while (matcher.find()) {
+            String var = matcher.group();
+            // Можно добавить фильтр по функциям exp4j, если хочешь
+            variablesInExpr.add(var);
         }
 
-        // Вычисляем результат
-        double result;
-        try {
-            result = expression.evaluate();
-            if (Double.isNaN(result) || Double.isInfinite(result)) {
-                throw new LocalizedException("solver.result_invalid");
-            }
-        } catch (Exception ex) {
-            throw new LocalizedException("solver.evaluation_error", ex);
-        }
 
-        // Возвращаем результат через SolverResult (у тебя уже реализован класс)
-        return new SolverResult(String.valueOf(result));
+        // Находим неизвестную переменную (например, x)
+        String unknown = variablesInExpr.stream()
+                .filter(var -> !paramValues.containsKey(var))
+                .findFirst()
+                .orElseThrow(() -> new LocalizedException("solver.no_unknown_variable"));
+
+
+        // Численное решение уравнения: f(x) = left - right = 0
+        double rightValue = evalExpression(rightExpr, paramValues);
+
+        double root = findRoot(
+                x -> evalExpression(leftExpr, paramValues, unknown, x) - rightValue,
+                -1e6, 1e6, EPS, MAX_ITER
+        );
+
+        return new SolverResult(unknown + "=" + root);
     }
 
     @Override
     public boolean supports(MathModel model) {
-        // Поддерживаем только модели типа "алгебраическое уравнение"
         return model.getModelType() == ModelType.ALGEBRAIC_EQUATION;
     }
+
+    // Вычисление выражения с параметрами
+    private double evalExpression(String expr, Map<String, Double> paramValues) throws LocalizedException {
+        try {
+            Expression e = new ExpressionBuilder(expr)
+                    .variables(paramValues.keySet())
+                    .build()
+                    .setVariables(paramValues);
+            return e.evaluate();
+        } catch (Exception ex) {
+            throw new LocalizedException("solver.evaluation_error", ex);
+        }
+    }
+
+    // Перегрузка с одной неизвестной
+    private double evalExpression(String expr, Map<String, Double> paramValues, String unknown, double x) throws LocalizedException {
+        Map<String, Double> vars = new java.util.HashMap<>(paramValues);
+        vars.put(unknown, x);
+        return evalExpression(expr, vars);
+    }
+
+    // Простой метод бисекции для поиска корня
+    private double findRoot(UnaryFunction f, double a, double b, double eps, int maxIter) throws LocalizedException {
+        double fa = f.apply(a), fb = f.apply(b);
+        if (fa * fb > 0) throw new LocalizedException("solver.no_root_on_interval");
+        for (int i = 0; i < maxIter; i++) {
+            double c = (a + b) / 2;
+            double fc = f.apply(c);
+            if (Math.abs(fc) < eps) return c;
+            if (fa * fc < 0) {
+                b = c; fb = fc;
+            } else {
+                a = c; fa = fc;
+            }
+        }
+        throw new LocalizedException("solver.root_not_found");
+    }
+
+    @FunctionalInterface
+    private interface UnaryFunction { double apply(double x) throws LocalizedException; }
 }

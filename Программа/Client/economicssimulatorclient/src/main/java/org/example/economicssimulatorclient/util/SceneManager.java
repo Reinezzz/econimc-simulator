@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.economicssimulatorclient.controller.MainController;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,10 +41,12 @@ public final class SceneManager {
     /**
      * Приватный конструктор для запрета создания экземпляров.
      */
-    private SceneManager() {}
+    private SceneManager() {
+    }
 
     /**
      * Инициализация менеджера сцен (один раз из MainApp).
+     *
      * @param stage основной Stage приложения
      */
     public static void init(Stage stage) {
@@ -53,6 +56,7 @@ public final class SceneManager {
 
     /**
      * Переключиться на заданный FXML (из ресурсов).
+     *
      * @param fxml имя FXML-файла
      */
     public static void switchTo(String fxml) {
@@ -67,6 +71,7 @@ public final class SceneManager {
 
     /**
      * Загружает и локализует FXML-файл.
+     *
      * @param fxml имя файла
      * @return {@link Parent} корневой элемент сцены
      */
@@ -82,16 +87,21 @@ public final class SceneManager {
             throw new RuntimeException("Cannot load " + fxml, e);
         }
     }
+
     /**
      * Переключиться на заданный FXML с передачей контроллеру инициализирующей функции.
      * Не ломает кэш, работает с root-сценой.
      * Не кэширует такие сцены!
-     * @param fxml имя FXML-файла
+     *
+     * @param fxml               имя FXML-файла
      * @param controllerConsumer действие с контроллером
-     * @param <T> тип контроллера
+     * @param <T>                тип контроллера
      */
     public static <T> void switchToWithController(String fxml, java.util.function.Consumer<T> controllerConsumer) {
         try {
+            if (currentFxml != null)
+                history.push(currentFxml);
+            currentFxml = fxml;
             I18n.setLocale(Locale.forLanguageTag("ru"));
             Locale locale = I18n.getLocale();
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
@@ -109,11 +119,19 @@ public final class SceneManager {
     public static void back() {
         if (!history.isEmpty()) {
             String prevFxml = history.pop();
-            Parent root = cache.computeIfAbsent(prevFxml, SceneManager::load);
-            scene.setRoot(root);
             currentFxml = prevFxml;
+
+            if (prevFxml.equals("main.fxml")) {
+                // Для главного экрана — всегда вызываем контроллер с обновлением моделей
+                switchToWithController("main.fxml", MainController::loadModels);
+            } else {
+                // Для всех остальных сцен — обычное поведение
+                Parent root = cache.computeIfAbsent(prevFxml, SceneManager::load);
+                scene.setRoot(root);
+            }
         }
     }
+
 
 
 }
