@@ -20,6 +20,8 @@ import java.util.*;
 public class MathModelResultController {
 
     @FXML
+    private Label chartTitle;
+    @FXML
     private Button backButton;
     @FXML
     private Button mainButton;
@@ -69,7 +71,6 @@ public class MathModelResultController {
 
         editParamsButton.setOnAction(e -> onEditParams());
         repeatButton.setOnAction(e -> onRepeat());
-
         chartTypeComboBox.setOnAction(e -> showChart());
     }
 
@@ -91,7 +92,7 @@ public class MathModelResultController {
                 chartTypeComboBox.setValue(supportedCharts.get(0));
             }
             chartTypeComboBox.setVisible(supportedCharts.size() > 1);
-            showChart();
+            Platform.runLater(this::showChart);
         } else {
             chartTypeComboBox.setVisible(false);
         }
@@ -218,7 +219,15 @@ public class MathModelResultController {
         String chartType = chartTypeComboBox.getValue();
         if (visualizer != null && chartType != null) {
             visualizer.visualize(mathModel, computationResult, chartPane, chartType);
-        }
+        } else if (visualizer == null)
+            showNoVisualizationMessage();
+    }
+
+
+    private void showNoVisualizationMessage() {
+        chartPane.getChildren().clear();
+        chartPane.setVisible(false);
+        chartTitle.setText("Визуализация для этой модели не поддерживается.");
     }
 
 

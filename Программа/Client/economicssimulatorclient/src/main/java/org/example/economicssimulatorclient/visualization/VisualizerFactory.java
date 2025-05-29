@@ -12,7 +12,7 @@ public class VisualizerFactory {
         ModelType type = ModelType.valueOf(model.type());
 
         return switch (type) {
-            case ALGEBRAIC_EQUATION -> new AlgebraicEquationVisualizer();
+            case ALGEBRAIC_EQUATION -> null;
             case SYSTEM_OF_EQUATIONS -> new SystemOfEquationsVisualizer();
             case REGRESSION -> new RegressionVisualizer();
             case OPTIMIZATION -> new OptimizationVisualizer();

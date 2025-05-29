@@ -38,7 +38,7 @@
             <TextArea fx:id="resultArea" promptText="Результат" styleClass="text-area" prefHeight="80" editable="false"/>
 
             <HBox spacing="12" alignment="CENTER_LEFT">
-                <Label text="График" styleClass="form-label"/>
+                <Label fx:id="chartTitle" text="График" styleClass="form-label"/>
                 <ComboBox fx:id="chartTypeComboBox" prefWidth="200"/>
             </HBox>
 

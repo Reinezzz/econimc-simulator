@@ -31,7 +31,7 @@ public class OptimizationSolver implements Solver {
         Future<SolverResult> future = executor.submit(() -> solveInternal(model, parameterValues));
         try {
             // 20 секунд на решение задачи
-            return future.get(20, TimeUnit.SECONDS);
+            return future.get(2000000000, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
             throw new LocalizedException("solver.timeout_exceeded", "Время решения задачи превысило 20 секунд. Попробуйте уменьшить диапазон поиска или упростить формулу.");
@@ -64,17 +64,20 @@ public class OptimizationSolver implements Solver {
                         p -> parseParamValue(p, parameterValues)
                 ));
 
+        // Собираем все идентификаторы из формулы
         Set<String> allVars = new HashSet<>();
         Matcher matcher = Pattern.compile("\\b[a-zA-Z_]\\w*\\b").matcher(formula);
         while (matcher.find()) {
             String var = matcher.group();
-            // Можно добавить фильтр по функциям exp4j, если хочешь
             allVars.add(var);
         }
 
-        // Переменные оптимизации — те, которых нет среди параметров
+        // Параметры модели
+        Set<String> paramNames = paramValues.keySet();
+
+        // Переменные оптимизации — те, которых нет среди параметров (т.е. x или x,y)
         List<String> optVars = allVars.stream()
-                .filter(var -> !paramValues.containsKey(var))
+                .filter(var -> !paramNames.contains(var))
                 .toList();
 
         if (optVars.size() == 1) {
@@ -83,10 +86,10 @@ public class OptimizationSolver implements Solver {
             double max = paramValues.getOrDefault("max" + var, DEFAULT_MAX);
 
             double resultX = goldenSectionMax(
-                    x -> evalExpression(formula, var, x, paramValues),
-                    min, max, EPS, MAX_ITER
+                    x -> evalExpression(formula, allVars, Map.of(var, x), paramValues),
+                    min, max
             );
-            double resultY = evalExpression(formula, var, resultX, paramValues);
+            double resultY = evalExpression(formula, allVars, Map.of(var, resultX), paramValues);
 
             return new SolverResult(var + "=" + resultX + "; value=" + resultY);
 
@@ -100,20 +103,31 @@ public class OptimizationSolver implements Solver {
             double max2 = paramValues.getOrDefault("max" + var2, DEFAULT_MAX);
 
             double[] result = gradientDescentMax(
-                    (x, y) -> evalExpression(formula, var1, x, var2, y, paramValues),
+                    (x, y) -> evalExpression(
+                            formula,
+                            allVars,
+                            Map.of(var1, x, var2, y),
+                            paramValues
+                    ),
                     (min1 + max1) / 2,
                     (min2 + max2) / 2,
                     min1, max1, min2, max2,
                     EPS, MAX_ITER
             );
 
-            double maxVal = evalExpression(formula, var1, result[0], var2, result[1], paramValues);
+            double maxVal = evalExpression(
+                    formula,
+                    allVars,
+                    Map.of(var1, result[0], var2, result[1]),
+                    paramValues
+            );
             return new SolverResult(var1 + "=" + result[0] + "; " + var2 + "=" + result[1] + "; value=" + maxVal);
 
         } else {
             throw new LocalizedException("solver.optimization.unsupported_variables_count");
         }
     }
+
 
     @Override
     public boolean supports(MathModel model) {
@@ -122,25 +136,23 @@ public class OptimizationSolver implements Solver {
 
     // --- Вспомогательные методы оптимизации ---
 
-    private double evalExpression(String formula, String varName, double value, Map<String, Double> fixedParams) throws LocalizedException {
-        Map<String, Double> variables = new HashMap<>(fixedParams);
-        variables.put(varName, value);
-        return evalExpression(formula, variables);
-    }
-
-    private double evalExpression(String formula, String var1, double value1, String var2, double value2, Map<String, Double> fixedParams) throws LocalizedException {
-        Map<String, Double> variables = new HashMap<>(fixedParams);
-        variables.put(var1, value1);
-        variables.put(var2, value2);
-        return evalExpression(formula, variables);
-    }
-
-    private double evalExpression(String formula, Map<String, Double> variables) throws LocalizedException {
+    // Универсальный метод для вычисления выражения с произвольными переменными оптимизации
+    private double evalExpression(String formula, Set<String> allVars, Map<String, Double> optValues, Map<String, Double> paramValues) throws LocalizedException {
         try {
-            Expression expression = new ExpressionBuilder(formula)
-                    .variables(variables.keySet())
-                    .build()
-                    .setVariables(variables);
+            ExpressionBuilder builder = new ExpressionBuilder(formula)
+                    .variables(allVars); // <--- все переменные, и параметры, и оптимизируемые
+
+            Expression expression = builder.build();
+
+            // Сначала параметры (a, b, c)
+            for (Map.Entry<String, Double> entry : paramValues.entrySet()) {
+                expression.setVariable(entry.getKey(), entry.getValue());
+            }
+            // Теперь переменные оптимизации (x и/или y)
+            for (Map.Entry<String, Double> entry : optValues.entrySet()) {
+                expression.setVariable(entry.getKey(), entry.getValue());
+            }
+
             double val = expression.evaluate();
             if (Double.isNaN(val) || Double.isInfinite(val))
                 throw new LocalizedException("solver.result_invalid");
@@ -150,14 +162,15 @@ public class OptimizationSolver implements Solver {
         }
     }
 
-    private double goldenSectionMax(UnaryFunction f, double a, double b, double eps, int maxIter) throws LocalizedException {
+
+    private double goldenSectionMax(UnaryFunction f, double a, double b) throws LocalizedException {
         final double phi = (1 + Math.sqrt(5)) / 2;
         double x1 = b - (b - a) / phi;
         double x2 = a + (b - a) / phi;
         double f1 = safeEval(f, x1);
         double f2 = safeEval(f, x2);
         int iter = 0;
-        while (Math.abs(b - a) > eps && iter < maxIter) {
+        while (Math.abs(b - a) > OptimizationSolver.EPS && iter < OptimizationSolver.MAX_ITER) {
             if (f1 < f2) {
                 a = x1;
                 x1 = x2;
