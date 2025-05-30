@@ -78,7 +78,8 @@ public class PasswordChangeController extends BaseController {
 
             PasswordResetDialogController ctrl = loader.getController();
             ctrl.setupValidation();
-
+            ctrl.clearStatusLabel();
+            ctrl.clearFields();
             dialog.setResultConverter(btn -> {
                 if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                     return new Pair<>(ctrl.getCode(), ctrl.getPassword());
@@ -110,7 +111,15 @@ public class PasswordChangeController extends BaseController {
      */
     @FXML
     private void goBack() {
-        SceneManager.switchTo("authorization.fxml");
+        SceneManager.switchTo("authorization.fxml",   c -> {
+            ((BaseController) c).clearStatusLabel();
+            ((BaseController) c).clearFields();
+        });
+    }
+
+    @Override
+    public void clearFields() {
+        if(emailField != null) emailField.clear();
     }
 
     /**
@@ -126,7 +135,10 @@ public class PasswordChangeController extends BaseController {
                 auth.resetPasswordConfirm(new PasswordResetConfirm(email, code, password));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "msg.password_changed");
-                    SceneManager.switchTo("authorization.fxml");
+                    SceneManager.switchTo("authorization.fxml",   c -> {
+                        ((BaseController) c).clearStatusLabel();
+                        ((BaseController) c).clearFields();
+                    });
                 });
             } catch (Exception ex) {
                 new Thread(() -> auth.cancelPasswordReset(email)).start();

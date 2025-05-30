@@ -1,134 +1,187 @@
 package com.example.economicssimulatorserver.controller;
 
 import com.example.economicssimulatorserver.dto.*;
-import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.service.AuthService;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.cache.Cache;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock private AuthService authService;
-    @Mock private CacheManager cacheManager;
-    @Mock private Cache cache;
+    @MockBean
+    private AuthService authService;
 
-    @InjectMocks private AuthController authController;
+    @MockBean
+    private CacheManager cacheManager;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(cacheManager.getCache(anyString())).thenReturn(cache);
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-    }
-
-    // ----- REGISTRATION -----
+    // Пример DTO-заглушек
+    private static final RegistrationRequest REG_REQ =
+            new RegistrationRequest("testuser", "test@email.com", "pass123");
+    private static final VerificationRequest VERIFY_REQ =
+            new VerificationRequest("test@email.com", "123456");
+    private static final LoginRequest LOGIN_REQ =
+            new LoginRequest("testuser", "pass123");
+    private static final PasswordResetRequest RESET_REQ =
+            new PasswordResetRequest("test@email.com");
+    private static final PasswordResetConfirm RESET_CONFIRM_REQ =
+            new PasswordResetConfirm("test@email.com", "123456", "newpass");
+    private static final RefreshTokenRequest REFRESH_REQ =
+            new RefreshTokenRequest("some-refresh-token");
+    private static final LogoutRequest LOGOUT_REQ =
+            new LogoutRequest("some-refresh-token");
 
     @Test
-    void register_ShouldReturnCreated() throws Exception {
-        RegistrationRequest req = new RegistrationRequest("user", "mail@ex.com", "pass");
-        ApiResponse response = new ApiResponse(true, "ok");
-        when(authService.register(any())).thenReturn(response);
+    @DisplayName("POST /auth/register - successful registration")
+    void testRegister() throws Exception {
+        Mockito.when(authService.register(any(RegistrationRequest.class)))
+                .thenReturn(new ApiResponse(true, "msg.verification_code_sent"));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"user\",\"email\":\"mail@ex.com\",\"password\":\"pass\"}"))
+                        .content("""
+                                {"username":"testuser","email":"test@email.com","password":"pass123"}
+                                """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("msg.verification_code_sent"));
     }
 
     @Test
-    void verifyEmail_ShouldReturnSuccess() throws Exception {
-        VerificationRequest req = new VerificationRequest("mail@ex.com", "123456");
-        ApiResponse response = new ApiResponse(true, "ok");
-        when(authService.verifyEmail(any())).thenReturn(response);
+    @DisplayName("POST /auth/verify-email - successful verification")
+    void testVerifyEmail() throws Exception {
+        Mockito.when(authService.verifyEmail(any(VerificationRequest.class)))
+                .thenReturn(new ApiResponse(true, "msg.email_confirmed"));
 
         mockMvc.perform(post("/auth/verify-email")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mail@ex.com\",\"code\":\"123456\"}"))
+                        .content("""
+                                {"email":"test@email.com","code":"123456"}
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("msg.email_confirmed"));
     }
 
-    // ----- LOGIN -----
+    @Test
+    @DisplayName("POST /auth/login - successful login")
+    void testLogin() throws Exception {
+        Mockito.when(authService.login(any(LoginRequest.class)))
+                .thenReturn(new LoginResponse("access", "refresh", "Bearer"));
 
-//    @Test
-//    void login_ShouldReturnToken() throws Exception {
-//        LoginRequest req = new LoginRequest("user", "pass");
-//        LoginResponse response = new LoginResponse("access", "Bearer");
-//        when(authService.login(any())).thenReturn(response);
-//
-//        mockMvc.perform(post("/auth/login")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"usernameOrEmail\":\"user\",\"password\":\"pass\"}"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.accessToken").value("access"))
-//                .andExpect(jsonPath("$.tokenType").value("Bearer"));
-//    }
-
-    // ----- PASSWORD RESET -----
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"usernameOrEmail":"testuser","password":"pass123"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("access"))
+                .andExpect(jsonPath("$.refreshToken").value("refresh"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+    }
 
     @Test
-    void passwordReset_ShouldReturnSuccess() throws Exception {
-        PasswordResetRequest req = new PasswordResetRequest("mail@ex.com");
-        ApiResponse response = new ApiResponse(true, "sent");
-        when(authService.initiatePasswordReset(any())).thenReturn(response);
+    @DisplayName("POST /auth/password-reset - initiate password reset")
+    void testPasswordReset() throws Exception {
+        Mockito.when(authService.initiatePasswordReset(any(PasswordResetRequest.class)))
+                .thenReturn(new ApiResponse(true, "msg.password_rest_code_sent"));
 
         mockMvc.perform(post("/auth/password-reset")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mail@ex.com\"}"))
+                        .content("""
+                                {"email":"test@email.com"}
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
 
     @Test
-    void passwordResetConfirm_ShouldReturnSuccess() throws Exception {
-        PasswordResetConfirm req = new PasswordResetConfirm("mail@ex.com", "123456", "newpw");
-        ApiResponse response = new ApiResponse(true, "ok");
-        when(authService.confirmPasswordReset(any())).thenReturn(response);
+    @DisplayName("POST /auth/password-reset/confirm - confirm password reset")
+    void testPasswordResetConfirm() throws Exception {
+        Mockito.when(authService.confirmPasswordReset(any(PasswordResetConfirm.class)))
+                .thenReturn(new ApiResponse(true, "msg.password_updated"));
 
         mockMvc.perform(post("/auth/password-reset/confirm")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mail@ex.com\",\"code\":\"123456\",\"newPassword\":\"newpw\"}"))
+                        .content("""
+                                {"email":"test@email.com","code":"123456","newPassword":"newpass"}
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
 
-    // ----- CANCEL REGISTRATION -----
-
     @Test
-    void cancelRegistration_ShouldEvictCacheAndReturnSuccess() throws Exception {
+    @DisplayName("POST /auth/cancel-registration")
+    void testCancelRegistration() throws Exception {
         mockMvc.perform(post("/auth/cancel-registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mail@ex.com\"}"))
+                        .content("""
+                                {"email":"test@email.com"}
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-        verify(cache, atLeastOnce()).evict("mail@ex.com");
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("msg.registration_canceled"));
     }
 
     @Test
-    void cancelPasswordReset_ShouldCallServiceAndReturnSuccess() throws Exception {
-        doNothing().when(authService).cancelPasswordReset("mail@ex.com");
+    @DisplayName("POST /auth/cancel-password-reset")
+    void testCancelPasswordReset() throws Exception {
+        Mockito.doNothing().when(authService).cancelPasswordReset(anyString());
+
         mockMvc.perform(post("/auth/cancel-password-reset")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mail@ex.com\"}"))
+                        .content("""
+                                {"email":"test@email.com"}
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-        verify(authService, atLeastOnce()).cancelPasswordReset("mail@ex.com");
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("msg.password_reset_canceled"));
+    }
+
+    @Test
+    @DisplayName("POST /auth/refresh - successful refresh")
+    void testRefresh() throws Exception {
+        Mockito.when(authService.refreshTokens(any(RefreshTokenRequest.class)))
+                .thenReturn(new RefreshTokenResponse("access", "refresh"));
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"refreshToken":"some-refresh-token"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("access"))
+                .andExpect(jsonPath("$.refreshToken").value("refresh"));
+    }
+
+    @Test
+    @DisplayName("POST /auth/logout")
+    void testLogout() throws Exception {
+        Mockito.doNothing().when(authService).logout(any(LogoutRequest.class));
+
+        mockMvc.perform(post("/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"refreshToken":"some-refresh-token"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Successfully logged out."));
     }
 }

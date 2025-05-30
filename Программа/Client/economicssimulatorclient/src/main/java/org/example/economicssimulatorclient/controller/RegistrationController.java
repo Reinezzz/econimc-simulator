@@ -91,7 +91,7 @@ public class RegistrationController extends BaseController {
                     }
                     Platform.runLater(() -> {
                         showSuccess(statusLabel, "msg.registration_success");
-                        SceneManager.switchTo("authorization.fxml");
+                        SceneManager.switchToWithoutContorller("main.fxml");
                     });
                 }, ex -> Platform.runLater(() -> {
                     showError(statusLabel, tr("error.base") + ex.getMessage());
@@ -109,7 +109,18 @@ public class RegistrationController extends BaseController {
      */
     @FXML
     private void openLogin() {
-        SceneManager.switchTo("authorization.fxml");
+        SceneManager.switchTo("authorization.fxml",  c -> {
+            ((BaseController) c).clearStatusLabel();
+            ((BaseController) c).clearFields();
+        });
+    }
+
+    @Override
+    public void clearFields() {
+        if(usernameField != null) usernameField.clear();
+        if(emailField != null) emailField.clear();
+        if(passwordField != null) passwordField.clear();
+        if(repeatPasswordField != null) repeatPasswordField.clear();
     }
 
     /**
@@ -128,7 +139,8 @@ public class RegistrationController extends BaseController {
             stage.setResizable(false);
 
             VerificationCodeDialogController ctrl = loader.getController();
-
+            ctrl.clearStatusLabel();
+            ctrl.clearFields();
             dialog.setResultConverter(btn -> {
                 if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE)
                     return ctrl.getCode();

@@ -1,6 +1,8 @@
 package org.example.economicssimulatorclient.service;
 
 import javafx.application.Platform;
+import org.example.economicssimulatorclient.controller.AuthorizationController;
+import org.example.economicssimulatorclient.controller.BaseController;
 import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.SessionManager;
 
@@ -36,7 +38,7 @@ public class MainService extends BaseService {
                     return super.post(baseUri, endpoint, body, respType, true, currentToken);
                 } else {
                     AuthService.getInstance().logout();
-                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml"));
+                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
                     throw new IllegalArgumentException("Сессия истекла, войдите заново");
                 }
             }
@@ -66,7 +68,7 @@ public class MainService extends BaseService {
                     return super.get(baseUri, endpoint, respType, true, currentToken);
                 } else {
                     AuthService.getInstance().logout();
-                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml"));
+                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
                     throw new IllegalArgumentException("Сессия истекла, войдите заново");
                 }
             }
@@ -93,7 +95,7 @@ public class MainService extends BaseService {
                     return super.put(baseUri, endpoint, body, respType, true, currentToken);
                 } else {
                     AuthService.getInstance().logout();
-                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml"));
+                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
                     throw new IllegalArgumentException("Сессия истекла, войдите заново");
                 }
             }
@@ -118,7 +120,7 @@ public class MainService extends BaseService {
                     super.delete(baseUri, endpoint, true, currentToken);
                 } else {
                     AuthService.getInstance().logout();
-                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml"));
+                    Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
                     throw new IllegalArgumentException("Сессия истекла, войдите заново");
                 }
             } else {

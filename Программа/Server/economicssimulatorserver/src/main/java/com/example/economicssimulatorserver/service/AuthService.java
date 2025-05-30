@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Сервис для обработки регистрации, верификации email, аутентификации и сброса пароля.
@@ -113,6 +114,11 @@ public class AuthService {
      * @throws LocalizedException если логин или пароль неверные
      */
     public LoginResponse login(LoginRequest req) {
+        // Проверяем наличие пользователя в базе до аутентификации
+        Optional<User> userOpt = userRepo.findByUsernameOrEmail(req.usernameOrEmail(), req.usernameOrEmail());
+        if (userOpt.isEmpty()) {
+            throw new LocalizedException("error.user_not_found"); // или свой собственный класс, если требуется
+        }
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
                     req.usernameOrEmail(), req.password());
@@ -127,6 +133,7 @@ public class AuthService {
             throw new LocalizedException("error.wrong_credentials");
         }
     }
+
 
 
     /**

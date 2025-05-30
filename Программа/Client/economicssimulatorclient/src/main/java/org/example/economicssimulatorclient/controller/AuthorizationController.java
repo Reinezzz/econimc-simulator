@@ -48,7 +48,7 @@ public class AuthorizationController extends BaseController {
                 auth.login(new LoginRequest(login, pass));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "auth.status_label.successful");
-                    SceneManager.switchTo("main.fxml");
+                    SceneManager.switchToWithoutContorller("main.fxml");
                 });
             } catch (IllegalArgumentException ex) {
                 Platform.runLater(() -> {
@@ -68,7 +68,10 @@ public class AuthorizationController extends BaseController {
      */
     @FXML
     private void openRegister() {
-        SceneManager.switchTo("registration.fxml");
+        SceneManager.switchTo("registration.fxml", c -> {
+            ((BaseController) c).clearStatusLabel();
+            ((BaseController) c).clearFields();
+        });
     }
 
     /**
@@ -76,6 +79,15 @@ public class AuthorizationController extends BaseController {
      */
     @FXML
     private void openReset() {
-        SceneManager.switchTo("password_change.fxml");
+        SceneManager.switchTo("password_change.fxml",  c -> {
+            ((BaseController) c).clearStatusLabel();
+            ((BaseController) c).clearFields();
+        });
+    }
+
+    @Override
+    public void clearFields() {
+        if (usernameEmailField != null) usernameEmailField.clear();
+        if (passwordField != null) passwordField.clear();
     }
 }

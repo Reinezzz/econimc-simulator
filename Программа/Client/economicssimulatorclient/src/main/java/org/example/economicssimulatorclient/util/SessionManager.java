@@ -1,5 +1,7 @@
 package org.example.economicssimulatorclient.util;
 
+import lombok.Getter;
+
 import java.util.prefs.Preferences;
 
 /**
@@ -11,6 +13,8 @@ public class SessionManager {
     private static final String ACCESS_TOKEN_KEY = "accessToken";
     private static final String REFRESH_TOKEN_KEY = "refreshToken";
     private static final SessionManager INSTANCE = new SessionManager();
+    @Getter
+    private boolean justLoggedOut = false;
 
     private final Preferences prefs;
 
@@ -59,6 +63,11 @@ public class SessionManager {
     public void logout() {
         prefs.remove(ACCESS_TOKEN_KEY);
         prefs.remove(REFRESH_TOKEN_KEY);
+        justLoggedOut = true;
+    }
+
+    public void resetJustLoggedOut() {
+        justLoggedOut = false;
     }
 
     /**
@@ -68,4 +77,5 @@ public class SessionManager {
     public boolean isLoggedIn() {
         return getAccessToken() != null && getRefreshToken() != null;
     }
+
 }

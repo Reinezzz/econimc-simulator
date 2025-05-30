@@ -3,7 +3,6 @@ package org.example.economicssimulatorclient.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.example.economicssimulatorclient.util.I18n;
 
 /**
  * Контроллер диалога ввода кода подтверждения email.
@@ -15,7 +14,7 @@ public class VerificationCodeDialogController extends BaseController {
     @FXML
     TextField codeField;
     @FXML
-    Label errorLabel;
+    Label statusLable;
     @FXML
     ButtonType okBtn;
     @FXML
@@ -37,9 +36,14 @@ public class VerificationCodeDialogController extends BaseController {
                 boolean empty = n.trim().isEmpty();
                 okButton.setDisable(empty);
                 cancelButton.setDisable(empty);
-                errorLabel.setText(empty ? tr("dialog.status_label.code_required") : "");
+                statusLable.setText(empty ? tr("dialog.status_label.code_required") : "");
             });
         });
+    }
+
+    @Override
+    public void clearFields() {
+        if(codeField != null) codeField.clear();
     }
 
     /**

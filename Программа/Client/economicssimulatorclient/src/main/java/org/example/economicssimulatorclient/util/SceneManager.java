@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.economicssimulatorclient.controller.BaseController;
 import org.example.economicssimulatorclient.controller.MainController;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public final class SceneManager {
      *
      * @param fxml имя FXML-файла
      */
-    public static void switchTo(String fxml) {
+    public static void switchToWithoutContorller(String fxml) {
         try {
             Parent root = cache.computeIfAbsent(fxml, SceneManager::load);
             scene.setRoot(root);
@@ -97,7 +98,7 @@ public final class SceneManager {
      * @param controllerConsumer действие с контроллером
      * @param <T>                тип контроллера
      */
-    public static <T> void switchToWithController(String fxml, java.util.function.Consumer<T> controllerConsumer) {
+    public static <T> void switchTo(String fxml, java.util.function.Consumer<T> controllerConsumer) {
         try {
             if (currentFxml != null)
                 history.push(currentFxml);

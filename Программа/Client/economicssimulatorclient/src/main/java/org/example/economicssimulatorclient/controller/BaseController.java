@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.controller;
 
+import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.example.economicssimulatorclient.util.I18n;
 
@@ -8,7 +9,8 @@ import org.example.economicssimulatorclient.util.I18n;
  * Предоставляет утилиты для локализации, DI и обработки ошибок.
  */
 public abstract class BaseController {
-
+    @FXML
+    protected Label statusLabel;
     /**
      * Получить строку локализации по ключу.
      * @param key ключ локализации
@@ -90,4 +92,14 @@ public abstract class BaseController {
             throw new IllegalStateException("No singleton provided for " + type);
         return type.cast(inst);
     }
+    public void clearStatusLabel() {
+        if (statusLabel != null) {
+            statusLabel.setText("");
+        }
+    }
+
+    // Абстрактный метод для очистки всех полей формы
+    public abstract void clearFields();
+
+
 }

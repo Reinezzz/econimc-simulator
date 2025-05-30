@@ -6,11 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
+import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.util.List;
 
-public class MainController {
+public class MainController extends BaseController {
+
+    private final AuthService authService = AuthService.getInstance();
 
     @FXML
     private VBox modelList;
@@ -52,14 +55,24 @@ public class MainController {
         return null;
     }
 
+    @Override
+    public void clearFields() {
+    }
+
     // Обработчик выхода НЕ трогаем!
     @FXML
     private void onExitButtonClicked() {
         new Thread(() -> {
             try {
-                // твоя логика выхода
+                authService.logout();
             } catch (Exception ignored) {}
-            Platform.runLater(() -> SceneManager.switchTo("authorization.fxml"));
+            Platform.runLater(() -> {
+                SceneManager.switchTo("authorization.fxml",   c -> {
+                    ((BaseController) c).clearStatusLabel();
+                    ((BaseController) c).clearFields();
+                });
+
+            });
         }).start();
     }
 }

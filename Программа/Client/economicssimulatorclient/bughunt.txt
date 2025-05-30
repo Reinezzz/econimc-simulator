@@ -1,12 +1,60 @@
-FEATURES:
-//TODO: Парсинг ответа.
-//TODO: Удаление моделей.
-//TODO: Валидация параметров и формулы на клиенте.
-//TODO: Упрощение ввода формул пользователем.
-//TODO: Форматирование формул на клиенте.
-
-
 BUGS:
-//TODO: Оптимизация падает в solver.evaluation_error.
-//TODO: Визуализатор регрессии не выводит ни 1 график, Pane пустой.
-//TODO: При редактировании модели, возврате на экран запуска, и возврате на экран просмотра клиент не запрашивает с сервера новую версию.
+
+
+REFACTOR:
+TODO: Все настройки доставать через app.properties.
+TODO: Сделать единую css.
+
+TESTS:
+SERVER:
+TODO: TEST FOR AuthController R
+TODO: TEST FOR AuthService
+TODO: TEST FOR UserService
+TODO: TEST FOR TokenService
+TODO: TEST FOR MailService
+TODO: TEST FOR RefreshTokenService
+TODO: TEST FOR UserRepository
+TODO: TEST FOR RefreshTokenRepository
+TODO: TEST FOR VerificationTokenRepository
+TODO: TEST FOR PasswordResetTokenRepository
+TODO: TEST FOR JwtUtil
+TODO: TEST FOR SecurityConfig
+TODO: TEST FOR LoginRequest
+TODO: TEST FOR LoginResponse
+TODO: TEST FOR LogoutRequest
+TODO: TEST FOR RegistrationRequest
+TODO: TEST FOR VerificationRequest
+TODO: TEST FOR VerificationToken
+TODO: TEST FOR PasswordResetRequest
+TODO: TEST FOR PasswordResetConfirm
+TODO: TEST FOR PasswordResetToken
+TODO: TEST FOR RefreshToken
+TODO: TEST FOR RefreshTokenRequest
+TODO: TEST FOR RefreshTokenResponse
+TODO: TEST FOR PendingRegistration
+TODO: TEST FOR ApiResponse
+
+CLIENT:
+TODO: TEST FOR AuthService
+TODO: TEST FOR MainService
+TODO: TEST FOR BaseService
+TODO: TEST FOR SessionManager
+TODO: TEST FOR SceneManager
+TODO: TEST FOR AuthorizationController
+TODO: TEST FOR RegistrationController
+TODO: TEST FOR PasswordResetDialogController
+TODO: TEST FOR PasswordChangeController
+TODO: TEST FOR VerificationCodeDialogController
+TODO: TEST FOR MainController
+TODO: TEST FOR BaseController
+TODO: TEST FOR JsonUtil
+TODO: TEST FOR LoginRequest
+TODO: TEST FOR LoginResponse
+TODO: TEST FOR LogoutRequest
+TODO: TEST FOR RegistrationRequest
+TODO: TEST FOR VerificationRequest
+TODO: TEST FOR PasswordResetRequest
+TODO: TEST FOR PasswordResetConfirm
+TODO: TEST FOR RefreshTokenRequest
+TODO: TEST FOR RefreshTokenResponse
+TODO: TEST FOR ApiResponse

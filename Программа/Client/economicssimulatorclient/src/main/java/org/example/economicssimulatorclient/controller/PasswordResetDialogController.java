@@ -20,7 +20,7 @@ public class PasswordResetDialogController extends BaseController {
     @FXML
     PasswordField repeatField;
     @FXML
-    Label errorLabel;
+    Label statusLable;
     @FXML
     ButtonType okBtn;
 
@@ -49,13 +49,13 @@ public class PasswordResetDialogController extends BaseController {
             boolean mismatch = !p1.equals(p2);
 
             if (empty) {
-                errorLabel.setText("");
+                statusLable.setText("");
                 okButton.setDisable(true);
             } else if (mismatch) {
-                showError(errorLabel, "msg.passwords_mismatch");
+                showError(statusLable, "msg.passwords_mismatch");
                 okButton.setDisable(true);
             } else {
-                errorLabel.setText("");
+                statusLable.setText("");
                 okButton.setDisable(false);
             }
         };
@@ -65,6 +65,13 @@ public class PasswordResetDialogController extends BaseController {
         repeatField.textProperty().addListener((obs, ov, nv) -> validate.run());
 
         validate.run();
+    }
+
+    @Override
+    public void clearFields() {
+        if(codeField != null) codeField.clear();
+        if(passField != null) passField.clear();
+        if(repeatField != null) repeatField.clear();
     }
 
     /**

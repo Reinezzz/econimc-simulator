@@ -3,6 +3,7 @@ package org.example.economicssimulatorclient;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import org.example.economicssimulatorclient.controller.AuthorizationController;
 import org.example.economicssimulatorclient.controller.BaseController;
 import org.example.economicssimulatorclient.controller.MainController;
 import org.example.economicssimulatorclient.service.AuthService;
@@ -28,7 +29,8 @@ public class MainApp extends Application {
         BaseController.provide(AuthService.class, new AuthService());
         SceneManager.init(primaryStage);
         String refreshToken = SessionManager.getInstance().getRefreshToken();
-        if (refreshToken != null) {
+        boolean justLoggedOut = SessionManager.getInstance().isJustLoggedOut();
+        if (refreshToken != null && !justLoggedOut) {
             // Пытаемся обновить accessToken асинхронно при наличии refreshToken
             new Thread(() -> {
                 boolean refreshed = false;
@@ -41,16 +43,22 @@ public class MainApp extends Application {
                 Platform.runLater(() -> {
                     if (finalRefreshed) {
                         // Если refresh прошёл успешно — открываем основной экран
-                        SceneManager.switchTo("main.fxml");
+                        SceneManager.switchToWithoutContorller("main.fxml");
                     } else {
                         // Иначе открываем форму входа
-                        SceneManager.switchTo("authorization.fxml");
+                        SceneManager.switchTo("authorization.fxml",   c -> {
+                            ((BaseController) c).clearStatusLabel();
+                            ((BaseController) c).clearFields();
+                        });
                     }
                 });
             }).start();
         } else {
             // Нет refreshToken — открываем форму входа
-            SceneManager.switchTo("authorization.fxml");
+            SceneManager.switchTo("authorization.fxml",   c -> {
+                ((BaseController) c).clearStatusLabel();
+                ((BaseController) c).clearFields();
+            });
         }
 
         primaryStage.setTitle("Economics Simulator");

@@ -15,7 +15,7 @@
 
             <Label styleClass="dialog-label" text="%dialog.verification_code"/>
             <TextField styleClass="dialog-field" fx:id="codeField" promptText="%prompt.code"/>
-            <Label styleClass="dialog-status" fx:id="errorLabel" />
+            <Label styleClass="dialog-status" fx:id="statusLable" />
         </VBox>
     </content>
 

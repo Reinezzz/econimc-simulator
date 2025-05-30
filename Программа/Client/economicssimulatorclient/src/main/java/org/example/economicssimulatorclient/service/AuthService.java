@@ -75,6 +75,7 @@ public class AuthService extends BaseService {
             var resp = post(baseUri, "login", req, LoginResponse.class, false, null);
             // Сохраняем оба токена
             SessionManager.getInstance().saveTokens(resp.accessToken(), resp.refreshToken());
+            SessionManager.getInstance().resetJustLoggedOut();
             return resp;
         } catch (Exception ex) {
             throw new IllegalArgumentException(extractErrorMessage(ex));
@@ -172,6 +173,8 @@ public class AuthService extends BaseService {
      */
     public void logout() throws IOException, InterruptedException {
         String refreshToken = SessionManager.getInstance().getRefreshToken();
+
+        SessionManager.getInstance().logout();
         if (refreshToken != null) {
             try {
                 var req = new RefreshTokenRequest(refreshToken);
@@ -180,7 +183,6 @@ public class AuthService extends BaseService {
                 // Игнорируем ошибку выхода (например, если refreshToken уже невалиден)
             }
         }
-        SessionManager.getInstance().logout();
     }
 
     /**
