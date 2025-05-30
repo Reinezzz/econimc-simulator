@@ -41,7 +41,7 @@ public class MainApp extends Application {
                 Platform.runLater(() -> {
                     if (finalRefreshed) {
                         // Если refresh прошёл успешно — открываем основной экран
-                        SceneManager.switchToWithController("main.fxml", MainController::loadModels);
+                        SceneManager.switchTo("main.fxml");
                     } else {
                         // Иначе открываем форму входа
                         SceneManager.switchTo("authorization.fxml");

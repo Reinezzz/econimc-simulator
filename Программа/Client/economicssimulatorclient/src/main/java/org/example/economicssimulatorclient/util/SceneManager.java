@@ -116,21 +116,6 @@ public final class SceneManager {
         }
     }
 
-    public static void back() {
-        if (!history.isEmpty()) {
-            String prevFxml = history.pop();
-            currentFxml = prevFxml;
-
-            if (prevFxml.equals("main.fxml")) {
-                // Для главного экрана — всегда вызываем контроллер с обновлением моделей
-                switchToWithController("main.fxml", MainController::loadModels);
-            } else {
-                // Для всех остальных сцен — обычное поведение
-                Parent root = cache.computeIfAbsent(prevFxml, SceneManager::load);
-                scene.setRoot(root);
-            }
-        }
-    }
 
 
 
