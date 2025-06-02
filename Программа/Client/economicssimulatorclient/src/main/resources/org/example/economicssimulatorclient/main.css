@@ -1,0 +1,125 @@
+.anchor-pane {
+    -fx-background-color: #fff;
+}
+
+/* TOP BAR */
+.top-bar {
+    -fx-background-color: transparent;
+    -fx-pref-height: 60px;
+    -fx-padding: 0 0 0 32;     /* ТОЛЬКО слева, как у блока моделей */
+    -fx-alignment: center-left;
+}
+.status-label {
+    -fx-font-size: 22px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1e0acb;
+    -fx-alignment: center;
+}
+
+.exit-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 12;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+
+.top-separator {
+    -fx-background-color: #e0e0e0;
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+    -fx-min-height: 1;
+}
+
+
+/* SIDE PANEL */
+.side-panel { -fx-padding: 52 32 0 32; }
+.section-title {
+    -fx-font-size: 32px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000;
+    -fx-padding: 0 0 32 0;
+}
+
+/* MODEL BUTTONS */
+.model-list-button {
+    -fx-background-color: #fff;
+    -fx-border-color: #cdc9c9;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 12 0 12 18;
+    -fx-font-size: 20px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-text-fill: #222;
+    -fx-min-height: 56px;
+    -fx-pref-height: 56px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+    -fx-margin: 0 0 16 0;
+}
+.model-list-button:hover { -fx-background-color: #f5f5ff; }
+
+/* GRID & TILES */
+.main-grid { -fx-hgap: 24; -fx-vgap: 24; -fx-padding: 32 32 32 32; -fx-alignment: top-center; }
+.tile-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+    -fx-alignment: center;
+    -fx-border-width: 0;
+    -fx-font-size: 32px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-text-fill: #fff;
+    -fx-pref-width: 674px;
+    -fx-pref-height: 600px;
+}
+.tile-button:hover { -fx-background-color: #17089f; }
+.tile-button.tile-button-wide {
+    -fx-pref-width: 1372px;
+    -fx-pref-height: 500px;
+}
+
+/* SEPARATOR */
+.separator {
+    -fx-background-color: #cdc9c9;
+    -fx-pref-width: 1;
+    -fx-min-width: 1;
+    -fx-max-width: 1
+}
+
+.tile-svg {
+    -fx-icon-color: #fff;
+    -fx-icon-size: 256px;
+}
+
+.icon-placeholder {
+    -fx-background-radius: 50;
+    -fx-min-width: 256;
+    -fx-min-height: 256;
+    -fx-pref-width: 256;
+    -fx-pref-height: 256;
+    -fx-max-width: 256;
+    -fx-max-height: 256;
+    -fx-alignment: center;
+    -fx-background-color: transparent;
+}
+
+.tile-text {
+    -fx-text-fill: #fff;
+    -fx-font-size: 32px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-padding: 20 0 0 0;
+    -fx-alignment: center;
+}
+

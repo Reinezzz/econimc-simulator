@@ -34,7 +34,7 @@ public class ModelViewController extends BaseController {
     @FXML
     private Label typeLabel;
     @FXML
-    private TextArea formulaArea;
+    private TextArea descriptionArea;
     @FXML
     private Button runButton;
     @FXML
@@ -68,7 +68,7 @@ public class ModelViewController extends BaseController {
     private void fillModelInfo() {
         nameLabel.setText(model.name());
         typeLabel.setText(model.modelType());
-        formulaArea.setText(model.description() != null ? model.description() : "");
+        descriptionArea.setText(model.description() != null ? model.description() : "");
         modelTitle.setText(model.name());
         fillParameters();
         setEditMode(false);
@@ -79,17 +79,19 @@ public class ModelViewController extends BaseController {
         valueFields.clear();
         for (ModelParameterDto param : parameters) {
             VBox paramBox = new VBox(3);
-            paramBox.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 8; -fx-border-radius: 4; -fx-background-radius: 4;");
+            paramBox.getStyleClass().add("parameter-card");
             paramBox.setSpacing(2);
 
             Label symbol = new Label(param.paramName());
-            symbol.setStyle("-fx-font-weight: bold;");
+            symbol.getStyleClass().add("parameter-name");
             Label descr = new Label(param.description());
+            descr.getStyleClass().add("parameter-desc");
             descr.setWrapText(true);
 
             TextField value = new TextField(param.paramValue());
             value.setEditable(false);
             value.setPromptText("Значение");
+            value.getStyleClass().add("parameter-input");
             valueFields.add(value);
 
             paramBox.getChildren().addAll(symbol, descr, value);

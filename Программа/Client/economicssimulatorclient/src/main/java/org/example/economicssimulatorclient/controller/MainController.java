@@ -25,9 +25,6 @@ public class MainController extends BaseController {
     private VBox modelList;
 
     @FXML
-    private Button addButton;
-
-    @FXML
     private Button exitButton; // onExitButtonClicked уже реализован, НЕ трогаем!
 
     @FXML
@@ -35,7 +32,7 @@ public class MainController extends BaseController {
 
     // Для "Последняя модель"
     @FXML
-    private Button tileButton; // первая кнопка в mainGrid (fx:id добавлен в FXML)
+    private VBox tileButton; // первая кнопка в mainGrid (fx:id добавлен в FXML)
     @FXML
     private Pane iconLastModel;
 
@@ -52,7 +49,7 @@ public class MainController extends BaseController {
 
 
         // "Последняя модель" — переход к просмотру последней модели, если есть
-        tileButton.setOnAction(e -> {
+        tileButton.setOnMouseClicked(e -> {
             if (lastModelId != null) {
                 SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(lastModelId));
             } else {

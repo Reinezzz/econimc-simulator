@@ -6,49 +6,48 @@
 
 <BorderPane xmlns:fx="http://javafx.com/javafx"
             fx:controller="org.example.economicssimulatorclient.controller.ModelResultController"
-            prefWidth="1100" prefHeight="600">
+            stylesheets="@model_result.css"
+            styleClass="screen">
 
     <top>
-        <HBox spacing="10">
-            <Button fx:id="backButton" text="Назад" prefWidth="80"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="mainButton" text="Главная" prefWidth="80"/>
-        </HBox>
+        <VBox>
+            <HBox styleClass="top-bar">
+                <Button fx:id="backButton" text="Назад" styleClass="exit-button"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="mainButton" text="Главная" styleClass="exit-button"/>
+            </HBox>
+            <Separator styleClass="top-separator"/>
+        </VBox>
     </top>
 
     <center>
-        <HBox>
-            <!-- Левый блок: Параметры (прокручиваемый) -->
-            <ScrollPane fitToWidth="true" prefWidth="260" maxWidth="260">
-                <VBox fx:id="parameterList" spacing="8"/>
+        <HBox styleClass="main-content">
+            <!-- Левый блок: Параметры -->
+            <ScrollPane fitToWidth="true" styleClass="parameter-scroll">
+                <VBox fx:id="parameterList" styleClass="parameter-list"/>
             </ScrollPane>
-            <Separator orientation="VERTICAL"/>
+            <Separator orientation="VERTICAL" styleClass="v-separator"/>
 
             <!-- Центральный блок: Результат вычислений -->
-            <VBox spacing="15" prefWidth="470">
-                <Label text="Результат вычислений"/>
-                <Label text="Результат"/>
-                <TextArea fx:id="resultArea" prefRowCount="3"/>
-                <HBox spacing="10">
-                    <Label text="График"/>
-                    <ComboBox fx:id="typeComboBox"/>
+            <VBox styleClass="result-block">
+                <Label text="Результат вычислений" styleClass="block-title"/>
+                <HBox styleClass="result-row">
+                    <Label text="Результат:" styleClass="result-label"/>
                 </HBox>
-                <Pane fx:id="chartPane" minHeight="230" maxHeight="250" minWidth="410"/>
-                <HBox spacing="15">
-                    <Button fx:id="saveButton" text="Сохранить отчёт" prefWidth="150"/>
-                    <Button fx:id="repeatButton" text="Повторить" prefWidth="120"/>
+                <TextArea fx:id="resultArea" prefRowCount="3" wrapText="true" styleClass="result-textarea"/>
+                <HBox styleClass="result-row">
+                    <Label text="График" styleClass="result-label"/>
+                    <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
                 </HBox>
-                <Label fx:id="statusLabel"/>
+                <Pane fx:id="chartPane" styleClass="chart-pane"/>
+                <HBox styleClass="result-buttons">
+                    <Button fx:id="saveButton" text="Сохранить отчёт" styleClass="action-button"/>
+                    <Button fx:id="repeatButton" text="Повторить" styleClass="action-button"/>
+                </HBox>
+                <Label fx:id="statusLabel" styleClass="status-label"/>
             </VBox>
-
-            <Separator orientation="VERTICAL"/>
-
-            <!-- Правый блок: Справка -->
-            <VBox spacing="10" prefWidth="350">
-                <Label text="Справка"/>
-                <TextArea editable="false" prefRowCount="8"/>
-                <TextField promptText="Введите вопрос"/>
-            </VBox>
+            <Separator orientation="VERTICAL" styleClass="v-separator"/>
         </HBox>
     </center>
 </BorderPane>
+

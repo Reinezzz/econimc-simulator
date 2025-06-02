@@ -9,62 +9,73 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.Pane?>
 
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.layout.BorderPane?>
 <AnchorPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.economicssimulatorclient.controller.MainController">
+            fx:controller="org.example.economicssimulatorclient.controller.MainController"
+            stylesheets="@main.css"
+            styleClass="anchor-pane">
 
-    <HBox fx:id="topBar" styleClass="top-bar"
+    <BorderPane  fx:id="topBar" styleClass="top-bar"
           AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-        <Label fx:id="statusLabel" />
-        <Button fx:id="exitButton" text="Выход" styleClass="exit-button" onAction="#onExitButtonClicked"/>
-    </HBox>
+        <left>
+            <VBox alignment="CENTER" prefHeight="60">
+                <Button fx:id="exitButton" text="Выход" styleClass="exit-button" onAction="#onExitButtonClicked" />
+            </VBox>
+        </left>
+        <center>
+            <Label fx:id="statusLabel" styleClass="status-label" alignment="CENTER_RIGHT"/>
+        </center>
+    </BorderPane >
+
+    <Separator orientation="HORIZONTAL" styleClass="top-separator"
+               AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="56"/>
 
     <HBox AnchorPane.topAnchor="60" AnchorPane.bottomAnchor="0"
           AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
 
-        <VBox fx:id="sidePanel" styleClass="side-panel"
-              prefWidth="260" spacing="10">
-            <Label text="Математические модели" styleClass="section-title"/>
-            <VBox fx:id="modelList" spacing="10"/>
+        <VBox fx:id="sidePanel" styleClass="side-panel">
+            <Label text="Экономические модели" styleClass="section-title"/>
+            <VBox fx:id="modelList" styleClass="model-list" spacing="16" />
         </VBox>
 
         <Separator orientation="VERTICAL" styleClass="separator"/>
 
-        <GridPane fx:id="mainGrid" styleClass="main-grid" hgap="20" vgap="20">
+        <GridPane fx:id="mainGrid" styleClass="main-grid">
 
-            <Button fx:id="tileButton" styleClass="tile-button"
-                    GridPane.rowIndex="0" GridPane.columnIndex="0"
-                    prefWidth="300" prefHeight="200">
-                <VBox alignment="CENTER" spacing="10">
-                    <Pane fx:id="iconLastModel"
-                          styleClass="icon-placeholder"
-                          prefWidth="60" prefHeight="60"/>
-                    <Label text="Последняя модель" styleClass="tile-text"/>
-                </VBox>
-            </Button>
+            <VBox fx:id="tileButton" styleClass="tile-button"
+                  alignment="CENTER" spacing="14"
+                  GridPane.rowIndex="0" GridPane.columnIndex="0">
+                <StackPane styleClass="icon-placeholder">
+                    <FontIcon iconLiteral="fa-bar-chart" styleClass="tile-svg"/>
+                </StackPane>
+                <Label text="Последняя модель" styleClass="tile-text"/>
+            </VBox>
 
-            <Button fx:id="tileSimulation" styleClass="tile-button"
-                    GridPane.rowIndex="0" GridPane.columnIndex="1"
-                    prefWidth="300" prefHeight="200">
-                <VBox alignment="CENTER" spacing="10">
-                    <Pane fx:id="iconSimulation"
-                          styleClass="icon-placeholder"
-                          prefWidth="60" prefHeight="60"/>
-                    <Label text="Имитационное моделирование" styleClass="tile-text"/>
-                </VBox>
-            </Button>
+            <VBox fx:id="tileSimulation" styleClass="tile-button"
+                  alignment="CENTER" spacing="14"
+                  GridPane.rowIndex="0" GridPane.columnIndex="1">
+                <StackPane styleClass="icon-placeholder">
+                    <FontIcon iconLiteral="fa-info-circle" styleClass="tile-svg"/>
+                </StackPane>
+                <Label text="Справка" styleClass="tile-text"/>
+            </VBox>
 
-            <Button fx:id="tileDocuments" styleClass="tile-button"
-                    GridPane.rowIndex="1" GridPane.columnIndex="0"
-                    GridPane.columnSpan="2"
-                    prefWidth="620" prefHeight="200">
-                <VBox alignment="CENTER" spacing="10">
-                    <Pane fx:id="iconDocuments"
-                          styleClass="icon-placeholder"
-                          prefWidth="60" prefHeight="60"/>
-                    <Label text="Сохраненные документы" styleClass="tile-text"/>
-                </VBox>
-            </Button>
+            <VBox fx:id="tileDocuments" styleClass="tile-button, tile-button-wide"
+                  alignment="CENTER" spacing="14"
+                  GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                <StackPane styleClass="icon-placeholder">
+                    <FontIcon iconLiteral="fa-file-pdf-o" styleClass="tile-svg"/>
+                </StackPane>
+                <Label text="Сохранённые документы" styleClass="tile-text"/>
+            </VBox>
+
         </GridPane>
+
     </HBox>
 </AnchorPane>

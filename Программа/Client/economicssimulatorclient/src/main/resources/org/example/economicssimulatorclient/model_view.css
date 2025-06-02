@@ -1,0 +1,196 @@
+.screen {
+    -fx-background-color: #fff;
+}
+
+/* TOP BAR */
+.top-bar {
+    -fx-background-color: transparent;
+    -fx-pref-height: 100px;
+    -fx-padding: 32 36 0 36;
+    -fx-spacing: 0;
+    -fx-alignment: center;
+}
+
+.topbar-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 16;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-padding: 7 32 7 32;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+.bottom-bar {
+    -fx-background-color: transparent;
+    -fx-pref-height: 100px;
+    -fx-padding: 0 36 0 36;
+    -fx-alignment: center;
+    -fx-spacing: 0;
+}
+.bottom-center-buttons {
+    -fx-alignment: center;
+    -fx-spacing: 24;
+}
+/* MAIN CONTENT */
+.main-content {
+    -fx-background-color: transparent;
+    -fx-spacing: 0;
+    -fx-padding: 0;
+}
+
+.top-separator, .bottom-separator {
+    -fx-background-color: #e0e0e0;
+    -fx-pref-height: 1;
+    -fx-min-height: 1;
+    -fx-max-height: 1;
+}
+.v-separator{
+    -fx-background-color: #e0e0e0;
+    -fx-pref-width: 1;
+    -fx-min-width: 1;
+    -fx-max-width: 1;
+}
+
+.parameter-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+    -fx-padding: 2 2 2 2;
+}
+
+.parameter-scroll .scroll-bar:vertical .track {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 5;
+}
+
+.parameter-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 5;
+    -fx-min-height: 40px;
+}
+
+.parameter-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #2a17f6;
+}
+
+.parameter-scroll .scroll-bar:vertical .increment-button,
+.parameter-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+
+.parameter-scroll .scroll-bar:vertical .increment-arrow,
+.parameter-scroll .scroll-bar:vertical .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-shape: "";
+}
+
+.parameter-list {
+    -fx-background-color: #fff;
+    -fx-spacing: 32;
+    -fx-padding: 30 0 0 30;
+}
+
+/* MODEL BLOCK (CENTER) */
+.model-block {
+    -fx-background-color: transparent;
+    -fx-padding: 32 64 0 64;
+    -fx-spacing: 16;
+    -fx-alignment: top-center;
+    -fx-pref-width: 900px;
+}
+
+/* TITLE */
+.model-title {
+    -fx-font-size: 44px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 700;
+    -fx-text-fill: #000;
+    -fx-padding: 0 0 18 0;
+    -fx-alignment: center;
+}
+
+/* ROWS & LABELS */
+.model-row {
+    -fx-spacing: 22;
+    -fx-padding: 0 0 10 0;
+    -fx-alignment: center-left;
+}
+.model-label {
+    -fx-font-size: 22px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 500;
+    -fx-text-fill: #000;
+}
+.model-value {
+    -fx-font-size: 22px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-text-fill: #444;
+    -fx-padding: 0 0 0 12;
+}
+
+/* TEXTAREA */
+.model-textarea {
+    -fx-font-size: 20px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-padding: 16;
+    -fx-background-color: #fff;
+    -fx-border-color: #bdbdbd;
+    -fx-border-width: 1.5;
+    -fx-pref-width: 700px;
+    -fx-pref-height: 120px;
+    -fx-wrap-text: true;
+}
+
+/* ACTION BUTTONS */
+.model-buttons {
+    -fx-spacing: 38;
+    -fx-padding: 20 0 0 0;
+    -fx-alignment: center;
+}
+
+/* СТАТУС */
+.status-label {
+    -fx-font-size: 19px;
+    -fx-text-fill: #1e0acb;
+    -fx-padding: 16 0 0 0;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 500;
+    -fx-alignment: center;
+}
+
+.parameter-card {
+    -fx-background-color: #fff;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 18 18 14 18;
+    -fx-spacing: 8;
+    -fx-effect: dropshadow(gaussian, rgba(60,60,60,0.06), 6, 0, 0, 0);
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1.5;
+    -fx-margin: 0 0 16 0;
+}
+
+.parameter-name {
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #000;
+}
+.parameter-desc {
+    -fx-font-size: 14px;
+    -fx-text-fill: #666;
+}
+.parameter-input {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #bdbdbd;
+    -fx-border-width: 1;
+    -fx-font-size: 16px;
+    -fx-padding: 4 12 4 12;
+    -fx-background-color: #fafaff;
+}
