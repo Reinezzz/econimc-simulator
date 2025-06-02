@@ -7,6 +7,7 @@ import org.example.economicssimulatorclient.controller.AuthorizationController;
 import org.example.economicssimulatorclient.controller.BaseController;
 import org.example.economicssimulatorclient.controller.MainController;
 import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -42,6 +43,7 @@ public class MainApp extends Application {
                 boolean finalRefreshed = refreshed;
                 Platform.runLater(() -> {
                     if (finalRefreshed) {
+                        BaseController.provide(EconomicModelService.class, new EconomicModelService());
                         // Если refresh прошёл успешно — открываем основной экран
                         SceneManager.switchToWithoutContorller("main.fxml");
                     } else {

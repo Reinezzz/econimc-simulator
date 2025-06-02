@@ -12,7 +12,7 @@ public class SessionManager {
 
     private static final String ACCESS_TOKEN_KEY = "accessToken";
     private static final String REFRESH_TOKEN_KEY = "refreshToken";
-    private static final SessionManager INSTANCE = new SessionManager();
+    private static SessionManager INSTANCE = new SessionManager();
     @Getter
     private boolean justLoggedOut = false;
 
@@ -31,6 +31,10 @@ public class SessionManager {
 
     public static Long getCurrentUserId() {
         return null;
+    }
+
+    public static void setInstance(SessionManager mockSessionManager) {
+        INSTANCE = mockSessionManager;
     }
 
     /**

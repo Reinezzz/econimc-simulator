@@ -37,6 +37,7 @@ public final class SceneManager {
     // Добавить в класс SceneManager
     private static final Deque<String> history = new ArrayDeque<>();
     private static String currentFxml = null;
+    private static SceneManager INSTANCE = new SceneManager();
 
 
     /**
@@ -118,6 +119,7 @@ public final class SceneManager {
     }
 
 
-
-
+    public static void setInstance(SceneManager mockSceneManager) {
+        INSTANCE = mockSceneManager;
+    }
 }

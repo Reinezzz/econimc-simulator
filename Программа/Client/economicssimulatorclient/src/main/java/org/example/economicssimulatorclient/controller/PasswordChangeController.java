@@ -110,7 +110,7 @@ public class PasswordChangeController extends BaseController {
      * Переход назад на экран авторизации.
      */
     @FXML
-    private void goBack() {
+    void goBack() {
         SceneManager.switchTo("authorization.fxml",   c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();

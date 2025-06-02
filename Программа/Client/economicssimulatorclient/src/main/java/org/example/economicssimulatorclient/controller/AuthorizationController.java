@@ -3,6 +3,7 @@ package org.example.economicssimulatorclient.controller;
 import javafx.scene.layout.StackPane;
 import org.example.economicssimulatorclient.dto.LoginRequest;
 import org.example.economicssimulatorclient.service.AuthService;
+import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -32,7 +33,7 @@ public class AuthorizationController extends BaseController {
      * Выполняет валидацию, асинхронный вызов сервиса и отображение результата.
      */
     @FXML
-    void doLogin() {
+    public void doLogin() {
         showError(statusLabel, ""); // очистка статуса
         String login = usernameEmailField.getText().trim();
         String pass = passwordField.getText();
@@ -48,6 +49,7 @@ public class AuthorizationController extends BaseController {
                 auth.login(new LoginRequest(login, pass));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "auth.status_label.successful");
+                    BaseController.provide(EconomicModelService.class, new EconomicModelService());
                     SceneManager.switchToWithoutContorller("main.fxml");
                 });
             } catch (IllegalArgumentException ex) {
@@ -67,7 +69,7 @@ public class AuthorizationController extends BaseController {
      * Переход на экран регистрации.
      */
     @FXML
-    private void openRegister() {
+    public void openRegister() {
         SceneManager.switchTo("registration.fxml", c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();
@@ -78,7 +80,7 @@ public class AuthorizationController extends BaseController {
      * Переход на экран сброса пароля.
      */
     @FXML
-    private void openReset() {
+    public void openReset() {
         SceneManager.switchTo("password_change.fxml",  c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();

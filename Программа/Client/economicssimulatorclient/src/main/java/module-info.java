@@ -15,9 +15,10 @@ module org.example.economicssimulatorclient {
     requires static lombok;
     requires java.prefs;
     requires org.json;
-    requires exp4j;      // если не было
+    requires exp4j;
+    requires org.mockito;
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
-    opens org.example.economicssimulatorclient to javafx.fxml;
+    opens org.example.economicssimulatorclient to javafx.fxml, org.testfx.junit5;
     opens org.example.economicssimulatorclient.config to javafx.fxml;
     opens org.example.economicssimulatorclient.dto to com.fasterxml.jackson.databind;
     exports org.example.economicssimulatorclient;

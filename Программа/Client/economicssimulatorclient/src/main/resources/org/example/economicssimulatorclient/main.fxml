@@ -15,6 +15,7 @@
 
     <HBox fx:id="topBar" styleClass="top-bar"
           AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <Label fx:id="statusLabel" />
         <Button fx:id="exitButton" text="Выход" styleClass="exit-button" onAction="#onExitButtonClicked"/>
     </HBox>
 
@@ -23,28 +24,26 @@
 
         <VBox fx:id="sidePanel" styleClass="side-panel"
               prefWidth="260" spacing="10">
-            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
             <Label text="Математические модели" styleClass="section-title"/>
             <VBox fx:id="modelList" spacing="10"/>
-            <Button fx:id="addButton" text="Добавить" styleClass="add-button"/>
         </VBox>
 
         <Separator orientation="VERTICAL" styleClass="separator"/>
 
         <GridPane fx:id="mainGrid" styleClass="main-grid" hgap="20" vgap="20">
 
-            <Button styleClass="tile-button"
+            <Button fx:id="tileButton" styleClass="tile-button"
                     GridPane.rowIndex="0" GridPane.columnIndex="0"
                     prefWidth="300" prefHeight="200">
                 <VBox alignment="CENTER" spacing="10">
                     <Pane fx:id="iconLastModel"
                           styleClass="icon-placeholder"
                           prefWidth="60" prefHeight="60"/>
-                    <Label text="Последняя модель" styleClass="tile-text" fx:id=""/>
+                    <Label text="Последняя модель" styleClass="tile-text"/>
                 </VBox>
             </Button>
 
-            <Button styleClass="tile-button"
+            <Button fx:id="tileSimulation" styleClass="tile-button"
                     GridPane.rowIndex="0" GridPane.columnIndex="1"
                     prefWidth="300" prefHeight="200">
                 <VBox alignment="CENTER" spacing="10">
@@ -55,7 +54,7 @@
                 </VBox>
             </Button>
 
-            <Button styleClass="tile-button"
+            <Button fx:id="tileDocuments" styleClass="tile-button"
                     GridPane.rowIndex="1" GridPane.columnIndex="0"
                     GridPane.columnSpan="2"
                     prefWidth="620" prefHeight="200">

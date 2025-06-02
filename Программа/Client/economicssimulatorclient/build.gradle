@@ -59,20 +59,20 @@ dependencies {
     testImplementation 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    testImplementation 'org.mockito:mockito-core:5.2.0'
+    implementation 'org.mockito:mockito-core:5.2.0'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     testImplementation 'net.bytebuddy:byte-buddy:1.14.13'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.3'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
     testImplementation 'org.testfx:testfx-junit5:4.0.16-alpha'
-    testImplementation 'org.testfx:openjfx-monocle:jdk-12.0.1+2'
 }
 
-//test {
-//    useJUnitPlatform()
-//}
+test {
+    useJUnitPlatform()
+}
 
 jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")

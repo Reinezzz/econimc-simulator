@@ -24,7 +24,7 @@ public class VerificationCodeDialogController extends BaseController {
      * Инициализация диалога — настройка поведения кнопок.
      */
     @FXML
-    private void initialize() {
+    void initialize() {
         Platform.runLater(() -> {
             Button okButton = (Button) dialogPane.lookupButton(okBtn);
             okButton.setDisable(true);

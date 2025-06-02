@@ -34,4 +34,5 @@ public final class JsonUtil {
     public static <T> T fromJson(String json, Class<T> clz) throws JsonProcessingException {
         return AppConfig.objectMapper.readValue(json, clz);
     }
+
 }

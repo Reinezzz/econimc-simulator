@@ -108,7 +108,7 @@ public class RegistrationController extends BaseController {
      * Переход к экрану авторизации.
      */
     @FXML
-    private void openLogin() {
+    void openLogin() {
         SceneManager.switchTo("authorization.fxml",  c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.economicssimulatorclient.controller.ModelViewController"
+            prefWidth="1920" prefHeight="1080">
+
+    <!-- Top bar -->
+    <top>
+        <HBox spacing="10" style="-fx-background-color: white;" alignment="CENTER_LEFT">
+            <Button fx:id="backButton" text="Назад" prefWidth="80"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="mainButton" text="Главная" prefWidth="80"/>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox>
+            <!-- Left: Параметры -->
+            <ScrollPane fitToWidth="true" prefWidth="400" maxWidth="500">
+                <VBox fx:id="parameterList" spacing="8"/>
+            </ScrollPane>
+            <Separator orientation="VERTICAL"/>
+
+            <!-- Center: Модель -->
+            <VBox spacing="15" prefWidth="900" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+                <Label fx:id="modelTitle" text="Модель" alignment="CENTER" style="-fx-font-size: 18px;"/>
+                <HBox spacing="10">
+                    <Label text="Название:"/>
+                    <Label fx:id="nameLabel"/>
+                </HBox>
+                <HBox spacing="10">
+                    <Label text="Тип:"/>
+                    <Label fx:id="typeLabel"/>
+                </HBox>
+                <Label text="Формула:"/>
+                <TextArea fx:id="formulaArea" editable="false" wrapText="true" maxWidth="410"/>
+                <HBox spacing="15" alignment="CENTER">
+                    <Button fx:id="runButton" text="Запуск" prefWidth="120"/>
+                    <Button fx:id="editButton" text="Редактировать" prefWidth="140"/>
+                </HBox>
+                <Label fx:id="statusLabel"/>
+            </VBox>
+            <Separator orientation="VERTICAL"/>
+
+            <!-- Right: Справка -->
+            <VBox spacing="10" prefWidth="350" alignment="TOP_CENTER">
+                <Label text="Справка" alignment="CENTER"/>
+                <TextArea editable="false" prefRowCount="8" maxWidth="320"/>
+                <TextField promptText="Введите вопрос" maxWidth="320"/>
+            </VBox>
+        </HBox>
+    </center>
+    <bottom>
+        <Button fx:id="addDocumentButton" text="Добавить документ" maxWidth="180" BorderPane.alignment="CENTER_LEFT" visible="false"/>
+    </bottom>
+</BorderPane>

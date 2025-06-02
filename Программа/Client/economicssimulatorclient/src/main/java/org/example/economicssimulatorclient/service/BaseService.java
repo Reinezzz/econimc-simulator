@@ -1,6 +1,5 @@
 package org.example.economicssimulatorclient.service;
 
-import javafx.application.Platform;
 import org.example.economicssimulatorclient.util.*;
 
 import java.io.IOException;
@@ -16,21 +15,10 @@ import java.net.http.HttpResponse;
 public abstract class BaseService {
 
     /** HTTP-клиент для отправки запросов. */
-    protected final HttpClient httpClient = HttpClientProvider.instance();
+    protected HttpClient httpClient = HttpClientProvider.instance();
 
     /**
      * Выполнить POST-запрос и вернуть десериализованный ответ.
-     *
-     * @param baseUri   базовый URI сервера
-     * @param endpoint  относительный путь (например, "login")
-     * @param body      тело запроса (DTO)
-     * @param respType  класс типа ответа
-     * @param auth      добавлять ли JWT-токен в заголовок Authorization
-     * @param accessToken JWT-токен (если требуется)
-     * @param <T>       тип ответа
-     * @return десериализованный ответ типа T
-     * @throws IOException если ошибка при отправке запроса
-     * @throws InterruptedException если поток прерван
      */
     protected <T> T post(
             URI baseUri,
@@ -41,10 +29,17 @@ public abstract class BaseService {
             String accessToken
     ) throws IOException, InterruptedException {
 
+        String jsonBody;
+        try {
+            jsonBody = JsonUtil.toJson(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка сериализации: " + e.getMessage(), e);
+        }
+
         HttpRequest.Builder builder = HttpRequest.newBuilder(baseUri.resolve(endpoint))
                 .header("Content-Type", "application/json")
                 .header("Accept-Language", I18n.getLocale().getLanguage())
-                .POST(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody));
 
         if (auth && accessToken != null)
             builder.header("Authorization", "Bearer " + accessToken);
@@ -61,16 +56,6 @@ public abstract class BaseService {
 
     /**
      * Выполнить GET-запрос и вернуть десериализованный ответ.
-     *
-     * @param baseUri   базовый URI сервера
-     * @param endpoint  относительный путь
-     * @param respType  класс типа ответа
-     * @param auth      добавлять ли JWT-токен в заголовок Authorization
-     * @param accessToken JWT-токен (если требуется)
-     * @param <T>       тип ответа
-     * @return десериализованный ответ типа T
-     * @throws IOException если ошибка при отправке запроса
-     * @throws InterruptedException если поток прерван
      */
     protected <T> T get(
             URI baseUri,
@@ -100,17 +85,6 @@ public abstract class BaseService {
 
     /**
      * Выполнить PUT-запрос и вернуть десериализованный ответ.
-     *
-     * @param baseUri   базовый URI сервера
-     * @param endpoint  относительный путь (например, "models/1")
-     * @param body      тело запроса (DTO)
-     * @param respType  класс типа ответа
-     * @param auth      добавлять ли JWT-токен в заголовок Authorization
-     * @param accessToken JWT-токен (если требуется)
-     * @param <T>       тип ответа
-     * @return десериализованный ответ типа T
-     * @throws IOException если ошибка при отправке запроса
-     * @throws InterruptedException если поток прерван
      */
     protected <T> T put(
             URI baseUri,
@@ -121,10 +95,17 @@ public abstract class BaseService {
             String accessToken
     ) throws IOException, InterruptedException {
 
+        String jsonBody;
+        try {
+            jsonBody = JsonUtil.toJson(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка сериализации: " + e.getMessage(), e);
+        }
+
         HttpRequest.Builder builder = HttpRequest.newBuilder(baseUri.resolve(endpoint))
                 .header("Content-Type", "application/json")
                 .header("Accept-Language", I18n.getLocale().getLanguage())
-                .PUT(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody));
 
         if (auth && accessToken != null)
             builder.header("Authorization", "Bearer " + accessToken);
@@ -141,13 +122,6 @@ public abstract class BaseService {
 
     /**
      * Выполнить DELETE-запрос.
-     *
-     * @param baseUri   базовый URI сервера
-     * @param endpoint  относительный путь (например, "models/1")
-     * @param auth      добавлять ли JWT-токен в заголовок Authorization
-     * @param accessToken JWT-токен (если требуется)
-     * @throws IOException если ошибка при отправке запроса
-     * @throws InterruptedException если поток прерван
      */
     protected void delete(
             URI baseUri,

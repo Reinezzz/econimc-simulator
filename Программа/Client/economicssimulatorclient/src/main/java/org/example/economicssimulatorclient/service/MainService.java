@@ -15,9 +15,6 @@ import java.net.URI;
  */
 public class MainService extends BaseService {
 
-    /**
-     * Авторизованный POST-запрос с авто-refresh токена при 401.
-     */
     @Override
     protected <T> T post(
             URI baseUri,
@@ -27,7 +24,6 @@ public class MainService extends BaseService {
             boolean auth,
             String accessToken
     ) throws IOException, InterruptedException {
-        // Игнорируем параметры auth и accessToken, всегда используем авторизацию через текущий accessToken
         String currentToken = SessionManager.getInstance().getAccessToken();
         try {
             return super.post(baseUri, endpoint, body, respType, true, currentToken);
@@ -46,9 +42,6 @@ public class MainService extends BaseService {
         }
     }
 
-    /**
-     * Авторизованный GET-запрос с авто-refresh токена при 401.
-     */
     @Override
     protected <T> T get(
             URI baseUri,
@@ -57,7 +50,6 @@ public class MainService extends BaseService {
             boolean auth,
             String accessToken
     ) throws IOException, InterruptedException {
-        // Игнорируем параметры auth и accessToken, всегда используем авторизацию через текущий accessToken
         String currentToken = SessionManager.getInstance().getAccessToken();
         try {
             return super.get(baseUri, endpoint, respType, true, currentToken);

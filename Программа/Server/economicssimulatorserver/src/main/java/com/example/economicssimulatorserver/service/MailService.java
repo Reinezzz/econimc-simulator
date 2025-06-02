@@ -54,7 +54,7 @@ public class MailService {
      * @param html содержимое письма в формате HTML
      * @throws IllegalStateException если не удалось отправить письмо
      */
-    private void sendHtml(String to, String subject, String html) {
+    void sendHtml(String to, String subject, String html) {
         try {
             MimeMessage mime = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(

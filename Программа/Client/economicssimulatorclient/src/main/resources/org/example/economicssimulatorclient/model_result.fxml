@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<BorderPane xmlns:fx="http://javafx.com/javafx"
+            fx:controller="org.example.economicssimulatorclient.controller.ModelResultController"
+            prefWidth="1100" prefHeight="600">
+
+    <top>
+        <HBox spacing="10">
+            <Button fx:id="backButton" text="Назад" prefWidth="80"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="mainButton" text="Главная" prefWidth="80"/>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox>
+            <!-- Левый блок: Параметры (прокручиваемый) -->
+            <ScrollPane fitToWidth="true" prefWidth="260" maxWidth="260">
+                <VBox fx:id="parameterList" spacing="8"/>
+            </ScrollPane>
+            <Separator orientation="VERTICAL"/>
+
+            <!-- Центральный блок: Результат вычислений -->
+            <VBox spacing="15" prefWidth="470">
+                <Label text="Результат вычислений"/>
+                <Label text="Результат"/>
+                <TextArea fx:id="resultArea" prefRowCount="3"/>
+                <HBox spacing="10">
+                    <Label text="График"/>
+                    <ComboBox fx:id="typeComboBox"/>
+                </HBox>
+                <Pane fx:id="chartPane" minHeight="230" maxHeight="250" minWidth="410"/>
+                <HBox spacing="15">
+                    <Button fx:id="saveButton" text="Сохранить отчёт" prefWidth="150"/>
+                    <Button fx:id="repeatButton" text="Повторить" prefWidth="120"/>
+                </HBox>
+                <Label fx:id="statusLabel"/>
+            </VBox>
+
+            <Separator orientation="VERTICAL"/>
+
+            <!-- Правый блок: Справка -->
+            <VBox spacing="10" prefWidth="350">
+                <Label text="Справка"/>
+                <TextArea editable="false" prefRowCount="8"/>
+                <TextField promptText="Введите вопрос"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

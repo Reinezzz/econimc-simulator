@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TokenServiceTest {
 

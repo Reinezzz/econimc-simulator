@@ -30,7 +30,7 @@ public class JwtUtil {
      * Инициализация: формирует секретный ключ из Base64.
      */
     @PostConstruct
-    private void init() {
+    void init() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecret());
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
