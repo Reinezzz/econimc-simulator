@@ -196,21 +196,16 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.refreshToken());
         User user = refreshToken.getUser();
 
-        // Удаляем старый токен и создаём новый (best practice — ротация)
-        refreshTokenService.deleteByToken(refreshToken.getToken());
-
-        // Создаём UserDetails как при логине
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPasswordHash())
                 .authorities("USER")
                 .build();
 
-        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userDetails);
-
         String accessToken = jwtUtil.generateToken(userDetails);
 
-        return new RefreshTokenResponse(accessToken, newRefreshToken.getToken());
+        // Возвращаем старый refresh token
+        return new RefreshTokenResponse(accessToken, refreshToken.getToken());
     }
 
 

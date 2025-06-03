@@ -39,11 +39,19 @@ public class RefreshTokenService {
      */
     @Transactional
     public RefreshToken createRefreshToken(UserDetails userDetails) {
-        // Получаем username (login/email)
         String username = userDetails.getUsername();
-        // Находим сущность User
         User user = userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new LocalizedException("error.user_not_found"));
+
+        // Проверка наличия валидного токена
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user)
+                .filter(rt -> rt.getExpiryDate().isAfter(Instant.now()));
+        if (existingToken.isPresent()) {
+            return existingToken.get();
+        }
+
+        // Удаляем только просроченные токены (опционально)
+        refreshTokenRepository.deleteByUser(user);
 
         String token = generateSecureToken();
         Instant expiryDate = Instant.now().plusSeconds(refreshTokenExpirationMinutes * 60);

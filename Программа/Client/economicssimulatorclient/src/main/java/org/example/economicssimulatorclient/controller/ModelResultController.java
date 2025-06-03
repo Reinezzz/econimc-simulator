@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.economicssimulatorclient.chart.ChartDrawer;
 import org.example.economicssimulatorclient.chart.ChartDrawerFactory;
@@ -15,6 +16,7 @@ import org.example.economicssimulatorclient.dto.ModelParameterDto;
 import org.example.economicssimulatorclient.dto.ModelResultDto;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.ChartDataConverter;
+import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class ModelResultController extends BaseController {
     public void initWithResult(CalculationResponseDto response, EconomicModelDto model) {
         this.response = response;
         this.parameters = new ArrayList<>(response.updatedParameters());
-        this.model = model; // EconomicModelDto из расчёта (добавь, если нет)
+        this.model = model;
         clearStatusLabel();
         fillParameters();
         fillResult();
@@ -66,16 +68,18 @@ public class ModelResultController extends BaseController {
         parameterList.getChildren().clear();
         for (ModelParameterDto param : parameters) {
             VBox paramBox = new VBox(3);
-            paramBox.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 8; -fx-border-radius: 4; -fx-background-radius: 4;");
-            paramBox.setSpacing(2);
-
+            paramBox.getStyleClass().add("parameter-card");
             Label symbol = new Label(param.paramName());
-            symbol.setStyle("-fx-font-weight: bold;");
+            symbol.getStyleClass().add("parameter-name");
             Label descr = new Label(param.description());
+            descr.getStyleClass().add("parameter-desc");
             descr.setWrapText(true);
+            Label type = new Label(param.paramType());
+            type.getStyleClass().add("parameter-type");
 
             TextField value = new TextField(param.paramValue());
             value.setEditable(true);
+            value.getStyleClass().add("parameter-input");
 
             value.textProperty().addListener((obs, oldVal, newVal) -> {
                 parameters.set(parameters.indexOf(param), new ModelParameterDto(
@@ -124,6 +128,12 @@ public class ModelResultController extends BaseController {
         Node chart = drawer != null ? drawer.buildChart(chartKey, chartDataMap.get(chartKey)) : null;
         if (chart != null) {
             chartPane.getChildren().add(chart);
+            if (chart instanceof Region region) {
+                region.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                region.setMinSize(0, 0);
+                region.prefWidthProperty().bind(chartPane.widthProperty());
+                region.prefHeightProperty().bind(chartPane.heightProperty());
+            }
         } else {
             Label lbl = new Label("Нет визуализации для выбранного графика.");
             chartPane.getChildren().add(lbl);

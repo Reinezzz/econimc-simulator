@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
+import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class ModelViewController extends BaseController {
 
     public void initWithModelId(Long id) {
         this.modelId = id;
+        LastModelStorage.saveLastModelId(modelId);
         clearStatusLabel();
         loadModel();
     }

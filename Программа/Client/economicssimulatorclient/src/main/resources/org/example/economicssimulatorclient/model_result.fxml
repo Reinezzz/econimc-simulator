@@ -37,17 +37,28 @@
                 <TextArea fx:id="resultArea" prefRowCount="3" wrapText="true" styleClass="result-textarea"/>
                 <HBox styleClass="result-row">
                     <Label text="График" styleClass="result-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
                     <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
                 </HBox>
-                <Pane fx:id="chartPane" styleClass="chart-pane"/>
-                <HBox styleClass="result-buttons">
-                    <Button fx:id="saveButton" text="Сохранить отчёт" styleClass="action-button"/>
-                    <Button fx:id="repeatButton" text="Повторить" styleClass="action-button"/>
-                </HBox>
+                <StackPane fx:id="chartPane" styleClass="chart-pane"/>
+
                 <Label fx:id="statusLabel" styleClass="status-label"/>
             </VBox>
             <Separator orientation="VERTICAL" styleClass="v-separator"/>
         </HBox>
     </center>
+    <bottom>
+        <VBox>
+            <Separator styleClass="bottom-separator"/>
+            <HBox styleClass="bottom-bar">
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="bottom-center-buttons" spacing="18">
+                    <Button fx:id="saveButton" text="Сохранить отчёт" styleClass="topbar-button"/>
+                    <Button fx:id="repeatButton" text="Повторить" styleClass="topbar-button"/>
+                </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </VBox>
+    </bottom>
 </BorderPane>
 

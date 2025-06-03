@@ -23,7 +23,7 @@
     <center>
         <HBox styleClass="main-content">
             <!-- Left: Параметры -->
-            <ScrollPane styleClass="parameter-scroll" fitToWidth="true" prefWidth="640">
+            <ScrollPane styleClass="parameter-scroll" fitToWidth="true" >
                 <VBox fx:id="parameterList" styleClass="parameter-list"/>
             </ScrollPane>
 

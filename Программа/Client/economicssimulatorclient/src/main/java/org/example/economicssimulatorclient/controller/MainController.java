@@ -11,6 +11,7 @@ import javafx.scene.control.Tooltip;
 import org.example.economicssimulatorclient.dto.EconomicModelDto;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.service.EconomicModelService;
+import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.SessionManager;
 
@@ -47,10 +48,11 @@ public class MainController extends BaseController {
         clearStatusLabel();
         loadModelList();
 
-
+        long lastModelId = LastModelStorage.loadLastModelId();
+        tileButton.setDisable(lastModelId == -1);
         // "Последняя модель" — переход к просмотру последней модели, если есть
         tileButton.setOnMouseClicked(e -> {
-            if (lastModelId != null) {
+            if (lastModelId != -1) {
                 SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(lastModelId));
             } else {
                 showError(statusLabel, "Нет последней модели для просмотра");
