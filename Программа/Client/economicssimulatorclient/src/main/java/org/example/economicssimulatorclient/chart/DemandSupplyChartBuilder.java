@@ -2,6 +2,8 @@ package org.example.economicssimulatorclient.chart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
@@ -11,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,19 +24,79 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
 
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
+        Node node;
         switch (chartKey) {
             case "supply_demand":
-                return buildSupplyDemandChart(chartData);
+                node = buildSupplyDemandChart(chartData);
+                break;
             case "surplus_area":
-                return buildSurplusAreaChart(chartData);
+                node = buildSurplusAreaChart(chartData);
+                break;
             case "shift_animation":
-                return buildShiftAnimation(chartData);
+                node = buildShiftAnimation(chartData);
+                break;
             default:
                 Label lbl = new Label("График не реализован: " + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
-                return new StackPane(lbl);
+                StackPane errorPane = new StackPane(lbl);
+                errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
+                errorPane.setPadding(new Insets(16));
+                return errorPane;
         }
+
+        // Если это StackPane (например, есть overlay) — стилизуем сам StackPane,
+        // а внутри ищем LineChart и стилизуем его!
+        if (node instanceof StackPane) {
+            StackPane pane = (StackPane) node;
+            pane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
+            pane.setPadding(new Insets(0));
+            pane.setPrefSize(750, 500);
+
+            // Стилизуем LineChart внутри (но не возвращаем его, а только стилизуем)
+            pane.getChildren().stream()
+                    .filter(child -> child instanceof LineChart)
+                    .forEach(child -> styleChart((LineChart<?, ?>) child));
+
+            // Вернуть сам StackPane!
+            return pane;
+        }
+
+        // Если просто LineChart — стилизуем его:
+        if (node instanceof LineChart) {
+            styleChart((LineChart<?, ?>) node);
+        }
+
+        return node;
     }
+
+    private void styleChart(LineChart<?, ?> chart) {
+        chart.setPrefWidth(760);
+        chart.setPrefHeight(420);
+        chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+        chart.setCreateSymbols(false);
+        chart.applyCss();
+
+        Node plotBackground = chart.lookup(".chart-plot-background");
+        if (plotBackground != null)
+            plotBackground.setStyle("-fx-background-color: white;");
+
+        Node verticalGrid = chart.lookup(".chart-vertical-grid-lines");
+        if (verticalGrid != null)
+            verticalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node horizontalGrid = chart.lookup(".chart-horizontal-grid-lines");
+        if (horizontalGrid != null)
+            horizontalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node legend = chart.lookup(".chart-legend");
+        if (legend != null)
+            legend.setStyle("-fx-background-color: white; -fx-border-color: #ededed; -fx-border-radius: 8; -fx-padding: 4 12 4 12;");
+
+        chart.setPadding(new Insets(0, 0, 0, 0));
+    }
+
+
+
 
     /**
      * 1. Линейный график - кривые спроса и предложения с точкой равновесия.
@@ -95,29 +158,47 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
             }
         }
 
-        // Создаем polygon overlay после layout’а chart
         StackPane root = new StackPane(chart);
 
-        chart.layout(); // важен первый layout для получения displayPosition
-        // Overlay области:
-        if (chartData.containsKey("consumer_surplus_area")) {
-            List<Map<String, Number>> areaPts = (List<Map<String, Number>>) chartData.get("consumer_surplus_area");
-            Polygon poly = buildAreaOverlay(chart, xAxis, yAxis, areaPts, Color.rgb(124, 210, 255, 0.4));
-            root.getChildren().add(poly);
-        }
-        if (chartData.containsKey("producer_surplus_area")) {
-            List<Map<String, Number>> areaPts = (List<Map<String, Number>>) chartData.get("producer_surplus_area");
-            Polygon poly = buildAreaOverlay(chart, xAxis, yAxis, areaPts, Color.rgb(206, 255, 178, 0.4));
-            root.getChildren().add(poly);
-        }
+        // Список полигонов для повторного построения при resize
+        List<Polygon> polygons = new ArrayList<>();
 
-        // Если нужно, навесь listener для динамической подгонки overlay при изменении размера chart
+        Runnable updatePolygons = () -> {
+            // Удалить старые полигоны
+            root.getChildren().removeAll(polygons);
+            polygons.clear();
+
+            if (chartData.containsKey("consumer_surplus_area")) {
+                List<Map<String, Number>> areaPts = (List<Map<String, Number>>) chartData.get("consumer_surplus_area");
+                Polygon poly = buildAreaOverlay(xAxis, yAxis, areaPts, Color.rgb(124, 210, 255, 0.4));
+                polygons.add(poly);
+            }
+            if (chartData.containsKey("producer_surplus_area")) {
+                List<Map<String, Number>> areaPts = (List<Map<String, Number>>) chartData.get("producer_surplus_area");
+                Polygon poly = buildAreaOverlay(xAxis, yAxis, areaPts, Color.rgb(206, 255, 178, 0.4));
+                polygons.add(poly);
+            }
+            root.getChildren().addAll(polygons);
+        };
+
+        // Ждём layout, затем рисуем полигоны и подписываемся на изменение осей
+        chart.layout();
+        Platform.runLater(updatePolygons);
+
+        // Реакция на изменение границ осей (при изменении размера, данных и т.д.)
+        xAxis.lowerBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
+        xAxis.upperBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
+        yAxis.lowerBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
+        yAxis.upperBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
+
+        // Ещё можно добавить listener на widthProperty/heightProperty chart, если хочется "железобетонно"
+        chart.widthProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
+        chart.heightProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
 
         return root;
     }
 
-    private Polygon buildAreaOverlay(LineChart<Number, Number> chart,
-                                     NumberAxis xAxis, NumberAxis yAxis,
+    private Polygon buildAreaOverlay(NumberAxis xAxis, NumberAxis yAxis,
                                      List<Map<String, Number>> pts, Color color) {
         Polygon poly = new Polygon();
         for (Map<String, Number> pt : pts) {
@@ -129,8 +210,6 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         poly.setStroke(Color.GRAY);
         poly.setStrokeWidth(1);
         poly.setMouseTransparent(true);
-
-        // (Опционально: навесить listener на resize/axis, чтобы overlay корректировался при zoom/pan)
         return poly;
     }
 

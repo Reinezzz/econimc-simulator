@@ -10,74 +10,76 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Обновлённый солвер для модели «Эластичность спроса», который формирует:
- * 1. "elasticity_curves"   — набор точек для двух серий ("elastic" и "inelastic");
- * 2. "revenue_bars"        — списки цен и выручки для столбчатой диаграммы;
- * 3. "elasticity_heatmap"  — списки категорий и значений эластичности для тепловой карты.
- */
 @Component
 public class ElasticitySolver implements EconomicModelSolver {
 
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
-        // 1) Считаем входные параметры
+        // 1. Считаем входные параметры
         Map<String, String> paramMap = request.parameters().stream()
                 .collect(Collectors.toMap(ModelParameterDto::paramName, ModelParameterDto::paramValue));
 
-        double Q0       = (Double) ParameterTypeConverter.fromString(paramMap.get("Q0"), "double");
-        double P0       = (Double) ParameterTypeConverter.fromString(paramMap.get("P0"), "double");
-        double Q1       = (Double) ParameterTypeConverter.fromString(paramMap.get("Q1"), "double");
-        double P1       = (Double) ParameterTypeConverter.fromString(paramMap.get("P1"), "double");
-        String category = paramMap.getOrDefault("category", "Обычный товар");
+        // Категории (через ;)
+        List<String> categories = Arrays.stream(paramMap.getOrDefault("category", "Обычный товар")
+                        .split(";"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
 
-        // Рассчитываем коэффициент эластичности по дуге:
-        // ((Q1 - Q0)/((Q1+Q0)/2)) / ((P1 - P0)/((P1+P0)/2))
-        double elasticity = ((Q1 - Q0) / ((Q1 + Q0) / 2.0))
-                / ((P1 - P0) / ((P1 + P0) / 2.0));
+        int n = categories.size();
 
-        // Выручка до и после
-        double revenue0 = Q0 * P0;
-        double revenue1 = Q1 * P1;
+        // Парсим параметры через ;, приводим к double, подгоняем под размер категорий
+        List<Double> p0List = parseNumberList(paramMap.get("P0"), n);
+        List<Double> p1List = parseNumberList(paramMap.get("P1"), n);
+        List<Double> q0List = parseNumberList(paramMap.get("Q0"), n);
+        List<Double> q1List = parseNumberList(paramMap.get("Q1"), n);
 
-        // === 2) Формируем три блока данных ===
-
-        // --- 2.1. Блок "elasticity_curves" ---
-        // Для минимального работоспособного отображения дадим две точки:
-        //   (P0, Q0)  и  (P1, Q1)  и дублируем их в обе серии.
-        List<Map<String, Number>> curvePoints = new ArrayList<>();
-        curvePoints.add(Map.of("price", P0, "quantity", Q0));
-        curvePoints.add(Map.of("price", P1, "quantity", Q1));
-
+        // 2. Формируем эластичности, кривые, revenue
+        List<Double> elasticities = new ArrayList<>();
         Map<String, Object> curvesData = new LinkedHashMap<>();
-        // "elastic" и "inelastic" пока совпадают
-        curvesData.put("elastic",   curvePoints);
-        curvesData.put("inelastic", curvePoints);
+        List<Double> revenue0List = new ArrayList<>();
+        List<Double> revenue1List = new ArrayList<>();
 
-        // --- 2.2. Блок "revenue_bars" ---
-        // Клиентский buildRevenueBarChart ждёт:
-        //    "prices": List<Number>
-        //    "revenue": List<Number>
-        Map<String, Object> revenueData = new LinkedHashMap<>();
-        revenueData.put("prices",  List.of(P0, P1));
-        revenueData.put("revenue", List.of(revenue0, revenue1));
+        for (int i = 0; i < n; i++) {
+            double P0 = p0List.get(i);
+            double P1 = p1List.get(i);
+            double Q0 = q0List.get(i);
+            double Q1 = q1List.get(i);
 
-        // --- 2.3. Блок "elasticity_heatmap" ---
-        // Клиентский buildElasticityHeatmap ждёт:
-        //    "categories": List<String>
-        //    "elasticity": List<Number>
+            // Эластичность по дуге
+            double elasticity = ((Q1 - Q0) / ((Q1 + Q0) / 2.0))
+                    / ((P1 - P0) / ((P1 + P0) / 2.0));
+            elasticities.add(elasticity);
+
+            // Кривые
+            List<Map<String, Number>> curvePoints = new ArrayList<>();
+            curvePoints.add(Map.of("price", P0, "quantity", Q0));
+            curvePoints.add(Map.of("price", P1, "quantity", Q1));
+            String seriesName = i == 0 ? "elastic" : (i == 1 ? "inelastic" : "series" + (i + 1));
+            curvesData.put(seriesName, curvePoints);
+
+            // Revenue
+            revenue0List.add(P0 * Q0);
+            revenue1List.add(P1 * Q1);
+        }
+
+        // 3. Блок heatmap
         Map<String, Object> heatmapData = new LinkedHashMap<>();
-        heatmapData.put("categories",  List.of(category));
-        heatmapData.put("elasticity",  List.of(elasticity));
+        heatmapData.put("categories", categories);
+        heatmapData.put("elasticity", elasticities);
 
-        // === 3) Собираем «объединённый» результат ===
-        // Топ-уровень: три вложенных Map под ключами, соответствующими case-ветвям в ElasticityChartBuilder.
+        // 4. Revenue_bars для всех категорий (цены — названия категорий, две серии: "Выручка до" и "Выручка после")
+        Map<String, Object> revenueData = new LinkedHashMap<>();
+        revenueData.put("categories", categories);
+        revenueData.put("revenue0", revenue0List);
+        revenueData.put("revenue1", revenue1List);
+
+        // 5. Собираем результат
         Map<String, Object> allCharts = new LinkedHashMap<>();
-        allCharts.put("elasticity_curves",   curvesData);
-        allCharts.put("revenue_bars",        revenueData);
-        allCharts.put("elasticity_heatmap",  heatmapData);
+        allCharts.put("elasticity_curves", curvesData);
+        allCharts.put("revenue_bars", revenueData);
+        allCharts.put("elasticity_heatmap", heatmapData);
 
-        // === 4) Упаковываем в DTO ===
         ModelResultDto result = new ModelResultDto(
                 null,
                 request.modelId(),
@@ -91,5 +93,28 @@ public class ElasticitySolver implements EconomicModelSolver {
     @Override
     public String getModelType() {
         return "Elasticity";
+    }
+
+    // Парсинг числовых списков через ; и обрезка/дополнение под нужный размер
+    private List<Double> parseNumberList(String input, int size) {
+        if (input == null || input.isEmpty()) {
+            // Возвратим нули
+            List<Double> zeros = new ArrayList<>(Collections.nCopies(size, 0.0));
+            return zeros;
+        }
+        String[] parts = input.split(";");
+        List<Double> result = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            if (i < parts.length) {
+                try {
+                    result.add(Double.parseDouble(parts[i].trim()));
+                } catch (NumberFormatException e) {
+                    result.add(0.0);
+                }
+            } else {
+                result.add(0.0);
+            }
+        }
+        return result;
     }
 }

@@ -3,6 +3,7 @@ package org.example.economicssimulatorclient.chart;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 import java.util.List;
@@ -15,18 +16,95 @@ public class CompetitionChartBuilder implements ChartDrawer {
 
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
+        Node node;
         switch (chartKey) {
             case "profit_curves":
-                return buildProfitCurvesChart(chartData);
+                node = buildProfitCurvesChart(chartData);
+                if (node instanceof LineChart<?, ?> chart) {
+                    chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+                    chart.setLegendSide(javafx.geometry.Side.BOTTOM);
+                    chart.setLegendVisible(true);
+                    chart.setHorizontalGridLinesVisible(true);
+                    chart.setVerticalGridLinesVisible(true);
+                    chart.lookupAll(".chart-plot-background").forEach(bg ->
+                            bg.setStyle("-fx-background-color: white;"));
+                    // Сетка светло-серая
+                    chart.lookupAll(".chart-horizontal-grid-lines, .chart-vertical-grid-lines")
+                            .forEach(grid -> grid.setStyle("-fx-stroke: #ececec;"));
+                    // Убираем padding
+                    chart.setPadding(javafx.geometry.Insets.EMPTY);
+                    // Прямые линии, без точек
+                    for (Object seriesObj : chart.getData()) {
+                        XYChart.Series<?, ?> series = (XYChart.Series<?, ?>) seriesObj;
+                        for (Object dataObj : series.getData()) {
+                            XYChart.Data<?, ?> data = (XYChart.Data<?, ?>) dataObj;
+                            Node symbol = data.getNode();
+                            if (symbol != null) symbol.setVisible(false);
+                        }
+                    }
+                    // Легенда на белом
+                    Node legend = chart.lookup(".chart-legend");
+                    if (legend != null) legend.setStyle("-fx-background-color: white;");
+                    // Растяжение графика
+                    chart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                }
+                break;
             case "comparison_hist":
-                return buildComparisonHistogram(chartData);
+                node = buildComparisonHistogram(chartData);
+                if (node instanceof BarChart<?, ?> chart) {
+                    chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+                    chart.setLegendSide(javafx.geometry.Side.BOTTOM);
+                    chart.setLegendVisible(true);
+                    chart.setHorizontalGridLinesVisible(true);
+                    chart.setVerticalGridLinesVisible(true);
+                    chart.lookupAll(".chart-plot-background").forEach(bg ->
+                            bg.setStyle("-fx-background-color: white;"));
+                    chart.lookupAll(".chart-horizontal-grid-lines, .chart-vertical-grid-lines")
+                            .forEach(grid -> grid.setStyle("-fx-stroke: #ececec;"));
+                    chart.setPadding(javafx.geometry.Insets.EMPTY);
+                    Node legend = chart.lookup(".chart-legend");
+                    if (legend != null) legend.setStyle("-fx-background-color: white;");
+                    chart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                }
+                break;
             case "deadweight_area":
-                return buildDeadweightAreaChart(chartData);
+                node = buildDeadweightAreaChart(chartData);
+                if (node instanceof AreaChart<?, ?> chart) {
+                    chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+                    chart.setLegendSide(javafx.geometry.Side.BOTTOM);
+                    chart.setLegendVisible(true);
+                    chart.setHorizontalGridLinesVisible(true);
+                    chart.setVerticalGridLinesVisible(true);
+                    chart.lookupAll(".chart-plot-background").forEach(bg ->
+                            bg.setStyle("-fx-background-color: white;"));
+                    chart.lookupAll(".chart-horizontal-grid-lines, .chart-vertical-grid-lines")
+                            .forEach(grid -> grid.setStyle("-fx-stroke: #ececec;"));
+                    chart.setPadding(javafx.geometry.Insets.EMPTY);
+                    // Легенда на белом
+                    Node legend = chart.lookup(".chart-legend");
+                    if (legend != null) legend.setStyle("-fx-background-color: white;");
+                    chart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    // Если внутри AreaChart есть маркеры точек — убрать:
+                    for (Object seriesObj : chart.getData()) {
+                        XYChart.Series<?, ?> series = (XYChart.Series<?, ?>) seriesObj;
+                        for (Object dataObj : series.getData()) {
+                            XYChart.Data<?, ?> data = (XYChart.Data<?, ?>) dataObj;
+                            Node symbol = data.getNode();
+                            if (symbol != null) symbol.setVisible(false);
+                        }
+                    }
+                }
+                break;
             default:
                 Label lbl = new Label("График не реализован: " + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
-                return new StackPane(lbl);
+                node = new StackPane(lbl);
         }
+        // Гарантированно растягиваем Node на всю доступную область (для StackPane)
+        if (node instanceof Region region) {
+            region.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        }
+        return node;
     }
 
     /**

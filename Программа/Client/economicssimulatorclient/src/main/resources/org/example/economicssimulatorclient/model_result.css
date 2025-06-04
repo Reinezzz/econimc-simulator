@@ -185,8 +185,8 @@
     -fx-border-color: #e0e0e0;
     -fx-border-radius: 16;
     -fx-background-radius: 16;
-    -fx-pref-height: 400px;
-    -fx-pref-width: 700px;
+    -fx-pref-height: 500px;
+    -fx-pref-width: 750px;
     -fx-padding: 20;
     -fx-effect: dropshadow(gaussian, rgba(60,60,60,0.06), 8,0,0,0);
 }

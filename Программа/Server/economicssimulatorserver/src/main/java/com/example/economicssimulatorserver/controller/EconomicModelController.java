@@ -96,7 +96,8 @@ public class EconomicModelController {
 
     @PostMapping("/calculate")
     public ResponseEntity<CalculationResponseDto> calculate(@RequestBody CalculationRequestDto request) {
-        return ResponseEntity.ok(modelCalculationService.calculate(request));
+        Long userId = getCurrentUserId();
+        return ResponseEntity.ok(modelCalculationService.calculate(request, userId));
     }
 }
 

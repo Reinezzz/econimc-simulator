@@ -29,4 +29,8 @@ public class ModelResult {
 
     @Column(nullable = false)
     private LocalDateTime calculatedAt = LocalDateTime.now();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
