@@ -10,6 +10,7 @@ import com.example.economicssimulatorserver.repository.EconomicModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,26 +19,27 @@ import java.util.stream.Collectors;
 public class EconomicModelService {
 
     private final EconomicModelRepository economicModelRepository;
+    private final ModelParameterService modelParameterService;
 
-    @Transactional(readOnly = true)
-    public List<EconomicModelDto> getAllModels() {
+    @Transactional()
+    public List<EconomicModelDto> getAllModels(Long userId) {
         return economicModelRepository.findAll().stream()
-                .map(this::toDto)
+                .map(model -> toDto(model, userId))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public EconomicModelDto getModelById(Long id) {
+    public EconomicModelDto getModelById(Long id, Long userId) {
         EconomicModel model = economicModelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Model not found: " + id));
-        return toDto(model);
+        return toDto(model, userId);
     }
 
     @Transactional
     public EconomicModelDto createModel(EconomicModelDto dto) {
         EconomicModel model = fromDto(dto);
         EconomicModel saved = economicModelRepository.save(model);
-        return toDto(saved);
+        return toDto(saved, null);
     }
 
     @Transactional
@@ -48,7 +50,7 @@ public class EconomicModelService {
         model.setDescription(dto.description());
         model.setModelType(dto.modelType());
         EconomicModel updated = economicModelRepository.save(model);
-        return toDto(updated);
+        return toDto(updated, null);
     }
 
     @Transactional
@@ -60,13 +62,18 @@ public class EconomicModelService {
 
     // ==== Преобразование между entity <-> record ====
 
-    private EconomicModelDto toDto(EconomicModel model) {
-        List<ModelParameterDto> paramDtos = model.getParameters() != null
-                ? model.getParameters().stream().map(this::toDto).collect(Collectors.toList())
-                : List.of();
+    private EconomicModelDto toDto(EconomicModel model, Long userId) {
+        List<ModelParameterDto> paramDtos =
+                (userId != null)
+                        ? modelParameterService.getParametersByModelId(model.getId(), userId)
+                        : model.getParameters() != null
+                        ? model.getParameters().stream().map(this::toDto).collect(Collectors.toList())
+                        : List.of();
+
         List<ModelResultDto> resultDtos = model.getResults() != null
                 ? model.getResults().stream().map(this::toDto).collect(Collectors.toList())
                 : List.of();
+
         return new EconomicModelDto(
                 model.getId(),
                 model.getModelType(),

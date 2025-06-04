@@ -1,8 +1,7 @@
 package com.example.economicssimulatorserver.entity;// UserModelParameter.java
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(
@@ -11,6 +10,11 @@ import lombok.Setter;
 )
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"model", "user", "parameter"})
 public class UserModelParameter {
 
     @Id
