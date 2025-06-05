@@ -1,5 +1,4 @@
 module org.example.economicssimulatorclient {
-    requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
 
@@ -9,7 +8,6 @@ module org.example.economicssimulatorclient {
     requires org.kordamp.ikonli.javafx;
     requires eu.hansolo.tilesfx;
     requires java.net.http;
-    requires javafx.graphics;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
     requires static lombok;
@@ -17,6 +15,7 @@ module org.example.economicssimulatorclient {
     requires org.json;
     requires exp4j;
     requires org.mockito;
+    requires org.fxyz3d.core;
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml, org.testfx.junit5;
     opens org.example.economicssimulatorclient.config to javafx.fxml;

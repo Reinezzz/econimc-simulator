@@ -1,41 +1,84 @@
 package org.example.economicssimulatorclient.chart;
 
-import javafx.scene.Node;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.DrawMode;
+import javafx.scene.transform.Rotate;
+import org.fxyz3d.shapes.primitives.SurfacePlotMesh;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
- * Визуализатор для IS-LM модели.
+ * Визуализатор для IS-LM модели, включая 3D surface через FXyz3D.
  */
 public class ISLMChartBuilder implements ChartDrawer {
 
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
+        Node node;
         switch (chartKey) {
             case "is_lm":
-                return buildISLMChart(chartData);
+                node = buildISLMChart(chartData);
+                break;
             case "surface":
-                return buildSurfaceChart(chartData);
+                node = buildSurfaceChart(chartData);
+                break;
             case "timeseries":
-                return buildTimeSeriesChart(chartData);
+                node = buildTimeSeriesChart(chartData);
+                break;
             default:
                 Label lbl = new Label("График не реализован: " + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
-                return new StackPane(lbl);
+                StackPane errorPane = new StackPane(lbl);
+                errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
+                errorPane.setPadding(new Insets(16));
+                return errorPane;
         }
+        if (node instanceof LineChart) {
+            styleChart((LineChart<?, ?>) node);
+        }
+
+        return node;
+    }
+
+    private void styleChart(LineChart<?, ?> chart) {
+        chart.setPrefWidth(760);
+        chart.setPrefHeight(420);
+        chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+        chart.setCreateSymbols(false);
+        chart.applyCss();
+
+        Node plotBackground = chart.lookup(".chart-plot-background");
+        if (plotBackground != null)
+            plotBackground.setStyle("-fx-background-color: white;");
+
+        Node verticalGrid = chart.lookup(".chart-vertical-grid-lines");
+        if (verticalGrid != null)
+            verticalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node horizontalGrid = chart.lookup(".chart-horizontal-grid-lines");
+        if (horizontalGrid != null)
+            horizontalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node legend = chart.lookup(".chart-legend");
+        if (legend != null)
+            legend.setStyle("-fx-background-color: white; -fx-border-color: #ededed; -fx-border-radius: 8; -fx-padding: 4 12 4 12;");
+
+        chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
     /**
-     * 1. Двухосевой график — пересечение кривых IS и LM
-     * chartData: "IS": List<Map<String, Number>> (x="income", y="rate")
-     *            "LM": List<Map<String, Number>> (x="income", y="rate")
-     *            "equilibrium": Map<String, Number> (x="income", y="rate")
+     * 1. IS/LM график с равновесием
      */
     private Node buildISLMChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
@@ -46,9 +89,12 @@ public class ISLMChartBuilder implements ChartDrawer {
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
         chart.setTitle("Модель IS-LM: Кривые и равновесие");
         chart.setAnimated(false);
+        chart.setCreateSymbols(false);
+        chart.setLegendVisible(true);
+        chart.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #ebebeb;");
 
-        addSeries(chart, chartData, "IS", "IS");
-        addSeries(chart, chartData, "LM", "LM");
+        addSeries(chart, chartData, "IS", "IS", "#FF5E3A", 3.0);
+        addSeries(chart, chartData, "LM", "LM", "#FFC800", 3.0);
 
         // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
@@ -58,8 +104,15 @@ public class ISLMChartBuilder implements ChartDrawer {
             if (x != null && y != null) {
                 XYChart.Series<Number, Number> eqSeries = new XYChart.Series<>();
                 eqSeries.setName("Равновесие");
-                eqSeries.getData().add(new XYChart.Data<>(x, y));
+                XYChart.Data<Number, Number> d = new XYChart.Data<>(x, y);
+                eqSeries.getData().add(d);
                 chart.getData().add(eqSeries);
+                // Стилизация точки равновесия (красный кружок)
+                d.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                    if (newNode != null) {
+                        newNode.setStyle("-fx-background-color: #37ff37, white; -fx-background-radius: 8px;");
+                    }
+                });
             }
         }
         return chart;
@@ -106,8 +159,6 @@ public class ISLMChartBuilder implements ChartDrawer {
 
     /**
      * 3. Временные ряды — динамика равновесия при изменении политики
-     * chartData: "policy": List<Map<String, Number>> (x="time", y="income")
-     *            "rate": List<Map<String, Number>> (x="time", y="rate")
      */
     private Node buildTimeSeriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
@@ -118,6 +169,9 @@ public class ISLMChartBuilder implements ChartDrawer {
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
         chart.setTitle("Динамика равновесия IS-LM");
         chart.setAnimated(false);
+        chart.setCreateSymbols(true);
+        chart.setLegendVisible(true);
+        chart.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #ebebeb;");
 
         // Временной ряд дохода
         if (chartData.containsKey("policy")) {
@@ -149,7 +203,8 @@ public class ISLMChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    private void addSeries(LineChart<Number, Number> chart, Map<String, Object> data, String key, String name) {
+    // Вспомогательная функция с цветом/толщиной
+    private void addSeries(LineChart<Number, Number> chart, Map<String, Object> data, String key, String name, String color, double width) {
         if (data.containsKey(key)) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) data.get(key);
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -161,6 +216,13 @@ public class ISLMChartBuilder implements ChartDrawer {
                     series.getData().add(new XYChart.Data<>(x, y));
             }
             chart.getData().add(series);
+
+            // Стилизуем линию после отрисовки
+            series.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.setStyle(String.format("-fx-stroke: %s; -fx-stroke-width: %.1f;", color, width));
+                }
+            });
         }
     }
 }
