@@ -74,9 +74,9 @@ public class ADASSolver implements EconomicModelSolver {
         List<Map<String, Number>> seriesLRAS    = new ArrayList<>();
         for (int i = 0; i < N; i++) {
             // для равновесия и визуализации AD-AS на графике x=Y, y=P
-            seriesAD.add(Map.of("x", Y_AD_shift[i], "y", P[i]));
-            seriesSRAS.add(Map.of("x", Y_SRAS[i],   "y", P[i]));
-            seriesLRAS.add(Map.of("x", Y_pot,       "y", P[i]));
+            seriesAD.add(Map.of("x", Y_AD_base[i], "y", P[i])); // было Y_AD_shift[i]
+            seriesSRAS.add(Map.of("x", Y_SRAS[i], "y", P[i]));
+            seriesLRAS.add(Map.of("x", Y_pot, "y", P[i]));
         }
         Map<String, Object> equilibriumData = new LinkedHashMap<>();
         equilibriumData.put("AD",          seriesAD);
@@ -122,10 +122,11 @@ public class ADASSolver implements EconomicModelSolver {
         List<Map<String, Number>> seriesSRAS_post= new ArrayList<>();
         List<Map<String, Number>> seriesLRAS3   = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            seriesAD_post.add(Map.of("x", Y_AD_shift[i], "y", P[i]));
-            seriesSRAS_post.add(Map.of("x", Y_SRAS[i],   "y", P[i]));
-            seriesLRAS3.add(Map.of("x", Y_pot,           "y", P[i]));
+            seriesAD_post.add(Map.of("x", Y_AD_base[i], "y", P[i])); // было Y_AD_shift[i]
+            seriesSRAS_post.add(Map.of("x", Y_SRAS[i], "y", P[i]));
+            seriesLRAS3.add(Map.of("x", Y_pot, "y", P[i]));
         }
+
         Map<String, Object> gapsData = new LinkedHashMap<>();
         gapsData.put("AD",         seriesAD_post);
         gapsData.put("SRAS",       seriesSRAS_post);

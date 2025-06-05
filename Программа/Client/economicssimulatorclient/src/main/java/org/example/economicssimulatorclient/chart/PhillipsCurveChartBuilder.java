@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.chart;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
@@ -15,18 +16,81 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
 
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
+        Node node;
         switch (chartKey) {
             case "scatter":
-                return buildScatterChart(chartData);
+                node = buildScatterChart(chartData);
+                break;
             case "timeseries":
-                return buildTimeSeriesChart(chartData);
+                node = buildTimeSeriesChart(chartData);
+                break;
             case "loops":
-                return buildLoopsChart(chartData);
+                node = buildLoopsChart(chartData);
+                break;
             default:
                 Label lbl = new Label("График не реализован: " + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
-                return new StackPane(lbl);
+                StackPane errorPane = new StackPane(lbl);
+                errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
+                errorPane.setPadding(new Insets(16));
+                return errorPane;
         }
+        if (node instanceof LineChart)
+            styleChart((LineChart<?, ?>) node);
+        if (node instanceof ScatterChart)
+            styleChart((ScatterChart<?, ?>) node);
+        return node;
+    }
+
+    private void styleChart(ScatterChart<?,?> chart) {
+        chart.setPrefWidth(760);
+        chart.setPrefHeight(420);
+        chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+        chart.applyCss();
+
+        Node plotBackground = chart.lookup(".chart-plot-background");
+        if (plotBackground != null)
+            plotBackground.setStyle("-fx-background-color: white;");
+
+        Node verticalGrid = chart.lookup(".chart-vertical-grid-lines");
+        if (verticalGrid != null)
+            verticalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node horizontalGrid = chart.lookup(".chart-horizontal-grid-lines");
+        if (horizontalGrid != null)
+            horizontalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node legend = chart.lookup(".chart-legend");
+        if (legend != null)
+            legend.setStyle("-fx-background-color: white; -fx-border-color: #ededed; -fx-border-radius: 8; -fx-padding: 4 12 4 12;");
+
+        chart.setPadding(new Insets(0, 0, 0, 0));
+    }
+
+    private void styleChart(LineChart<?, ?> chart) {
+        chart.setPrefWidth(760);
+        chart.setPrefHeight(420);
+        chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
+        chart.setCreateSymbols(false);
+        chart.applyCss();
+
+        Node plotBackground = chart.lookup(".chart-plot-background");
+        if (plotBackground != null)
+            plotBackground.setStyle("-fx-background-color: white;");
+
+        Node verticalGrid = chart.lookup(".chart-vertical-grid-lines");
+        if (verticalGrid != null)
+            verticalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node horizontalGrid = chart.lookup(".chart-horizontal-grid-lines");
+        if (horizontalGrid != null)
+            horizontalGrid.setStyle("-fx-stroke: #ebebeb;");
+
+        Node legend = chart.lookup(".chart-legend");
+        if (legend != null)
+            legend.setStyle("-fx-background-color: white; -fx-border-color: #ededed; -fx-border-radius: 8; -fx-padding: 4 12 4 12;");
+
+        chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
     /**

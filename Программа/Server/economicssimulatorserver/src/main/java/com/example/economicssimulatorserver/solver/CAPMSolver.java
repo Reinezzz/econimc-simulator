@@ -40,18 +40,23 @@ public class CAPMSolver implements EconomicModelSolver {
         //   β=0  → доходность=Rf
         //   β=β  → доходность=expectedReturn
         List<Map<String, Number>> smlPoints = new ArrayList<>();
-        smlPoints.add(Map.of("risk",   0.0,  "return", Rf));
-        smlPoints.add(Map.of("risk",  beta, "return", expectedReturn));
-        // Оборачиваем в Map<"sml"→List<…>>
+        smlPoints.add(Map.of("risk", 0.0, "return", Rf));
+        smlPoints.add(Map.of("risk", beta, "return", expectedReturn));
         Map<String, Object> smlData = new LinkedHashMap<>();
         smlData.put("sml", smlPoints);
 
         // === 4) БЛОК "efficient_frontier" ===
-        // Клиент ожидает Map со списками "portfolios" и "frontier"
+        // Несколько портфелей и "frontier"
         Map<String, Object> efData = new LinkedHashMap<>();
-        // - "portfolios": точка (σ, expectedReturn)
-        efData.put("portfolios", List.of(Map.of("risk", sigma, "return", expectedReturn)));
-        // - "frontier": β от 0 до 2 шагом 0.2, E(R)=Rf + β*(Rm-Rf)
+        List<Map<String, Number>> portfolios = new ArrayList<>();
+        // Добавим 5 портфелей с разными beta (и sigma = beta для примера)
+        for (double b = 0.0; b <= 2.0; b += 0.5) {
+            double r = Rf + b * (Rm - Rf) + alpha;
+            double s = b; // sigma = beta для примера, если нужна другая формула - подставить свою
+            portfolios.add(Map.of("risk", s, "return", r));
+        }
+        efData.put("portfolios", portfolios);
+        // Эффективная граница
         List<Map<String, Number>> frontierPoints = new ArrayList<>();
         for (double b = 0.0; b <= 2.0; b += 0.2) {
             double r_i = Rf + b * (Rm - Rf);
@@ -60,22 +65,30 @@ public class CAPMSolver implements EconomicModelSolver {
         efData.put("frontier", frontierPoints);
 
         // === 5) БЛОК "decomposition" ===
-        // Клиент ожидает List<Map<"label",String; "alpha",Number; "beta",Number>>
         List<Map<String, Object>> decompositionList = new ArrayList<>();
         decompositionList.add(Map.of(
                 "label", "Portfolio",
                 "alpha", alpha,
                 "beta",  beta
         ));
-        // Оборачиваем в Map<"decomposition"→List<…>>
+        decompositionList.add(Map.of(
+                "label", "Market",
+                "alpha", 0.0,
+                "beta",  1.0
+        ));
+        decompositionList.add(Map.of(
+                "label", "Risk-free",
+                "alpha", 0.0,
+                "beta",  0.0
+        ));
         Map<String, Object> decompData = new LinkedHashMap<>();
         decompData.put("decomposition", decompositionList);
 
         // === 6) Собираем финальный allCharts ===
         Map<String, Object> allCharts = new LinkedHashMap<>();
-        allCharts.put("sml",                smlData);      // Map с одним ключом "sml"→List<…>
-        allCharts.put("efficient_frontier", efData);       // Map с ключами "portfolios", "frontier"
-        allCharts.put("decomposition",      decompData);   // Map с одним ключом "decomposition"→List<…>
+        allCharts.put("sml",                smlData);
+        allCharts.put("efficient_frontier", efData);
+        allCharts.put("decomposition",      decompData);
 
         // === 7) Сериализуем и возвращаем ===
         ModelResultDto result = new ModelResultDto(
