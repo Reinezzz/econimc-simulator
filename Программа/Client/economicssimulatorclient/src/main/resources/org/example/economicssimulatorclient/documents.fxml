@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.economicssimulatorclient.controller.DocumentController"
+            stylesheets="@documents.css">
+
+
+    <!-- Верхняя панель -->
+    <HBox styleClass="top-bar"
+          AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <Button fx:id="backButton" text="Назад" styleClass="exit-button"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button fx:id="mainButton" text="Главная" styleClass="exit-button"/>
+    </HBox>
+
+    <!-- Основной контент -->
+    <VBox AnchorPane.topAnchor="60"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          styleClass="content-pane"
+          spacing="20">
+
+        <!-- Кнопка и заголовок -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <MenuButton text="Документ"
+                        styleClass="choice-box"
+                        mnemonicParsing="false">
+                <items>
+                    <MenuItem text="Документ"/>
+                </items>
+            </MenuButton>
+            <Label text="Сохранённые документы" styleClass="page-title"/>
+        </HBox>
+
+        <!-- Таблица документов -->
+        <Pane styleClass="table-container" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-scroll" prefHeight="600">
+                <GridPane fx:id="tableGrid"
+                          styleClass="table-grid"
+                          gridLinesVisible="true">
+                    <!-- Динамические строки генерирует контроллер -->
+                </GridPane>
+            </ScrollPane>
+        </Pane>
+
+        <!-- Статус-лейбл -->
+        <Label fx:id="statusLabel"
+               styleClass="status-label"
+        />
+
+        <!-- Нижние кнопки -->
+        <HBox styleClass="bottom-buttons" alignment="CENTER" spacing="20">
+            <Button fx:id="selectButton"  text="Выбрать"  styleClass="primary-button"/>
+            <Button fx:id="addButton"     text="Добавить" styleClass="primary-button"/>
+            <Button fx:id="deleteButton"  text="Удалить"  styleClass="danger-button"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

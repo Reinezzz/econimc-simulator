@@ -21,6 +21,8 @@ public class MainController extends BaseController {
 
     private final AuthService authService = AuthService.getInstance();
     private final EconomicModelService modelService = get(EconomicModelService.class);
+    @FXML
+    public VBox tileDocuments;
 
     @FXML
     private VBox modelList;
@@ -57,6 +59,9 @@ public class MainController extends BaseController {
             } else {
                 showError(statusLabel, "Нет последней модели для просмотра");
             }
+        });
+        tileDocuments.setOnMouseClicked(e -> {
+            SceneManager.switchTo("documents.fxml", DocumentController::initialize);
         });
     }
 

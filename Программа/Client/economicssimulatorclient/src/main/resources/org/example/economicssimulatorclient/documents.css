@@ -1,0 +1,158 @@
+/* Фон всей сцены */
+.root, .screen, .content-pane {
+    -fx-background-color: #fff;
+}
+
+/* Верхняя панель */
+.top-bar {
+    -fx-padding: 32 55 24 55;
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+}
+
+/* Кнопки "Назад" и "Главная" */
+.exit-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 16;
+    -fx-text-fill: #fff;
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-padding: 18 34 18 34;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(30,10,203,0.11), 10, 0.2, 0, 1);
+}
+
+/* Верхняя строка с комбобоксом и заголовком */
+.page-title {
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 64;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000;
+    -fx-alignment: center-left;
+    -fx-padding: 16 0 16 32;
+}
+
+.choice-box, .menu-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 8;
+    -fx-border-color: #b2b1b1;
+    -fx-border-width: 2;
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-text-fill: #fff;
+    -fx-padding: 9 12 9 12;
+}
+
+.menu-button .label {
+    -fx-text-fill: #fff;
+}
+
+/* Контейнер таблицы */
+.table-container {
+    -fx-background-color: #fff;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: #b2b1b1;
+    -fx-border-width: 2;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(three-pass-box, #ededed, 10, 0.07, 0, 3);
+}
+
+/* Скролл таблицы */
+.table-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 16;
+}
+
+/* Таблица */
+.table-grid {
+    -fx-background-color: #fff;
+    -fx-font-size: 24;
+    -fx-font-family: "Actor", "Roboto", Arial;
+    -fx-hgap: 10;
+    -fx-vgap: 5;
+    -fx-alignment: center-left;
+}
+
+.table-header {
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000;
+    -fx-padding: 12 12 12 12;
+}
+
+/* Ячейки и строки таблицы */
+.table-grid .label {
+    -fx-font-family: "Actor", "Roboto", Arial;
+    -fx-font-size: 24;
+    -fx-text-fill: #000;
+    -fx-alignment: center-left;
+    -fx-padding: 16 12 16 12;
+}
+
+/* Стиль чекбокса (увеличенный) */
+.table-grid .check-box {
+    -fx-scale-x: 1.8;
+    -fx-scale-y: 1.8;
+    -fx-padding: 10;
+}
+
+/* Стиль кнопки скачать */
+.download-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 8;
+    -fx-text-fill: #fff;
+    -fx-font-size: 32;
+    -fx-padding: 10 44 10 44;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(30,10,203,0.09), 5, 0.1, 0, 1);
+}
+
+/* Нижние кнопки */
+.bottom-buttons {
+    -fx-padding: 16 0 0 0;
+    -fx-alignment: center;
+}
+
+.primary-button {
+    -fx-background-color: #1e0acb;
+    -fx-background-radius: 16;
+    -fx-text-fill: #fff;
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-padding: 18 34 18 34;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.danger-button {
+    -fx-background-color: #ff0004;
+    -fx-background-radius: 16;
+    -fx-text-fill: #fff;
+    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-padding: 18 34 18 34;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+/* Статус-лейбл */
+#statusLabel {
+    -fx-font-size: 18;
+    -fx-text-fill: #888;
+    -fx-padding: 8 0 0 24;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+}
+
+/* Убрать границы вокруг кнопок при фокусе */
+.button:focused, .download-button:focused, .primary-button:focused, .danger-button:focused {
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-color: inherit;
+}

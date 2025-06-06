@@ -66,7 +66,9 @@ public class ModelResultController extends BaseController {
 
     private void fillParameters() {
         parameterList.getChildren().clear();
-        for (ModelParameterDto param : parameters) {
+        for (int i = 0; i < parameters.size(); i++) {
+            ModelParameterDto param = parameters.get(i);
+            int index = i;
             VBox paramBox = new VBox(3);
             paramBox.getStyleClass().add("parameter-card");
             Label symbol = new Label(param.paramName());
@@ -82,7 +84,7 @@ public class ModelResultController extends BaseController {
             value.getStyleClass().add("parameter-input");
 
             value.textProperty().addListener((obs, oldVal, newVal) -> {
-                parameters.set(parameters.indexOf(param), new ModelParameterDto(
+                parameters.set(index, new ModelParameterDto(
                         param.id(), param.modelId(), param.paramName(), param.paramType(),
                         newVal, param.displayName(), param.description(), param.customOrder()
                 ));

@@ -117,7 +117,7 @@ public class ModelViewController extends BaseController {
         });
 
         addDocumentButton.setOnAction(e -> {
-            showError(statusLabel, "Добавление документа пока не реализовано");
+            SceneManager.switchTo("documents.fxml", DocumentController::initialize);
         });
     }
 
