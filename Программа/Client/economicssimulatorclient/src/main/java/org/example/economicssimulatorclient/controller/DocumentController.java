@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import org.example.economicssimulatorclient.dto.DocumentDto;
 import org.example.economicssimulatorclient.service.DocumentService;
@@ -102,27 +104,37 @@ public class DocumentController extends BaseController {
     }
 
     private void addTableHeader() {
+        for (int col = 0; col < 4; col++) {
+            Label header = new Label(headers[col]);
+            header.getStyleClass().add("table-header");
+            tableGrid.add(header, col, 0);
+        }
+// Добавить псевдо-линию:
+        Rectangle line = new Rectangle();
+        line.setHeight(2);
+        line.setFill(Color.web("#b2b1b1"));
+        GridPane.setColumnSpan(line, 4);
+        tableGrid.add(line, 0, 1);
         tableGrid.add(new Label(""),                  0, 0);
-        Label dateHeader = new Label(tr("documents.uploadedAt"));
+        Label dateHeader = new Label("Дата");
         dateHeader.getStyleClass().add("table-header");
         tableGrid.add(dateHeader, 1, 0);
-        Label nameHeader = new Label(tr("documents.name"));
+        Label nameHeader = new Label("Документ");
         nameHeader.getStyleClass().add("table-header");
         tableGrid.add(nameHeader, 2, 0);
-        Label downloadHeader = new Label(tr("documents.download"));
+        Label downloadHeader = new Label("Скачать");
         downloadHeader.getStyleClass().add("table-header");
         tableGrid.add(downloadHeader, 3, 0);
     }
 
     private void onAdd() {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle(tr("documents.chooseFile"));
+        chooser.setTitle("Выберите файл");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File file = chooser.showOpenDialog(tableGrid.getScene().getWindow());
         if (file != null) {
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setHeaderText(tr("documents.enterDescription"));
-            dialog.setContentText(tr("documents.description"));
+            dialog.setHeaderText("Введите описание");
             dialog.getEditor().setText("");
             dialog.showAndWait();
             String description = dialog.getResult();
@@ -134,7 +146,7 @@ public class DocumentController extends BaseController {
                     throw new RuntimeException(e);
                 }
                 Platform.runLater(() -> {
-                    showSuccess(statusLabel, "documents.uploaded");
+                    showSuccess(statusLabel, "Документ загружен");
                     loadDocuments();
                 });
             }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки: " + ex.getMessage())));
@@ -149,12 +161,12 @@ public class DocumentController extends BaseController {
             }
         }
         if (indicesToDelete.isEmpty()) {
-            showError(statusLabel, "documents.selectForDelete");
+            showError(statusLabel, "Выбран для удаления");
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, tr("documents.confirmDelete"), ButtonType.YES, ButtonType.NO);
-        confirm.setTitle(tr("documents.confirmDeleteTitle"));
+        confirm.setTitle("Подтвердите удаление");
         confirm.showAndWait();
         if (confirm.getResult() != ButtonType.YES) return;
 
@@ -168,7 +180,7 @@ public class DocumentController extends BaseController {
                 }
             }
             Platform.runLater(() -> {
-                showSuccess(statusLabel, "documents.deleted");
+                showSuccess(statusLabel, "Документ удален");
                 loadDocuments();
             });
         }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
@@ -176,7 +188,7 @@ public class DocumentController extends BaseController {
 
     private void onDownload(long docId, String docName) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle(tr("documents.saveAs"));
+        chooser.setTitle("Сохранить как");
         chooser.setInitialFileName(docName);
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File saveFile = chooser.showSaveDialog(tableGrid.getScene().getWindow());
@@ -189,7 +201,7 @@ public class DocumentController extends BaseController {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    Platform.runLater(() -> showSuccess(statusLabel, "documents.downloaded"));
+                    Platform.runLater(() -> showSuccess(statusLabel, "Документ скачан"));
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -205,7 +217,7 @@ public class DocumentController extends BaseController {
             }
         }
         if (selected.isEmpty()) {
-            showError(statusLabel, "documents.selectAtLeastOne");
+            showError(statusLabel, "Выберите хотя бы 1");
             return;
         }
         String names = selected.stream().map(DocumentDto::name).reduce((a, b) -> a + ", " + b).orElse("");

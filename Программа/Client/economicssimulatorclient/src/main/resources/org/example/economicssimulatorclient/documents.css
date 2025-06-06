@@ -1,56 +1,109 @@
-/* Фон всей сцены */
-.root, .screen, .content-pane {
+.screen {
     -fx-background-color: #fff;
 }
 
-/* Верхняя панель */
+/* TOP BAR */
 .top-bar {
-    -fx-padding: 32 55 24 55;
-    -fx-background-color: transparent;
+    -fx-background-color: #transparent;
+    -fx-pref-height: 100px;
+    -fx-padding: 32 36 0 36;
+    -fx-spacing: 0;
     -fx-alignment: center;
 }
 
-/* Кнопки "Назад" и "Главная" */
-.exit-button {
+.topbar-button {
     -fx-background-color: #1e0acb;
     -fx-background-radius: 16;
     -fx-text-fill: #fff;
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 24;
-    -fx-font-weight: bold;
-    -fx-padding: 18 34 18 34;
-    -fx-border-width: 0;
+    -fx-font-size: 16px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-padding: 7 32 7 32;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(30,10,203,0.11), 10, 0.2, 0, 1);
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+.danger-button {
+    -fx-background-color: #ff0004;
+    -fx-background-radius: 16;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-padding: 7 32 7 32;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+.top-separator, .bottom-separator {
+    -fx-background-color: #e0e0e0;
+    -fx-pref-height: 1;
+    -fx-min-height: 1;
+    -fx-max-height: 1;
+}
+.bottom-bar {
+    -fx-background-color: transparent;
+    -fx-pref-height: 100px;
+    -fx-padding: 0 36 0 36;
+    -fx-alignment: center;
+    -fx-spacing: 0;
+}
+.bottom-center-buttons {
+    -fx-alignment: center;
+    -fx-spacing: 24;
+}
+.content-pane {
+    -fx-background-color: #fff;
+    -fx-padding: 0 36 0 36;
+    -fx-spacing: 16;
+    -fx-alignment: top-center;
 }
 
-/* Верхняя строка с комбобоксом и заголовком */
+/* HEADER & SELECTOR */
 .page-title {
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 64;
-    -fx-font-weight: bold;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-size: 44px;
+    -fx-font-weight: 700;
     -fx-text-fill: #000;
     -fx-alignment: center-left;
-    -fx-padding: 16 0 16 32;
+    -fx-padding: 8 0 8 36;
 }
 
-.choice-box, .menu-button {
+.result-combo, .result-combo .text {
+    -fx-text-fill: #fff;              /* Белый текст (например) */
+    -fx-font-size: 18px;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 600;
     -fx-background-color: #1e0acb;
-    -fx-background-radius: 8;
-    -fx-border-color: #b2b1b1;
-    -fx-border-width: 2;
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 24;
-    -fx-font-weight: bold;
+}
+.result-combo .list{
+    -fx-background-radius: 16;
+}
+/* Чтобы выбранный элемент в выпадающем списке тоже был белым: */
+.result-combo .list-cell {
     -fx-text-fill: #fff;
-    -fx-padding: 9 12 9 12;
+    -fx-background-color: #1e0acb;    /* фон выпадающих пунктов */
+    -fx-font-size: 18px;
+
 }
 
-.menu-button .label {
+/* При наведении/выборе — изменять фон/цвет */
+.result-combo .list-cell:hover {
+    -fx-background-color: #2a17f6;
+    -fx-text-fill: #fff;
+
+}
+.result-combo, .result-combo .text {
     -fx-text-fill: #fff;
 }
+.result-combo .arrow {
+    -fx-background-color: #fff;
+}
+.result-combo .arrow-button {
+    -fx-background-color: transparent;
+}
 
-/* Контейнер таблицы */
+/* ТАБЛИЦА */
 .table-container {
     -fx-background-color: #fff;
     -fx-background-radius: 16;
@@ -60,98 +113,57 @@
     -fx-padding: 0;
     -fx-effect: dropshadow(three-pass-box, #ededed, 10, 0.07, 0, 3);
 }
-
-/* Скролл таблицы */
 .table-scroll {
     -fx-background-color: transparent;
-    -fx-padding: 16;
+    -fx-padding: 18;
 }
-
-/* Таблица */
 .table-grid {
     -fx-background-color: #fff;
-    -fx-font-size: 24;
+    -fx-font-size: 22;
     -fx-font-family: "Actor", "Roboto", Arial;
     -fx-hgap: 10;
-    -fx-vgap: 5;
+    -fx-vgap: 7;
     -fx-alignment: center-left;
 }
-
 .table-header {
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 24;
-    -fx-font-weight: bold;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-size: 22;
+    -fx-font-weight: 700;
     -fx-text-fill: #000;
-    -fx-padding: 12 12 12 12;
+    -fx-padding: 14 12 14 12;
 }
-
-/* Ячейки и строки таблицы */
 .table-grid .label {
     -fx-font-family: "Actor", "Roboto", Arial;
-    -fx-font-size: 24;
+    -fx-font-size: 22;
     -fx-text-fill: #000;
     -fx-alignment: center-left;
     -fx-padding: 16 12 16 12;
 }
-
-/* Стиль чекбокса (увеличенный) */
 .table-grid .check-box {
     -fx-scale-x: 1.8;
     -fx-scale-y: 1.8;
     -fx-padding: 10;
 }
-
-/* Стиль кнопки скачать */
 .download-button {
     -fx-background-color: #1e0acb;
     -fx-background-radius: 8;
     -fx-text-fill: #fff;
-    -fx-font-size: 32;
-    -fx-padding: 10 44 10 44;
+    -fx-font-size: 28;
+    -fx-padding: 10 34 10 34;
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(30,10,203,0.09), 5, 0.1, 0, 1);
 }
-
-/* Нижние кнопки */
-.bottom-buttons {
-    -fx-padding: 16 0 0 0;
+/* СТАТУС */
+.status-label {
+    -fx-font-size: 19px;
+    -fx-text-fill: #888;
+    -fx-padding: 16 0 0 24;
+    -fx-font-family: "Roboto", Arial, sans-serif;
+    -fx-font-weight: 500;
     -fx-alignment: center;
 }
-
-.primary-button {
-    -fx-background-color: #1e0acb;
-    -fx-background-radius: 16;
-    -fx-text-fill: #fff;
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 24;
-    -fx-font-weight: bold;
-    -fx-padding: 18 34 18 34;
-    -fx-border-width: 0;
-    -fx-cursor: hand;
-}
-
-.danger-button {
-    -fx-background-color: #ff0004;
-    -fx-background-radius: 16;
-    -fx-text-fill: #fff;
-    -fx-font-family: "Roboto SemiBold", "Segoe UI", Arial;
-    -fx-font-size: 24;
-    -fx-font-weight: bold;
-    -fx-padding: 18 34 18 34;
-    -fx-border-width: 0;
-    -fx-cursor: hand;
-}
-
-/* Статус-лейбл */
-#statusLabel {
-    -fx-font-size: 18;
-    -fx-text-fill: #888;
-    -fx-padding: 8 0 0 24;
-    -fx-font-family: "Roboto", Arial, sans-serif;
-}
-
 /* Убрать границы вокруг кнопок при фокусе */
-.button:focused, .download-button:focused, .primary-button:focused, .danger-button:focused {
+.button:focused, .download-button:focused, .topbar-button:focused, .danger-button:focused {
     -fx-border-color: transparent;
     -fx-background-insets: 0;
     -fx-background-color: inherit;
