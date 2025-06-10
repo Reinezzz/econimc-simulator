@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.controller;
 
 import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.service.*;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +27,10 @@ public class LlmController {
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
             String username = userDetails.getUsername();
             return userRepository.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + username))
+                    .orElseThrow(() -> new LocalizedException("error.user_not_found"))
                     .getId();
         }
-        throw new IllegalStateException("User not authenticated");
+        throw new LocalizedException("error.user_not_authenticated");
     }
 
     /**

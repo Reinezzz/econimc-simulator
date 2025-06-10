@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class LlmService {
                 attempt++;
             }
         }
-        throw new RuntimeException("Не удалось получить валидный ответ от LLM после " + maxRetries + " попыток", lastException);
+        throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
     /**
@@ -88,7 +89,7 @@ public class LlmService {
                 attempt++;
             }
         }
-        throw new RuntimeException("Не удалось получить валидный ответ от LLM после " + maxRetries + " попыток", lastException);
+        throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
     // --- Внутренние методы ---
@@ -168,7 +169,7 @@ public class LlmService {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Ollama error: " + response.getStatusCode());
+            throw new LocalizedException("error.ollama_status", response.getStatusCode());
         }
 
         StringBuilder jsonBuilder = new StringBuilder();
@@ -190,12 +191,12 @@ public class LlmService {
                 }
             }
         } catch (IOException | java.io.IOException e) {
-            throw new RuntimeException("Ошибка чтения ответа от Ollama", e);
+            throw new LocalizedException("error.ollama_read");
         }
 
         String finalJson = jsonBuilder.toString().trim();
         if (finalJson.isEmpty()) {
-            throw new RuntimeException("Ответ LLM пустой после сборки, проверь prompt и формат!");
+            throw new LocalizedException("error.llm_empty_response");
         }
         System.out.println("OLLAMA >>> " + finalJson);
         return finalJson;
@@ -226,7 +227,7 @@ public class LlmService {
             }
             return result;
         } catch (Exception ex) {
-            throw new RuntimeException("LLM ответ не парсится как JSON с параметрами: " + ex.getMessage(), ex);
+            throw new LocalizedException("error.llm_parse_json", ex.getMessage());
         }
     }
 

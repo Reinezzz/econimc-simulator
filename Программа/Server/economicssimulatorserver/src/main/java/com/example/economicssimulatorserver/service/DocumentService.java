@@ -2,6 +2,7 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.DocumentDto;
 import com.example.economicssimulatorserver.entity.DocumentEntity;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.DocumentRepository;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -36,7 +37,7 @@ public class DocumentService {
     @Transactional
     public DocumentDto uploadDocument(Long userId, MultipartFile file, String description) {
         if (!isPdf(file)) {
-            throw new IllegalArgumentException("Можно загружать только PDF-файлы.");
+            throw new LocalizedException("error.pdf_only");
         }
         try {
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -61,7 +62,7 @@ public class DocumentService {
 
             return toDto(entity);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка загрузки файла", e);
+            throw new LocalizedException("error.document_upload");
         }
     }
 
@@ -75,7 +76,7 @@ public class DocumentService {
                             .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка скачивания файла", e);
+            throw new LocalizedException("error.document_download");
         }
     }
 
@@ -92,7 +93,7 @@ public class DocumentService {
         } catch (MinioException ignore) {
             // Файл мог быть уже удалён из minio — игнорируем
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка удаления файла из хранилища", e);
+            throw new LocalizedException("error.document_delete");
         }
         documentRepository.delete(doc);
     }
@@ -106,14 +107,14 @@ public class DocumentService {
 
     public DocumentDto getById(Long documentId) {
         DocumentEntity entity = documentRepository.findById(documentId)
-                .orElseThrow(() -> new RuntimeException("Документ не найден: " + documentId));
+                .orElseThrow(() -> new LocalizedException("error.document_not_found"));
         return toDto(entity);
     }
 
     private DocumentEntity getUserDocumentOrThrow(Long docId, Long userId) {
         return documentRepository.findById(docId)
                 .filter(doc -> doc.getUserId().equals(userId))
-                .orElseThrow(() -> new RuntimeException("Документ не найден или нет доступа"));
+                .orElseThrow(() -> new LocalizedException("error.document_access_denied"));
     }
 
     private DocumentDto toDto(DocumentEntity entity) {

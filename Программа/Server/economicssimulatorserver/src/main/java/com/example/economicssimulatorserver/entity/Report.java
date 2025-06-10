@@ -1,16 +1,9 @@
 package com.example.economicssimulatorserver.entity;
 
-import com.example.economicssimulatorserver.converter.LlmChatResponseDtoListConverter;
-import com.example.economicssimulatorserver.converter.ModelParameterDtoListConverter;
-import com.example.economicssimulatorserver.converter.ModelResultDtoConverter;
-import com.example.economicssimulatorserver.dto.LlmChatResponseDto;
-import com.example.economicssimulatorserver.dto.ModelParameterDto;
-import com.example.economicssimulatorserver.dto.ModelResultDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "reports")

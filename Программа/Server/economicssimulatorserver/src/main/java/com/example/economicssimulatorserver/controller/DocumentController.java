@@ -1,6 +1,7 @@
 package com.example.economicssimulatorserver.controller;
 
 import com.example.economicssimulatorserver.dto.DocumentDto;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.service.DocumentService;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,10 @@ public class DocumentController {
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
             String username = userDetails.getUsername();
             return userRepository.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + username))
+                    .orElseThrow(() -> new LocalizedException("error.user_not_found"))
                     .getId();
         }
-        throw new IllegalStateException("User not authenticated");
+        throw new LocalizedException("error.user_not_authenticated");
     }
     /**
      * Загрузка PDF-документа.
@@ -55,7 +56,7 @@ public class DocumentController {
         DocumentDto doc = documentService.getUserDocuments(userId).stream()
                 .filter(d -> d.id().equals(documentId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Документ не найден"));
+                .orElseThrow(() -> new LocalizedException("error.document_not_found"));
 
         InputStream inputStream = documentService.downloadDocument(documentId, userId);
 
