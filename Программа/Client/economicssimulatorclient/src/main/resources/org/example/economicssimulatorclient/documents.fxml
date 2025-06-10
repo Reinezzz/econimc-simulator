@@ -13,9 +13,9 @@
     <top>
         <VBox>
             <HBox styleClass="top-bar">
-                <Button fx:id="backButton" text="Назад" styleClass="topbar-button"/>
+                <Button fx:id="backButton" text="%common.back" styleClass="topbar-button"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="mainButton" text="Главная" styleClass="topbar-button"/>
+                <Button fx:id="mainButton" text="%main.title" styleClass="topbar-button"/>
             </HBox>
             <Separator styleClass="top-separator"/>
         </VBox>
@@ -27,7 +27,7 @@
             <HBox  alignment="CENTER">
                 <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Сохранённые документы" styleClass="page-title" alignment="CENTER"/>
+                <Label text="%docs.saved" styleClass="page-title" alignment="CENTER"/>
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>
                 <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-container" VBox.vgrow="ALWAYS">
@@ -54,9 +54,9 @@
             <HBox styleClass="bottom-bar">
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="bottom-center-buttons" spacing="24">
-                    <Button fx:id="selectButton"  text="Выбрать"  styleClass="topbar-button"/>
-                    <Button fx:id="addButton"     text="Добавить" styleClass="topbar-button"/>
-                    <Button fx:id="deleteButton"  text="Удалить"  styleClass="danger-button"/>
+                    <Button fx:id="selectButton"  text="%docs.select"  styleClass="topbar-button"/>
+                    <Button fx:id="addButton"     text="%docs.add" styleClass="topbar-button"/>
+                    <Button fx:id="deleteButton"  text="%docs.delete"  styleClass="danger-button"/>
                 </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>

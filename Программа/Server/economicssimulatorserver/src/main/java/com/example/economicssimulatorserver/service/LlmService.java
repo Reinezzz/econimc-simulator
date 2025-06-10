@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class LlmService {
 
     @Value("${llm.ollama.language.default:ru}")
     private String defaultLanguage;
-
+    private final MessageSource messageSource;
     // --- Публичные методы ---
 
     /**
@@ -96,52 +97,57 @@ public class LlmService {
 
     /** Формируем prompt для extraction запроса */
     private String buildExtractionPrompt(EconomicModelDto model, DocumentDto document, List<ModelParameterDto> params) {
+        Locale locale = Locale.forLanguageTag(defaultLanguage);
         StringBuilder sb = new StringBuilder();
-        sb.append("Твоя задача — найти значения параметров экономической модели из PDF-документа. ");
-        sb.append("Модель: ").append(model.name()).append(".\n");
-        sb.append("Описание модели: ").append(model.description()).append("\n");
-        sb.append("Параметры модели:\n");
+        sb.append(messageSource.getMessage("prompt.extract.task", null, locale)).append(' ');
+        sb.append(messageSource.getMessage("prompt.extract.model", new Object[]{model.name()}, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.extract.description", new Object[]{model.description()}, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.extract.parameters_header", null, locale)).append("\n");
         for (ModelParameterDto p : params) {
-            sb.append("- ").append(p.displayName()).append(" (").append(p.paramName()).append("): ")
-                    .append(p.description()).append(" [Тип: ").append(p.paramType()).append("]\n");
+            sb.append(messageSource.getMessage("prompt.extract.param_item",
+                    new Object[]{p.displayName(), p.paramName(), p.description(), p.paramType()}, locale)).append("\n");
         }
         sb.append("\nДокумент: ").append(document.name()).append("\n");
-        sb.append("Извлеки значения всех параметров из документа (или придумай реалистичные значения, если не найдено!). ");
-        sb.append("Ответь строго в формате JSON МАССИВА по шаблону:\n");
-        sb.append("[{\"paramName\": \"имя параметра\", \"paramValue\": \"значение\"}, ...]\n");
-        sb.append("Не добавляй пояснений или текста, только JSON.\n");
+        sb.append("\n").append(messageSource.getMessage("prompt.extract.document", new Object[]{document.name()}, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.extract.explain", null, locale)).append(' ');
+        sb.append(messageSource.getMessage("prompt.extract.format", null, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.extract.template", null, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.extract.no_explanation", null, locale)).append("\n");
         return sb.toString();
     }
 
     /** Формируем prompt для chat запроса */
     private String buildChatPrompt(LlmChatRequestDto req, EconomicModelDto model) {
+        Locale locale = Locale.forLanguageTag(defaultLanguage);
         StringBuilder sb = new StringBuilder();
-        sb.append("Ты ассистент для обучения экономическим моделям. ");
-        sb.append("Отвечай кратко и только по теме модели. ").append("Модель: ").append(model.name()).append(".\n");
-        sb.append("Описание модели: ").append(model.description()).append("\n");
+        sb.append(messageSource.getMessage("prompt.chat.intro", null, locale)).append(' ');
+        sb.append(messageSource.getMessage("prompt.chat.topic", new Object[]{model.name()}, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.chat.description", new Object[]{model.description()}, locale)).append("\n");
 
-        sb.append("Параметры и их значения:\n");
+        sb.append(messageSource.getMessage("prompt.chat.parameters", null, locale)).append("\n");
         for (ModelParameterDto p : req.parameters()) {
-            sb.append("- ").append(p.displayName()).append(" (").append(p.paramName()).append("): ")
-                    .append(p.paramValue()).append(" [Тип: ").append(p.paramType()).append("] — ").append(p.description()).append("\n");
+            sb.append(messageSource.getMessage("prompt.chat.param_item",
+                    new Object[]{p.displayName(), p.paramName(), p.paramValue(), p.paramType(), p.description()}, locale)).append("\n");
         }
 
         if (req.visualizations() != null && !req.visualizations().isEmpty()) {
-            sb.append("\nДанные визуализации (для анализа):\n");
+            sb.append("\n").append(messageSource.getMessage("prompt.chat.visual_header", null, locale)).append("\n");
             for (LlmVisualizationDto vis : req.visualizations()) {
-                sb.append("- График: ").append(vis.chartTitle()).append(" (").append(vis.chartKey()).append(")\n");
-                sb.append("  Данные: ").append(vis.chartData().toString()).append("\n");
+                sb.append(messageSource.getMessage("prompt.chat.visual_chart",
+                        new Object[]{vis.chartTitle(), vis.chartKey()}, locale)).append("\n");
+                sb.append(messageSource.getMessage("prompt.chat.visual_data",
+                        new Object[]{vis.chartData().toString()}, locale)).append("\n");
             }
         }
 
         if (req.result() != null) {
-            sb.append("\nРезультат расчёта модели:\n");
+            sb.append("\n").append(messageSource.getMessage("prompt.chat.result_header", null, locale)).append("\n");
             sb.append(req.result().toString()).append("\n");
         }
 
-        sb.append("Сообщение пользователя: ").append(req.userMessage()).append("\n");
-        sb.append("Отвечай строго по теме модели и параметров, избегай разговоров не по теме экономики и этой модели.\n");
-        sb.append("Язык ответа: ").append(defaultLanguage).append("\n");
+        sb.append(messageSource.getMessage("prompt.chat.user_message", new Object[]{req.userMessage()}, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.chat.keep_topic", null, locale)).append("\n");
+        sb.append(messageSource.getMessage("prompt.chat.language", new Object[]{defaultLanguage}, locale)).append("\n");
         return sb.toString();
     }
 

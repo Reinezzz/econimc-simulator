@@ -10,12 +10,12 @@
       fx:controller="org.example.economicssimulatorclient.controller.LlmChatComponentController"
       stylesheets="@llm_chat_component.css"
       spacing="10" fillWidth="true">
-    <Label fx:id="titleLabel" text="Чат с LLM" styleClass="llm-chat-title"/>
+    <Label fx:id="titleLabel" text="%llm.chat" styleClass="llm-chat-title"/>
     <ScrollPane fx:id="chatScroll" fitToWidth="true" prefHeight="250" styleClass="llm-chat-scroll">
         <VBox fx:id="chatArea" spacing="5" styleClass="llm-chat-area"/>
     </ScrollPane>
     <HBox spacing="5" styleClass="llm-chat-input-row">
-        <TextField fx:id="inputField" promptText="Введите сообщение..." HBox.hgrow="ALWAYS" styleClass="llm-chat-input"/>
+        <TextField fx:id="inputField" promptText="%llm.prompt" HBox.hgrow="ALWAYS" styleClass="llm-chat-input"/>
         <VBox fx:id="sendButton" styleClass="llm-chat-send-btn">
             <FontIcon iconLiteral="fa-send-o" styleClass="tile-svg"/>
         </VBox>

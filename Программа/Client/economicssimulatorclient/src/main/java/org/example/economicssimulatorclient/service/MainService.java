@@ -35,7 +35,7 @@ public class MainService extends BaseService {
                 } else {
                     AuthService.getInstance().logout();
                     Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
-                    throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                    throw new IllegalArgumentException(org.example.economicssimulatorclient.util.I18n.t("error.session_expired"));
                 }
             }
             throw ex;
@@ -61,7 +61,7 @@ public class MainService extends BaseService {
                 } else {
                     AuthService.getInstance().logout();
                     Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
-                    throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                    throw new IllegalArgumentException(org.example.economicssimulatorclient.util.I18n.t("error.session_expired"));
                 }
             }
             throw ex;
@@ -88,7 +88,7 @@ public class MainService extends BaseService {
                 } else {
                     AuthService.getInstance().logout();
                     Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
-                    throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                    throw new IllegalArgumentException(org.example.economicssimulatorclient.util.I18n.t("error.session_expired"));
                 }
             }
             throw ex;
@@ -113,7 +113,7 @@ public class MainService extends BaseService {
                 } else {
                     AuthService.getInstance().logout();
                     Platform.runLater(() -> SceneManager.switchTo("authorization.fxml", c -> ((BaseController) c).clearFields()));
-                    throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                    throw new IllegalArgumentException(org.example.economicssimulatorclient.util.I18n.t("error.session_expired"));
                 }
             } else {
                 throw ex;

@@ -10,6 +10,7 @@ import org.example.economicssimulatorclient.dto.DocumentDto;
 import org.example.economicssimulatorclient.dto.ReportListItemDto;
 import org.example.economicssimulatorclient.service.DocumentService;
 import org.example.economicssimulatorclient.service.ReportService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
@@ -46,7 +47,10 @@ public class DocumentController extends BaseController {
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
 
-        typeComboBox.getItems().setAll("Документы", "Отчеты");
+        typeComboBox.getItems().setAll(
+                I18n.t("docs.type.documents"),
+                I18n.t("docs.type.reports")
+        );
         typeComboBox.getSelectionModel().selectFirst();
         typeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> loadTable());
 
@@ -54,11 +58,6 @@ public class DocumentController extends BaseController {
         deleteButton.setOnAction(e -> onDelete());
         selectButton.setVisible(false);
         selectButton.setOnAction(e -> onSelect());
-        Platform.runLater(() -> {
-            System.out.println("backButton: " + backButton.isVisible() + " | opacity=" + backButton.getOpacity() + " | layoutX=" + backButton.getLayoutX());
-            System.out.println("backButton: width=" + backButton.getWidth() + ", height=" + backButton.getHeight());
-            System.out.println("mainButton: width=" + mainButton.getWidth() + ", height=" + mainButton.getHeight());
-        });
     }
 
     public void fromView(boolean isVisible) {
@@ -71,10 +70,10 @@ public class DocumentController extends BaseController {
 
     private void loadTable() {
         String selectedType = typeComboBox.getValue();
-        if ("Документы".equals(selectedType)) {
+        if (I18n.t("docs.type.documents").equals(selectedType)) {
             loadDocuments();
             return;
-        }if("Отчеты".equals(selectedType)){
+        }if (I18n.t("docs.type.reports").equals(selectedType)) {
             loadReports();
             return;
         }
@@ -96,7 +95,7 @@ public class DocumentController extends BaseController {
                 throw new RuntimeException(e);
             }
             Platform.runLater(() -> fillDocumentsTable(docs));
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки документов: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.loading_error") + ex.getMessage())));
     }
 
     private void fillDocumentsTable(List<DocumentDto> docs) {
@@ -159,7 +158,7 @@ public class DocumentController extends BaseController {
                 throw new RuntimeException(e);
             }
             Platform.runLater(() -> fillReportsTable(list));
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки отчетов: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.reports_loading_error") + ex.getMessage())));
     }
 
     private void fillReportsTable(List<ReportListItemDto> reportList) {
@@ -209,8 +208,8 @@ public class DocumentController extends BaseController {
     private void addTableHeader(boolean isReport) {
         tableGrid.getChildren().clear();
         String[] headers = isReport ?
-                new String[]{"", "Дата", "Имя", "Скачать"}
-                : new String[]{"", "Дата", "Документ", "Скачать"};
+                new String[]{"", I18n.t("docs.header.date"), I18n.t("docs.header.name"), I18n.t("docs.header.download")}
+                : new String[]{"", I18n.t("docs.header.date"), I18n.t("docs.header.document"), I18n.t("docs.header.download")};
         for (int col = 0; col < headers.length; col++) {
             Label header = new Label(headers[col]);
             header.getStyleClass().add("table-header");
@@ -224,12 +223,12 @@ public class DocumentController extends BaseController {
     }
 
     private void onAdd() {
-        if (!"Документы".equals(typeComboBox.getValue())) {
-            showError(statusLabel, "Добавлять можно только документы");
+        if (!I18n.t("docs.type.documents").equals(typeComboBox.getValue())) {
+            showError(statusLabel, "docs.add_only_documents");
             return;
         }
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Выберите файл");
+        chooser.setTitle(I18n.t("common.choose_file"));
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File file = chooser.showOpenDialog(tableGrid.getScene().getWindow());
         if (file != null) {
@@ -241,10 +240,10 @@ public class DocumentController extends BaseController {
                     throw new RuntimeException(e);
                 }
                 Platform.runLater(() -> {
-                    showSuccess(statusLabel, "Документ загружен");
+                    showSuccess(statusLabel, "docs.document_uploaded");
                     loadDocuments();
                 });
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.upload_error") + ex.getMessage())));
         }
     }
 
@@ -256,7 +255,7 @@ public class DocumentController extends BaseController {
             }
         }
         if (indicesToDelete.isEmpty()) {
-            showError(statusLabel, "Выберите элементы для удаления");
+            showError(statusLabel, "docs.select_items_delete");
             return;
         }
 
@@ -271,10 +270,10 @@ public class DocumentController extends BaseController {
                     }
                 }
                 Platform.runLater(() -> {
-                    showSuccess(statusLabel, "Документ(ы) удален(ы)");
+                    showSuccess(statusLabel, "docs.documents_deleted");
                     loadDocuments();
                 });
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.delete_error") + ex.getMessage())));
         } else {
             runAsync(() -> {
                 for (int idx : indicesToDelete) {
@@ -286,10 +285,10 @@ public class DocumentController extends BaseController {
                     }
                 }
                 Platform.runLater(() -> {
-                    showSuccess(statusLabel, "Отчет(ы) удален(ы)");
+                    showSuccess(statusLabel, "docs.report_deleted");
                     loadReports();
                 });
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.delete_error") + ex.getMessage())));
         }
     }
 
@@ -304,11 +303,11 @@ public class DocumentController extends BaseController {
                 try (InputStream in = documentService.downloadDocument(docId);
                      FileOutputStream out = new FileOutputStream(saveFile)) {
                     in.transferTo(out);
-                    Platform.runLater(() -> showSuccess(statusLabel, "Документ скачан"));
+                    Platform.runLater(() -> showSuccess(statusLabel, "docs.document_downloaded"));
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка скачивания: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.download_error") + ex.getMessage())));
         }
     }
 
@@ -323,11 +322,11 @@ public class DocumentController extends BaseController {
                 try (FileOutputStream out = new FileOutputStream(saveFile)) {
                     byte[] data = reportService.downloadReport(reportId);
                     out.write(data);
-                    Platform.runLater(() -> showSuccess(statusLabel, "Отчет скачан"));
+                    Platform.runLater(() -> showSuccess(statusLabel, "docs.report_downloaded"));
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка скачивания: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.download_error") + ex.getMessage())));
         }
     }
 
@@ -337,19 +336,19 @@ public class DocumentController extends BaseController {
         for (int i = 0; i < checkBoxes.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
                 if (selectedIdx != -1) {
-                    showError(statusLabel, "Выберите только один документ!");
+                    showError(statusLabel, "docs.select_one");
                     return;
                 }
                 selectedIdx = i;
             }
         }
         if (selectedIdx == -1) {
-            showError(statusLabel, "Выберите документ для извлечения параметров");
+            showError(statusLabel, "docs.select_for_extract");
             return;
         }
         DocumentDto selectedDoc = documents.get(selectedIdx);
         if (modelId == null) {
-            showError(statusLabel, "Неизвестна модель для извлечения параметров");
+            showError(statusLabel, "docs.unknown_model");
             return;
         }
         selectButton.setDisable(true);
@@ -357,12 +356,12 @@ public class DocumentController extends BaseController {
             try {
                 // Реализуй свою логику LLM извлечения параметров по выбранному документу
                 // ...
-                Platform.runLater(() -> showSuccess(statusLabel, "Параметры извлечены")); // пример
+                Platform.runLater(() -> showSuccess(statusLabel, "docs.params_extracted")); // пример
             } finally {
                 Platform.runLater(() -> selectButton.setDisable(false));
             }
         }, ex -> Platform.runLater(() -> {
-            showError(statusLabel, "Ошибка при извлечении: " + ex.getMessage());
+            showError(statusLabel, I18n.t("docs.extraction_error") + ex.getMessage());
             selectButton.setDisable(false);
         }));
     }

@@ -4,6 +4,7 @@ import com.example.economicssimulatorserver.dto.ModelParameterDto;
 import com.example.economicssimulatorserver.entity.EconomicModel;
 import com.example.economicssimulatorserver.entity.ModelParameter;
 import com.example.economicssimulatorserver.entity.UserModelParameter;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.EconomicModelRepository;
 import com.example.economicssimulatorserver.repository.ModelParameterRepository;
 import com.example.economicssimulatorserver.repository.UserModelParameterRepository;
@@ -72,7 +73,7 @@ public class ModelParameterService {
     @Transactional
     public ModelParameterDto createParameter(Long modelId, ModelParameterDto dto) {
         EconomicModel model = economicModelRepository.findById(modelId)
-                .orElseThrow(() -> new IllegalArgumentException("Model not found: " + modelId));
+                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
         ModelParameter parameter = fromDto(dto);
         parameter.setModel(model);
         ModelParameter saved = modelParameterRepository.save(parameter);
@@ -99,14 +100,14 @@ public class ModelParameterService {
 
         // Возвращаем DTO с новым value
         ModelParameter param = modelParameterRepository.findById(paramId)
-                .orElseThrow(() -> new IllegalArgumentException("Parameter not found: " + paramId));
+                .orElseThrow(() -> new LocalizedException("error.parameter_not_found"));
         return toDtoWithValue(param, userParam.getValue());
     }
 
     @Transactional
     public void deleteParameter(Long paramId) {
         if (!modelParameterRepository.existsById(paramId))
-            throw new IllegalArgumentException("Parameter not found: " + paramId);
+            throw new LocalizedException("error.parameter_not_found");
         modelParameterRepository.deleteById(paramId);
     }
 

@@ -27,10 +27,10 @@ public class AppConfig {
             if (in != null) {
                 props.load(in);
             } else {
-                throw new RuntimeException("Не найден app.properties в ресурсах");
+                throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("config.missing_app_properties"));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка загрузки app.properties", e);
+            throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("config.load_error"), e);
         }
     }
 

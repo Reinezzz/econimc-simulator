@@ -6,6 +6,7 @@ import com.example.economicssimulatorserver.dto.ModelResultDto;
 import com.example.economicssimulatorserver.entity.EconomicModel;
 import com.example.economicssimulatorserver.entity.ModelParameter;
 import com.example.economicssimulatorserver.entity.ModelResult;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.EconomicModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class EconomicModelService {
     @Transactional(readOnly = true)
     public EconomicModelDto getModelById(Long id, Long userId) {
         EconomicModel model = economicModelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Model not found: " + id));
+                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
         return toDto(model, userId);
     }
 
@@ -45,7 +46,7 @@ public class EconomicModelService {
     @Transactional
     public EconomicModelDto updateModel(Long id, EconomicModelDto dto) {
         EconomicModel model = economicModelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Model not found: " + id));
+                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
         model.setName(dto.name());
         model.setDescription(dto.description());
         model.setModelType(dto.modelType());
@@ -56,7 +57,7 @@ public class EconomicModelService {
     @Transactional
     public void deleteModel(Long id) {
         if (!economicModelRepository.existsById(id))
-            throw new IllegalArgumentException("Model not found: " + id);
+            throw new LocalizedException("error.model_not_found");
         economicModelRepository.deleteById(id);
     }
 

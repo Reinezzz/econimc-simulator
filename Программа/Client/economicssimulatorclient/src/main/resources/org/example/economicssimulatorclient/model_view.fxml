@@ -12,9 +12,9 @@
     <top>
         <VBox>
             <HBox styleClass="top-bar">
-                <Button fx:id="backButton" text="Назад" styleClass="topbar-button"/>
+                <Button fx:id="backButton" text="%common.back" styleClass="topbar-button"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="mainButton" text="Главная" styleClass="topbar-button"/>
+                <Button fx:id="mainButton" text="%main.title" styleClass="topbar-button"/>
             </HBox>
             <Separator styleClass="top-separator"/>
         </VBox>
@@ -31,18 +31,18 @@
 
             <!-- Center: Модель -->
             <VBox styleClass="model-block" prefWidth="640">
-                <Label fx:id="modelTitle" text="Модель" styleClass="model-title"/>
+                <Label fx:id="modelTitle" text="%model.title" styleClass="model-title"/>
                 <HBox styleClass="model-row">
-                    <Label text="Название:" styleClass="model-label"/>
+                    <Label text="%model.name" styleClass="model-label"/>
                     <Label fx:id="nameLabel" styleClass="model-value"/>
                 </HBox>
                 <HBox styleClass="model-row">
-                    <Label text="Тип:" styleClass="model-label"/>
+                    <Label text="%model.type" styleClass="model-label"/>
                     <Label fx:id="typeLabel" styleClass="model-value"/>
                 </HBox>
-                <Label text="Описание" styleClass="model-label"/>
+                <Label text="%model.description" styleClass="model-label"/>
                 <TextArea fx:id="descriptionArea" editable="false" wrapText="true" styleClass="model-textarea"/>
-                <Label text="Формула" styleClass="model-label"/>
+                <Label text="%model.formula" styleClass="model-label"/>
                 <TextArea fx:id="formulaArea" editable="false" wrapText="true" styleClass="model-textarea"/>
                 <Label fx:id="statusLabel" styleClass="status-label"/>
 
@@ -57,11 +57,11 @@
         <VBox>
             <Separator styleClass="bottom-separator"/>
             <HBox styleClass="bottom-bar">
-                <Button fx:id="addDocumentButton" text="Добавить документ" styleClass="topbar-button"/>
+                <Button fx:id="addDocumentButton" text="%docs.add_document" styleClass="topbar-button"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="bottom-center-buttons" spacing="18">
-                    <Button fx:id="runButton" text="Запуск" styleClass="topbar-button"/>
-                    <Button fx:id="editButton" text="Редактировать" styleClass="topbar-button"/>
+                    <Button fx:id="runButton" text="%model.run" styleClass="topbar-button"/>
+                    <Button fx:id="editButton" text="%model.edit" styleClass="topbar-button"/>
                 </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>

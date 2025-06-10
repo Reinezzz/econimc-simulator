@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
                 node = buildComparativeStaticsChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -75,17 +76,17 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
     private Node buildTrajectoriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Время");
-        yAxis.setLabel("Значение");
+        xAxis.setLabel(I18n.t("chart.time"));
+        yAxis.setLabel(I18n.t("chart.value"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Рост капитала и выпуска");
+        chart.setTitle(I18n.t("chart.solow.trajectories.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("capital")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("capital");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Капитал");
+            series.setName(I18n.t("chart.capital"));
             for (Map<String, Number> pt : pts) {
                 Number t = pt.get("time");
                 Number k = pt.get("capital");
@@ -97,7 +98,7 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
         if (chartData.containsKey("output")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("output");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Выпуск");
+            series.setName(I18n.t("chart.output"));
             for (Map<String, Number> pt : pts) {
                 Number t = pt.get("time");
                 Number y = pt.get("output");
@@ -116,17 +117,17 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
     private Node buildPhaseDiagram(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Капитал (K)");
-        yAxis.setLabel("Изменение капитала (ΔK)");
+        xAxis.setLabel(I18n.t("chart.capital"));
+        yAxis.setLabel(I18n.t("chart.capital_change"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Фазовая диаграмма (сходимость)");
+        chart.setTitle(I18n.t("chart.solow.phase.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("phase")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("phase");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("ΔK от K");
+            series.setName(I18n.t("chart.capital_change") + " / K");
             for (Map<String, Number> pt : pts) {
                 Number k = pt.get("capital");
                 Number dk = pt.get("capital_change");
@@ -145,11 +146,11 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
     private Node buildComparativeStaticsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Время");
-        yAxis.setLabel("Выпуск (Y)");
+        xAxis.setLabel(I18n.t("chart.time"));
+        yAxis.setLabel(I18n.t("chart.output"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Сравнительная статика: долгосрочный рост");
+        chart.setTitle(I18n.t("chart.solow.statics.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("scenarios")) {

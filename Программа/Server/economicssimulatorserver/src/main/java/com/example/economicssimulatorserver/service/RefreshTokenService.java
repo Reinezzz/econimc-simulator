@@ -74,12 +74,12 @@ public class RefreshTokenService {
     public RefreshToken validateRefreshToken(String token) {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByToken(token);
         if (refreshTokenOpt.isEmpty()) {
-            throw new IllegalArgumentException("Refresh token not found.");
+            throw new LocalizedException("error.refresh_token_not_found");
         }
         RefreshToken refreshToken = refreshTokenOpt.get();
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(refreshToken);
-            throw new IllegalArgumentException("Refresh token expired.");
+            throw new LocalizedException("error.refresh_token_expired");
         }
         return refreshToken;
     }

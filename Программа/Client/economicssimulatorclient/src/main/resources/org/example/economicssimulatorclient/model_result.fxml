@@ -12,9 +12,9 @@
     <top>
         <VBox>
             <HBox styleClass="top-bar">
-                <Button fx:id="backButton" text="Назад" styleClass="exit-button"/>
+                <Button fx:id="backButton" text="%common.back" styleClass="exit-button"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="mainButton" text="Главная" styleClass="exit-button"/>
+                <Button fx:id="mainButton" text="%main.title" styleClass="exit-button"/>
             </HBox>
             <Separator styleClass="top-separator"/>
         </VBox>
@@ -31,11 +31,11 @@
             <!-- Центральный блок: Результат вычислений -->
             <VBox styleClass="result-block">
                 <HBox styleClass="result-row">
-                    <Label text="Результат:" styleClass="result-label"/>
+                    <Label text="%result.result" styleClass="result-label"/>
                 </HBox>
                 <TextArea fx:id="resultArea" prefRowCount="3" wrapText="true" styleClass="result-textarea"/>
                 <HBox styleClass="result-row">
-                    <Label text="График" styleClass="result-label"/>
+                    <Label text="%result.chart" styleClass="result-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
                 </HBox>
@@ -55,8 +55,8 @@
             <HBox styleClass="bottom-bar">
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="bottom-center-buttons" spacing="18">
-                    <Button fx:id="saveButton" text="Сохранить отчёт" styleClass="topbar-button"/>
-                    <Button fx:id="repeatButton" text="Повторить" styleClass="topbar-button"/>
+                    <Button fx:id="saveButton" text="%result.save_report" styleClass="topbar-button"/>
+                    <Button fx:id="repeatButton" text="%result.repeat" styleClass="topbar-button"/>
                 </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>

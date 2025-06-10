@@ -3,6 +3,7 @@ package com.example.economicssimulatorserver.service;
 import com.example.economicssimulatorserver.dto.CalculationRequestDto;
 import com.example.economicssimulatorserver.dto.CalculationResponseDto;
 import com.example.economicssimulatorserver.dto.ModelResultDto;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.solver.EconomicModelSolver;
 import com.example.economicssimulatorserver.solver.SolverFactory;
@@ -29,11 +30,11 @@ public class ModelCalculationService {
     @Transactional
     public CalculationResponseDto calculate(CalculationRequestDto request,Long userId) {
         EconomicModel model = economicModelRepository.findById(request.modelId())
-                .orElseThrow(() -> new IllegalArgumentException("Model not found: " + request.modelId()));
+                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
 
         EconomicModelSolver solver = solverFactory.getSolver(request.modelType());
         if (solver == null)
-            throw new IllegalArgumentException("Solver not found for modelType: " + request.modelType());
+            throw new LocalizedException("error.solver_not_found");
 
         // Получение результата вычислений
         CalculationResponseDto resultDto = solver.solve(request);

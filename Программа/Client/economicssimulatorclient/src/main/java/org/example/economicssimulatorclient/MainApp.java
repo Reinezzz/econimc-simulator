@@ -63,7 +63,7 @@ public class MainApp extends Application {
             });
         }
 
-        primaryStage.setTitle("Economics Simulator");
+        primaryStage.setTitle(org.example.economicssimulatorclient.util.I18n.t("app.title"));
         primaryStage.setResizable(true);
         primaryStage.setMaximized(true);
         primaryStage.show();

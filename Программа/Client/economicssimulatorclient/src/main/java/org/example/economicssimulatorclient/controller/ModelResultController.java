@@ -17,6 +17,7 @@ import org.example.economicssimulatorclient.chart.ChartDrawerFactory;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.parser.ParserFactory;
 import org.example.economicssimulatorclient.parser.ResultParser;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.ReportImageUtil;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.service.ReportService;
@@ -128,6 +129,20 @@ public class ModelResultController extends BaseController {
 
         typeComboBox.getItems().clear();
         typeComboBox.getItems().addAll(chartDataMap.keySet());
+        typeComboBox.setCellFactory(cb -> new javafx.scene.control.ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : I18n.t("chart." + item));
+            }
+        });
+        typeComboBox.setButtonCell(new javafx.scene.control.ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : I18n.t("chart." + item));
+            }
+        });
         if (!chartDataMap.isEmpty()) {
             typeComboBox.getSelectionModel().selectFirst();
             showChart(chartDataMap, typeComboBox.getItems().get(0));
@@ -201,7 +216,7 @@ public class ModelResultController extends BaseController {
             for (Map.Entry<String, Map<String, Object>> entry : chartDataMap.entrySet()) {
                 String chartKey = entry.getKey();
                 Map<String, Object> data = entry.getValue();
-                String chartTitle = chartKey;
+                String chartTitle = I18n.t("chart." + chartKey);
                 visualizations.add(new LlmVisualizationDto(chartKey, chartTitle, data));
             }
         }

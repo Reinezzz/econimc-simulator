@@ -5,6 +5,7 @@ import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -96,7 +97,7 @@ public class CompetitionChartBuilder implements ChartDrawer {
                 }
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 node = new StackPane(lbl);
         }
@@ -115,17 +116,17 @@ public class CompetitionChartBuilder implements ChartDrawer {
     private Node buildProfitCurvesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Количество");
-        yAxis.setLabel("Прибыль");
+        xAxis.setLabel(I18n.t("chart.quantity"));
+        yAxis.setLabel(I18n.t("chart.profit"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Кривые прибыли: Конкуренция vs Монополия");
+        chart.setTitle(I18n.t("chart.competition.profit_curves.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("competition")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("competition");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Совершенная конкуренция");
+            series.setName(I18n.t("chart.perfect_competition"));
             for (Map<String, Number> pt : pts) {
                 Number quantity = pt.get("quantity");
                 Number profit = pt.get("profit");
@@ -139,7 +140,7 @@ public class CompetitionChartBuilder implements ChartDrawer {
         if (chartData.containsKey("monopoly")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("monopoly");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Монополия");
+            series.setName(I18n.t("chart.monopoly"));
             for (Map<String, Number> pt : pts) {
                 Number quantity = pt.get("quantity");
                 Number profit = pt.get("profit");
@@ -161,11 +162,11 @@ public class CompetitionChartBuilder implements ChartDrawer {
     private Node buildComparisonHistogram(Map<String, Object> chartData) {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Показатель");
-        yAxis.setLabel("Значение");
+        xAxis.setLabel(I18n.t("chart.category"));
+        yAxis.setLabel(I18n.t("chart.value"));
 
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Сравнение: Конкуренция vs Монополия");
+        chart.setTitle(I18n.t("chart.competition.comparison_hist.title"));
         chart.setAnimated(false);
 
         List<String> categories = (List<String>) chartData.get("categories");
@@ -173,9 +174,9 @@ public class CompetitionChartBuilder implements ChartDrawer {
         List<Number> monoValues = (List<Number>) chartData.get("monopoly");
 
         XYChart.Series<String, Number> compSeries = new XYChart.Series<>();
-        compSeries.setName("Совершенная конкуренция");
+        compSeries.setName(I18n.t("chart.perfect_competition"));
         XYChart.Series<String, Number> monoSeries = new XYChart.Series<>();
-        monoSeries.setName("Монополия");
+        monoSeries.setName(I18n.t("chart.monopoly"));
 
         if (categories != null && compValues != null && monoValues != null) {
             for (int i = 0; i < categories.size(); i++) {
@@ -200,18 +201,18 @@ public class CompetitionChartBuilder implements ChartDrawer {
     private Node buildDeadweightAreaChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Количество");
-        yAxis.setLabel("Цена");
+        xAxis.setLabel(I18n.t("chart.quantity"));
+        yAxis.setLabel(I18n.t("chart.price"));
 
         AreaChart<Number, Number> chart = new AreaChart<>(xAxis, yAxis);
-        chart.setTitle("Потери от монопольной власти (Deadweight Loss)");
+        chart.setTitle(I18n.t("chart.competition.deadweight_area.title"));
         chart.setAnimated(false);
 
         // Кривые спроса и предложения
         if (chartData.containsKey("demand")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("demand");
             XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-            demandSeries.setName("Спрос");
+            demandSeries.setName(I18n.t("chart.demand"));
             for (Map<String, Number> pt : pts) {
                 Number quantity = pt.get("quantity");
                 Number price = pt.get("price");
@@ -224,7 +225,7 @@ public class CompetitionChartBuilder implements ChartDrawer {
         if (chartData.containsKey("supply")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("supply");
             XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-            supplySeries.setName("Предложение");
+            supplySeries.setName(I18n.t("chart.supply"));
             for (Map<String, Number> pt : pts) {
                 Number quantity = pt.get("quantity");
                 Number price = pt.get("price");

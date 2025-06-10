@@ -37,7 +37,7 @@ public class ISLMChartBuilder implements ChartDrawer {
                 node = buildTimeSeriesChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(org.example.economicssimulatorclient.util.I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -83,11 +83,11 @@ public class ISLMChartBuilder implements ChartDrawer {
     private Node buildISLMChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Доход (Y)");
-        yAxis.setLabel("Ставка (i)");
+        xAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.income"));
+        yAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.rate"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Модель IS-LM: Кривые и равновесие");
+        chart.setTitle(org.example.economicssimulatorclient.util.I18n.t("chart.islm.title"));
         chart.setAnimated(false);
         chart.setCreateSymbols(false);
         chart.setLegendVisible(true);
@@ -131,18 +131,19 @@ public class ISLMChartBuilder implements ChartDrawer {
 
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Доход (Y)");
-        yAxis.setLabel("Ставка (i)");
+        xAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.income"));
+        yAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.rate"));
+
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("3D поверхность: доход-ставка");
+        chart.setTitle(org.example.economicssimulatorclient.util.I18n.t("chart.islm.surface"));
         chart.setAnimated(false);
 
         if (slices != null) {
             int idx = 0;
             for (List<Map<String, Number>> slice : slices) {
                 XYChart.Series<Number, Number> series = new XYChart.Series<>();
-                series.setName("Срез " + (++idx));
+                series.setName(org.example.economicssimulatorclient.util.I18n.t("chart.slice") + " " + (++idx));
                 for (Map<String, Number> pt : slice) {
                     Number income = pt.get("income");
                     Number rate   = pt.get("rate");
@@ -163,11 +164,11 @@ public class ISLMChartBuilder implements ChartDrawer {
     private Node buildTimeSeriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Время");
-        yAxis.setLabel("Значение");
+        xAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.time"));
+        yAxis.setLabel(org.example.economicssimulatorclient.util.I18n.t("chart.value"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Динамика равновесия IS-LM");
+        chart.setTitle(org.example.economicssimulatorclient.util.I18n.t("chart.islm.timeseries"));
         chart.setAnimated(false);
         chart.setCreateSymbols(true);
         chart.setLegendVisible(true);
@@ -177,7 +178,7 @@ public class ISLMChartBuilder implements ChartDrawer {
         if (chartData.containsKey("policy")) {
             List<Map<String, Number>> seriesPts = (List<Map<String, Number>>) chartData.get("policy");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Доход");
+            series.setName(org.example.economicssimulatorclient.util.I18n.t("chart.income"));
             for (Map<String, Number> pt : seriesPts) {
                 Number t = pt.get("time");
                 Number y = pt.get("income");
@@ -191,7 +192,7 @@ public class ISLMChartBuilder implements ChartDrawer {
         if (chartData.containsKey("rate")) {
             List<Map<String, Number>> seriesPts = (List<Map<String, Number>>) chartData.get("rate");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Ставка");
+            series.setName(org.example.economicssimulatorclient.util.I18n.t("chart.rate"));
             for (Map<String, Number> pt : seriesPts) {
                 Number t = pt.get("time");
                 Number r = pt.get("rate");

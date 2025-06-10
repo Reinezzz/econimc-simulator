@@ -25,7 +25,7 @@
           AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
         <left>
             <VBox alignment="CENTER" prefHeight="60">
-                <Button fx:id="exitButton" text="Выход" styleClass="exit-button" onAction="#onExitButtonClicked" />
+                <Button fx:id="exitButton" text="%common.exit" styleClass="exit-button" onAction="#onExitButtonClicked"/>
             </VBox>
         </left>
         <center>
@@ -40,7 +40,7 @@
           AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
 
         <VBox fx:id="sidePanel" styleClass="side-panel">
-            <Label text="Экономические модели" styleClass="section-title"/>
+            <Label text="%main.models" styleClass="section-title"/>
             <VBox fx:id="modelList" styleClass="model-list" spacing="16" />
         </VBox>
 
@@ -54,7 +54,7 @@
                 <StackPane styleClass="icon-placeholder">
                     <FontIcon iconLiteral="fa-bar-chart" styleClass="tile-svg"/>
                 </StackPane>
-                <Label text="Последняя модель" styleClass="tile-text"/>
+                <Label text="%main.last_model" styleClass="tile-text"/>
             </VBox>
 
 
@@ -64,7 +64,7 @@
                 <StackPane styleClass="icon-placeholder">
                     <FontIcon iconLiteral="fa-file-pdf-o" styleClass="tile-svg"/>
                 </StackPane>
-                <Label text="Сохранённые документы" styleClass="tile-text"/>
+                <Label text="%docs.saved" styleClass="tile-text"/>
             </VBox>
 
         </GridPane>

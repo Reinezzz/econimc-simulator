@@ -82,7 +82,7 @@ public class ReportService extends MainService {
                 response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
             } else {
                 org.example.economicssimulatorclient.service.AuthService.getInstance().logout();
-                throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                throw new IllegalArgumentException(org.example.economicssimulatorclient.util.I18n.t("error.session_expired"));
             }
         }
         if (response.statusCode() != 200) {

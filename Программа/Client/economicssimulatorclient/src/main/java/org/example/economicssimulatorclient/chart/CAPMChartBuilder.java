@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class CAPMChartBuilder implements ChartDrawer {
                 node = buildDecompositionChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -100,11 +101,11 @@ public class CAPMChartBuilder implements ChartDrawer {
     private Node buildSMLChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Бета (β), риск");
-        yAxis.setLabel("Доходность (%)");
+        xAxis.setLabel(I18n.t("chart.beta"));
+        yAxis.setLabel(I18n.t("chart.return"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Линия рынка ценных бумаг (SML)");
+        chart.setTitle(I18n.t("chart.capm.sml.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("sml")) {
@@ -131,18 +132,18 @@ public class CAPMChartBuilder implements ChartDrawer {
     private Node buildEfficientFrontierChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Риск (σ)");
-        yAxis.setLabel("Доходность (%)");
+        xAxis.setLabel(I18n.t("chart.beta"));
+        yAxis.setLabel(I18n.t("chart.return"));
 
         ScatterChart<Number, Number> chart = new ScatterChart<>(xAxis, yAxis);
-        chart.setTitle("Эффективная граница портфелей");
+        chart.setTitle(I18n.t("chart.capm.efficient_frontier.title"));
         chart.setAnimated(false);
 
         // Сами портфели
         if (chartData.containsKey("portfolios")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("portfolios");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Портфели");
+            series.setName(I18n.t("chart.portfolios"));
             for (Map<String, Number> pt : pts) {
                 Number sigma = pt.get("risk");
                 Number ret = pt.get("return");
@@ -156,7 +157,7 @@ public class CAPMChartBuilder implements ChartDrawer {
         if (chartData.containsKey("frontier")) {
             List<Map<String, Number>> frontier = (List<Map<String, Number>>) chartData.get("frontier");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Эффективная граница");
+            series.setName(I18n.t("chart.efficient_frontier_line"));
             for (Map<String, Number> pt : frontier) {
                 Number sigma = pt.get("risk");
                 Number ret = pt.get("return");
@@ -177,17 +178,17 @@ public class CAPMChartBuilder implements ChartDrawer {
     private Node buildDecompositionChart(Map<String, Object> chartData) {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Актив");
-        yAxis.setLabel("Вклад (%)");
+        xAxis.setLabel(I18n.t("chart.category"));
+        yAxis.setLabel(I18n.t("chart.revenue"));
 
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Декомпозиция доходности (альфа, бета)");
+        chart.setTitle(I18n.t("chart.capm.decomposition.title"));
         chart.setAnimated(false);
 
         XYChart.Series<String, Number> alphaSeries = new XYChart.Series<>();
-        alphaSeries.setName("Альфа");
+        alphaSeries.setName("Alpha");
         XYChart.Series<String, Number> betaSeries = new XYChart.Series<>();
-        betaSeries.setName("Бета");
+        betaSeries.setName("Beta");
 
         if (chartData.containsKey("decomposition")) {
             List<Map<String, Object>> decomposition = (List<Map<String, Object>>) chartData.get("decomposition");

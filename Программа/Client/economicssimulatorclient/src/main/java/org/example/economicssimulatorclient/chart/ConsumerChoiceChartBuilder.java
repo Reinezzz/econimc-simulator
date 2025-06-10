@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
                 node = buildIncomeSubstitutionChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 return new StackPane(lbl);
         }
@@ -85,11 +86,11 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
     private Node buildIndifferenceCurvesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Товар X");
-        yAxis.setLabel("Товар Y");
+        xAxis.setLabel(I18n.t("chart.good_x"));
+        yAxis.setLabel(I18n.t("chart.good_y"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Кривые безразличия и бюджетная линия");
+        chart.setTitle(I18n.t("chart.consumer.indifference_curves.title"));
         chart.setAnimated(false);
 
         // Семейство кривых безразличия
@@ -113,7 +114,7 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         if (chartData.containsKey("budget")) {
             List<Map<String, Number>> budget = (List<Map<String, Number>>) chartData.get("budget");
             XYChart.Series<Number, Number> budgetSeries = new XYChart.Series<>();
-            budgetSeries.setName("Бюджетная линия");
+            budgetSeries.setName(I18n.t("chart.budget_line"));
             for (Map<String, Number> pt : budget) {
                 Number x = pt.get("quantity");
                 Number y = pt.get("price");
@@ -135,18 +136,18 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
     private Node buildOptimumMapChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Товар X");
-        yAxis.setLabel("Товар Y");
+        xAxis.setLabel(I18n.t("chart.good_x"));
+        yAxis.setLabel(I18n.t("chart.good_y"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Оптимум потребителя");
+        chart.setTitle(I18n.t("chart.consumer.optimum_map.title"));
         chart.setAnimated(false);
 
         // Кривая безразличия
         if (chartData.containsKey("indifference_curve")) {
             List<Map<String, Number>> curve = (List<Map<String, Number>>) chartData.get("indifference_curve");
             XYChart.Series<Number, Number> curveSeries = new XYChart.Series<>();
-            curveSeries.setName("Кривая безразличия");
+            curveSeries.setName(I18n.t("chart.indifference_curves"));
             for (Map<String, Number> pt : curve) {
                 Number x = pt.get("quantity");
                 Number y = pt.get("price");
@@ -159,7 +160,7 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         if (chartData.containsKey("budget")) {
             List<Map<String, Number>> budget = (List<Map<String, Number>>) chartData.get("budget");
             XYChart.Series<Number, Number> budgetSeries = new XYChart.Series<>();
-            budgetSeries.setName("Бюджетная линия");
+            budgetSeries.setName(I18n.t("chart.budget_line"));
             for (Map<String, Number> pt : budget) {
                 Number x = pt.get("quantity");
                 Number y = pt.get("price");
@@ -173,7 +174,7 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
             Map<String, Number> pt = (Map<String, Number>) chartData.get("optimum");
             if (pt.get("x") != null && pt.get("y") != null) {
                 XYChart.Series<Number, Number> optimumSeries = new XYChart.Series<>();
-                optimumSeries.setName("Оптимум");
+                optimumSeries.setName(I18n.t("chart.optimum"));
                 optimumSeries.getData().add(new XYChart.Data<>(pt.get("x"), pt.get("y")));
                 chart.getData().add(optimumSeries);
             }
@@ -192,17 +193,17 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
     private Node buildIncomeSubstitutionChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Товар X");
-        yAxis.setLabel("Товар Y");
+        xAxis.setLabel(I18n.t("chart.good_x"));
+        yAxis.setLabel(I18n.t("chart.good_y"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Эффект дохода и замещения");
+        chart.setTitle(I18n.t("chart.consumer.income_substitution.title"));
         chart.setAnimated(false);
 
-        addSeries(chart, chartData, "before", "До изменения");
-        addSeries(chart, chartData, "after", "После изменения");
-        addSeries(chart, chartData, "substitution", "Замещение");
-        addSeries(chart, chartData, "income", "Доход");
+        addSeries(chart, chartData, "before", I18n.t("chart.before"));
+        addSeries(chart, chartData, "after", I18n.t("chart.after"));
+        addSeries(chart, chartData, "substitution", I18n.t("chart.substitution"));
+        addSeries(chart, chartData, "income", I18n.t("chart.income_effect"));
 
         return chart;
     }

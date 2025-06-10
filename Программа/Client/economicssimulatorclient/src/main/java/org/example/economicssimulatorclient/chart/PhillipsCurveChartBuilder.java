@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
                 node = buildLoopsChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -100,17 +101,17 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
     private Node buildScatterChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Безработица (%)");
-        yAxis.setLabel("Инфляция (%)");
+        xAxis.setLabel(I18n.t("chart.unemployment"));
+        yAxis.setLabel(I18n.t("chart.inflation"));
 
         ScatterChart<Number, Number> chart = new ScatterChart<>(xAxis, yAxis);
-        chart.setTitle("Кривая Филлипса: инфляция и безработица");
+        chart.setTitle(I18n.t("chart.phillips.scatter.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("points")) {
             List<Map<String, Number>> points = (List<Map<String, Number>>) chartData.get("points");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Данные");
+            series.setName(I18n.t("chart.data"));
             for (Map<String, Number> pt : points) {
                 Number u = pt.get("unemployment");
                 Number inf = pt.get("inflation");
@@ -130,17 +131,17 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
     private Node buildTimeSeriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Год");
-        yAxis.setLabel("Значение (%)");
+        xAxis.setLabel(I18n.t("chart.year"));
+        yAxis.setLabel(I18n.t("chart.value"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Инфляция и безработица по годам");
+        chart.setTitle(I18n.t("chart.phillips.timeseries.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("unemployment")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("unemployment");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Безработица");
+            series.setName(I18n.t("chart.unemployment"));
             for (Map<String, Number> pt : pts) {
                 Number year = pt.get("year");
                 Number value = pt.get("unemployment");
@@ -152,7 +153,7 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
         if (chartData.containsKey("inflation")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("inflation");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Инфляция");
+            series.setName(I18n.t("chart.inflation"));
             for (Map<String, Number> pt : pts) {
                 Number year = pt.get("year");
                 Number value = pt.get("inflation");
@@ -172,15 +173,15 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
     private Node buildLoopsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Безработица (%)");
-        yAxis.setLabel("Инфляция (%)");
+        xAxis.setLabel(I18n.t("chart.unemployment"));
+        yAxis.setLabel(I18n.t("chart.inflation"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Краткосрочные и долгосрочные траектории (петли)");
+        chart.setTitle(I18n.t("chart.phillips.loops.title"));
         chart.setAnimated(false);
 
-        addSeries(chart, chartData, "short_run", "Краткосрочная траектория");
-        addSeries(chart, chartData, "long_run", "Долгосрочная траектория");
+        addSeries(chart, chartData, "short_run", I18n.t("chart.short_run"));
+        addSeries(chart, chartData, "long_run", I18n.t("chart.long_run"));
         return chart;
     }
 

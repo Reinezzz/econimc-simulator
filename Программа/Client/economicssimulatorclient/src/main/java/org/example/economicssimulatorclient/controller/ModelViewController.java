@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import org.example.economicssimulatorclient.controller.LlmChatComponentController;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
@@ -96,9 +97,9 @@ public class ModelViewController extends BaseController {
                 this.parameters = modelService.getParametersByModelId(modelId);
                 Platform.runLater(this::fillModelInfo);
             } catch (Exception ex) {
-                Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки: " + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, I18n.t("model.load_error") + ex.getMessage()));
             }
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("model.load_error") + ex.getMessage())));
     }
 
     private void fillModelInfo() {
@@ -139,7 +140,7 @@ public class ModelViewController extends BaseController {
             ));
         }
         fillParameters(); // обновить UI
-        showSuccess(statusLabel, "Параметры из документа подставлены");
+        showSuccess(statusLabel, "model.params_from_doc");
     }
 
 
@@ -160,7 +161,7 @@ public class ModelViewController extends BaseController {
             TextField value = new TextField(param.paramValue());
             value.setEditable(false);
             value.setPromptText("Значение");
-            value.getStyleClass().add("parameter-input");
+            value.setPromptText(I18n.t("model.value_placeholder"));
             valueFields.add(value);
 
             paramBox.getChildren().addAll(symbol, descr, value);
@@ -177,7 +178,7 @@ public class ModelViewController extends BaseController {
 
         runButton.setOnAction(e -> {
             if (editMode) {
-                showError(statusLabel, "Сначала сохраните параметры");
+                showError(statusLabel, "model.save_params_first");
                 return;
             }
             runCalculation();
@@ -196,7 +197,7 @@ public class ModelViewController extends BaseController {
         for (TextField value : valueFields) {
             value.setEditable(enable);
         }
-        editButton.setText(enable ? "Сохранить" : "Редактировать");
+        editButton.setText(enable ? I18n.t("model.save") : I18n.t("model.edit"));
         runButton.setDisable(enable);
     }
 
@@ -211,7 +212,7 @@ public class ModelViewController extends BaseController {
                 ModelParameterDto p = parameters.get(i);
                 String newValue = valueFields.get(i).getText();
                 if (newValue == null || newValue.isEmpty()) {
-                    showError(statusLabel, "Параметр " + p.paramName() + " не может быть пустым");
+                    showError(statusLabel, I18n.t("model.param_empty") + p.paramName());
                     valid = false;
                     break;
                 }
@@ -235,14 +236,14 @@ public class ModelViewController extends BaseController {
                     }
                     this.parameters = modelService.getParametersByModelId(modelId);
                     Platform.runLater(() -> {
-                        showSuccess(statusLabel, "Параметры успешно сохранены");
+                        showSuccess(statusLabel, "model.params_saved");
                         fillParameters();
                         setEditMode(false);
                     });
                 } catch (Exception ex) {
-                    Platform.runLater(() -> showError(statusLabel, "Ошибка сохранения: " + ex.getMessage()));
+                    Platform.runLater(() -> showError(statusLabel, I18n.t("model.save_error") + ex.getMessage()));
                 }
-            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка сохранения: " + ex.getMessage())));
+            }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("model.save_error") + ex.getMessage())));
         }
     }
 
@@ -257,9 +258,9 @@ public class ModelViewController extends BaseController {
                         SceneManager.switchTo("model_result.fxml",
                                 (ModelResultController c) -> c.initWithResult(resp, model)));
             } catch (Exception ex) {
-                Platform.runLater(() -> showError(statusLabel, "Ошибка расчета: " + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, I18n.t("model.calc_error") + ex.getMessage()));
             }
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка расчета: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("model.calc_error") + ex.getMessage())));
     }
 
     private void setupLlmChatComponent() {

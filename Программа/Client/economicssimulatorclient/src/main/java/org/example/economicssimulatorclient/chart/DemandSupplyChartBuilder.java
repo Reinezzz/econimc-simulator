@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
                 node = buildShiftAnimation(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -107,15 +108,15 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
     private Node buildSupplyDemandChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Количество");
-        yAxis.setLabel("Цена");
+        xAxis.setLabel(I18n.t("chart.quantity"));
+        yAxis.setLabel(I18n.t("chart.price"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Спрос и предложение");
+        chart.setTitle(I18n.t("chart.demand.supply_demand.title"));
         chart.setAnimated(false);
 
-        addSeries(chart, chartData, "demand", "Спрос");
-        addSeries(chart, chartData, "supply", "Предложение");
+        addSeries(chart, chartData, "demand", I18n.t("chart.demand"));
+        addSeries(chart, chartData, "supply", I18n.t("chart.supply"));
 
         // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
@@ -124,7 +125,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
             Number p = eq.get("price");
             if (q != null && p != null) {
                 XYChart.Series<Number, Number> eqSeries = new XYChart.Series<>();
-                eqSeries.setName("Равновесие");
+                eqSeries.setName(I18n.t("chart.equilibrium_point"));
                 eqSeries.getData().add(new XYChart.Data<>(q, p));
                 chart.getData().add(eqSeries);
             }
@@ -135,15 +136,15 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
     private Node buildSurplusAreaChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Количество");
-        yAxis.setLabel("Цена");
+        xAxis.setLabel(I18n.t("chart.quantity"));
+        yAxis.setLabel(I18n.t("chart.price"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Излишки потребителя и производителя");
+        chart.setTitle(I18n.t("chart.demand.surplus_area.title"));
         chart.setAnimated(false);
 
-        addSeries(chart, chartData, "demand", "Спрос");
-        addSeries(chart, chartData, "supply", "Предложение");
+        addSeries(chart, chartData, "demand", I18n.t("chart.demand"));
+        addSeries(chart, chartData, "supply", I18n.t("chart.supply"));
 
         // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
@@ -152,7 +153,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
             Number p = eq.get("price");
             if (q != null && p != null) {
                 XYChart.Series<Number, Number> eqSeries = new XYChart.Series<>();
-                eqSeries.setName("Равновесие");
+                eqSeries.setName(I18n.t("chart.equilibrium_point"));
                 eqSeries.getData().add(new XYChart.Data<>(q, p));
                 chart.getData().add(eqSeries);
             }
@@ -224,11 +225,11 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         // Всё делаем поверх LineChart, шаги — по таймеру
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Количество");
-        yAxis.setLabel("Цена");
+        xAxis.setLabel(I18n.t("chart.quantity"));
+        yAxis.setLabel(I18n.t("chart.price"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Анимация сдвигов кривых");
+        chart.setTitle(I18n.t("chart.demand.shift_animation.title"));
         chart.setAnimated(false);
 
         List<List<Map<String, Number>>> demandShifts = (List<List<Map<String, Number>>>) chartData.get("demand_shifts");
@@ -236,7 +237,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         List<Map<String, Number>> equilibriums = (List<Map<String, Number>>) chartData.get("equilibriums");
 
         if (demandShifts == null || supplyShifts == null) {
-            Label lbl = new Label("Недостаточно данных для анимации сдвигов.");
+            Label lbl = new Label(I18n.t("chart.shift.not_enough_data"));
             return new StackPane(lbl);
         }
         Timeline timeline = new Timeline();
@@ -246,8 +247,8 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
             timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(i),
                     e -> {
                         chart.getData().clear();
-                        addSeries(chart, demandShifts.get(idx), "Спрос");
-                        addSeries(chart, supplyShifts.get(idx), "Предложение");
+                        addSeries(chart, demandShifts.get(idx), I18n.t("chart.demand"));
+                        addSeries(chart, supplyShifts.get(idx), I18n.t("chart.supply"));
                         // Точка равновесия на этом шаге
                         if (equilibriums != null && idx < equilibriums.size()) {
                             Map<String, Number> eq = equilibriums.get(idx);
@@ -255,7 +256,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
                             Number p = eq.get("price");
                             if (q != null && p != null) {
                                 XYChart.Series<Number, Number> eqSeries = new XYChart.Series<>();
-                                eqSeries.setName("Равновесие");
+                                eqSeries.setName(I18n.t("chart.equilibrium_point"));
                                 eqSeries.getData().add(new XYChart.Data<>(q, p));
                                 chart.getData().add(eqSeries);
                             }

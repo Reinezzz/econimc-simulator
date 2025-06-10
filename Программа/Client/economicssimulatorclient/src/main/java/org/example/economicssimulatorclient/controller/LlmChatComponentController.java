@@ -67,7 +67,7 @@ public class LlmChatComponentController {
                 LlmChatResponseDto resp = LlmService.getInstance().chat(baseUri, finalReq);
                 Platform.runLater(() -> addMessage("assistant", resp.assistantMessage()));
             } catch (Exception ex) {
-                Platform.runLater(() -> addMessage("system", "Ошибка LLM: " + ex.getMessage()));
+                Platform.runLater(() -> addMessage("system", org.example.economicssimulatorclient.util.I18n.t("error.llm") + ex.getMessage()));
             } finally {
                 Platform.runLater(() -> {
                     sendButton.setDisable(false);

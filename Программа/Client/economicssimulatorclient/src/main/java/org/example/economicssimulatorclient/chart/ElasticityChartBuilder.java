@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class ElasticityChartBuilder implements ChartDrawer {
                 node = heatmapContainer;
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 return new StackPane(lbl);
         }
@@ -90,20 +91,20 @@ public class ElasticityChartBuilder implements ChartDrawer {
     private Node buildElasticityCurves(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Цена");
-        yAxis.setLabel("Количество");
+        xAxis.setLabel(I18n.t("chart.price"));
+        yAxis.setLabel(I18n.t("chart.quantity"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Сравнение эластичности спроса");
+        chart.setTitle(I18n.t("chart.elasticity.elasticity_curves.title"));
         chart.setAnimated(false);
 
         // Добавляем все имеющиеся серии (elastic, inelastic, seriesN)
         for (String key : chartData.keySet()) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get(key);
             String name = switch (key) {
-                case "elastic" -> "Эластичный спрос";
-                case "inelastic" -> "Неэластичный спрос";
-                default -> "Категория " + (key.replace("series", ""));
+                case "elastic" -> I18n.t("chart.elastic_demand");
+                case "inelastic" -> I18n.t("chart.inelastic_demand");
+                default -> I18n.t("chart.category") + " " + (key.replace("series", ""));
             };
             addSeries(chart, pts, name);
         }
@@ -121,17 +122,17 @@ public class ElasticityChartBuilder implements ChartDrawer {
 
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Категория");
-        yAxis.setLabel("Общая выручка");
+        xAxis.setLabel(I18n.t("chart.category"));
+        yAxis.setLabel(I18n.t("chart.revenue"));
 
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Выручка по категориям");
+        chart.setTitle(I18n.t("chart.elasticity.revenue_bars.title"));
         chart.setAnimated(false);
 
         XYChart.Series<String, Number> series0 = new XYChart.Series<>();
-        series0.setName("До изменения цены");
+        series0.setName(I18n.t("chart.before"));
         XYChart.Series<String, Number> series1 = new XYChart.Series<>();
-        series1.setName("После изменения цены");
+        series1.setName(I18n.t("chart.after"));
 
         if (categories != null && revenue0 != null && revenue1 != null) {
             for (int i = 0; i < categories.size(); i++) {

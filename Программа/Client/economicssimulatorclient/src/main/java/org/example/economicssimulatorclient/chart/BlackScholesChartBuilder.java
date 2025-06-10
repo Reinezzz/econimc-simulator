@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class BlackScholesChartBuilder implements ChartDrawer {
                 node = buildGreeksChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -76,11 +77,11 @@ public class BlackScholesChartBuilder implements ChartDrawer {
     private Node buildSurfaceChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Цена актива (S)");
-        yAxis.setLabel("Цена опциона (C)");
+        xAxis.setLabel(I18n.t("chart.asset_price"));
+        yAxis.setLabel(I18n.t("chart.option_price"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Цена опциона: поверхность (эмуляция 3D)");
+        chart.setTitle(I18n.t("chart.bs.surface.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("surface")) {
@@ -109,17 +110,17 @@ public class BlackScholesChartBuilder implements ChartDrawer {
     private Node buildTimeDecayChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Время до экспирации (T)");
-        yAxis.setLabel("Цена опциона (C)");
+        xAxis.setLabel(I18n.t("chart.time_to_expiry"));
+        yAxis.setLabel(I18n.t("chart.option_price"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Временной распад опциона");
+        chart.setTitle(I18n.t("chart.bs.decay.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("decay")) {
             List<Map<String, Number>> decay = (List<Map<String, Number>>) chartData.get("decay");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Цена опциона");
+            series.setName(I18n.t("chart.option_price"));
             for (Map<String, Number> pt : decay) {
                 Number t = pt.get("T");
                 Number c = pt.get("C");
@@ -139,11 +140,11 @@ public class BlackScholesChartBuilder implements ChartDrawer {
     private Node buildGreeksChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Цена актива (S) или t");
-        yAxis.setLabel("Греки");
+        xAxis.setLabel(I18n.t("chart.asset_price") + " / t");
+        yAxis.setLabel(I18n.t("chart.greeks"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Греки опциона");
+        chart.setTitle(I18n.t("chart.bs.greeks.title"));
         chart.setAnimated(false);
 
         if (chartData.containsKey("greeks")) {

@@ -11,6 +11,7 @@ import javafx.scene.control.Tooltip;
 import org.example.economicssimulatorclient.dto.EconomicModelDto;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.service.EconomicModelService;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.SessionManager;
@@ -57,7 +58,7 @@ public class MainController extends BaseController {
             if (lastModelId != -1) {
                 SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(lastModelId));
             } else {
-                showError(statusLabel, "Нет последней модели для просмотра");
+                showError(statusLabel, "main.no_last_model");
             }
         });
         tileDocuments.setOnMouseClicked(e -> {
@@ -77,9 +78,9 @@ public class MainController extends BaseController {
                 List<EconomicModelDto> models = modelService.getAllModels();
                 Platform.runLater(() -> populateModelList(models));
             } catch (Exception ex) {
-                Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки моделей: " + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, I18n.t("main.load_error") + ex.getMessage()));
             }
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки моделей: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("main.load_error") + ex.getMessage())));
     }
 
     /**

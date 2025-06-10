@@ -2,6 +2,7 @@ package org.example.economicssimulatorclient.service;
 
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.example.economicssimulatorclient.dto.DocumentDto;
+import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.JsonUtil;
 
 import java.io.*;
@@ -26,10 +27,10 @@ public class DocumentService extends MainService {
     // Загрузить PDF-документ
     public DocumentDto uploadDocument(File pdfFile) throws IOException, InterruptedException {
         if (pdfFile == null || !pdfFile.exists()) {
-            throw new IllegalArgumentException("Файл не найден.");
+            throw new IllegalArgumentException(I18n.t("error.file_not_found"));
         }
         if (!pdfFile.getName().toLowerCase().endsWith(".pdf")) {
-            throw new IllegalArgumentException("Можно загружать только PDF-файлы.");
+            throw new IllegalArgumentException(I18n.t("error.only_pdf"));
         }
 
         String boundary = "----WebKitFormBoundary" + System.currentTimeMillis();
@@ -64,11 +65,11 @@ public class DocumentService extends MainService {
             if (tryRefreshToken()) {
                 return uploadDocument(pdfFile); // retry
             } else {
-                throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                throw new IllegalArgumentException(I18n.t("error.session_expired"));
             }
         }
         if (response.statusCode() >= 400) {
-            throw new RuntimeException("Ошибка загрузки файла: " + response.body());
+            throw new RuntimeException(I18n.t("error.upload_failed") + response.body());
         }
         return JsonUtil.fromJson(response.body(), DocumentDto.class);
     }
@@ -85,11 +86,11 @@ public class DocumentService extends MainService {
             if (tryRefreshToken()) {
                 return downloadDocument(documentId); // retry
             } else {
-                throw new IllegalArgumentException("Сессия истекла, войдите заново");
+                throw new IllegalArgumentException(I18n.t("error.session_expired"));
             }
         }
         if (response.statusCode() >= 400) {
-            throw new RuntimeException("Ошибка скачивания файла");
+            throw new RuntimeException(I18n.t("error.download_failed"));
         }
         return response.body();
     }

@@ -2,6 +2,7 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.entity.Report;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.ReportRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.MinioClient;
@@ -10,12 +11,14 @@ import io.minio.RemoveObjectArgs;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final MinioClient minioClient;
+    private final MessageSource messageSource;
 
     @Value("${minio.bucket.reports}")
     private String reportBucket;
@@ -99,9 +103,9 @@ public class ReportService {
     // --- СКАЧИВАНИЕ ОТЧЕТА (pdf как bytes) ---
     public byte[] downloadReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new IllegalArgumentException("Report not found"));
+                .orElseThrow(() -> new LocalizedException("error.report_not_found"));
         if (!report.getUserId().equals(userId)) {
-            throw new SecurityException("Access denied");
+            throw new LocalizedException("error.report_access_denied");
         }
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             minioClient.getObject(
@@ -118,9 +122,9 @@ public class ReportService {
     @Transactional
     public void deleteReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new IllegalArgumentException("Report not found"));
+                .orElseThrow(() -> new LocalizedException("error.report_not_found"));
         if (!report.getUserId().equals(userId)) {
-            throw new SecurityException("Access denied");
+            throw new LocalizedException("error.report_access_denied");
         }
         // Удалить из Minio
         minioClient.removeObject(
@@ -147,16 +151,19 @@ public class ReportService {
             com.itextpdf.kernel.font.PdfFont font = com.itextpdf.kernel.font.PdfFontFactory.createFont(fontBytes, com.itextpdf.io.font.PdfEncodings.IDENTITY_H);
 
             com.itextpdf.layout.Document document = new com.itextpdf.layout.Document(pdfDoc);
+            Locale locale = Locale.forLanguageTag(dto.language());
 
-            document.add(new com.itextpdf.layout.element.Paragraph(dto.modelName() + " / " + dto.name())
-                    .setFont(font).setBold());
-            document.add(new com.itextpdf.layout.element.Paragraph("Пользователь: " + username).setFont(font));
-            document.add(new com.itextpdf.layout.element.Paragraph("Дата: " + OffsetDateTime.now().toString()).setFont(font));
-            document.add(new com.itextpdf.layout.element.Paragraph("Язык: " + dto.language()).setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.user", new Object[]{username}, locale)).setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.date", new Object[]{OffsetDateTime.now().toString()}, locale)).setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.language", new Object[]{dto.language()}, locale)).setFont(font));
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
             // Параметры с описанием
-            document.add(new com.itextpdf.layout.element.Paragraph("Параметры:").setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.parameters", null, locale)).setFont(font));
             for (ModelParameterDto param : dto.parameters()) {
                 String descr = param.description() == null ? "" : param.description();
                 document.add(new com.itextpdf.layout.element.Paragraph(
@@ -167,16 +174,19 @@ public class ReportService {
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
             // Парсенный результат (текст)
-            document.add(new com.itextpdf.layout.element.Paragraph("Результат:").setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.result", null, locale)).setFont(font));
             if (dto.parsedResult() != null && !dto.parsedResult().isBlank()) {
                 document.add(new com.itextpdf.layout.element.Paragraph(dto.parsedResult()).setFont(font));
             } else {
-                document.add(new com.itextpdf.layout.element.Paragraph("—").setFont(font));
+                document.add(new com.itextpdf.layout.element.Paragraph(
+                        messageSource.getMessage("pdf.none", null, locale)).setFont(font));
             }
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
             // Все графики
-            document.add(new com.itextpdf.layout.element.Paragraph("Графики:").setFont(font));
+            document.add(new com.itextpdf.layout.element.Paragraph(
+                    messageSource.getMessage("pdf.charts", null, locale)).setFont(font));
             if (dto.charts() != null && !dto.charts().isEmpty()) {
                 for (ReportChartImageDto chart : dto.charts()) {
                     byte[] imgBytes = Base64.getDecoder().decode(chart.imageBase64());
@@ -188,7 +198,8 @@ public class ReportService {
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
             if (dto.llmMessages() != null && !dto.llmMessages().isEmpty()) {
-                document.add(new com.itextpdf.layout.element.Paragraph("Ответы LLM:").setFont(font));
+                document.add(new com.itextpdf.layout.element.Paragraph(
+                        messageSource.getMessage("pdf.llm_responses", null, locale)).setFont(font));
                 for (LlmChatResponseDto msg : dto.llmMessages()) {
                     document.add(new com.itextpdf.layout.element.Paragraph("A: " + msg.assistantMessage()).setFont(font));
                 }

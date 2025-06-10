@@ -9,6 +9,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class ADASChartBuilder implements ChartDrawer {
                 node = buildGapsChart(chartData);
                 break;
             default:
-                Label lbl = new Label("График не реализован: " + chartKey);
+                Label lbl = new Label(I18n.t("chart.not_impl") + chartKey);
                 lbl.setStyle("-fx-text-fill: red;");
                 StackPane errorPane = new StackPane(lbl);
                 errorPane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
@@ -81,16 +82,16 @@ public class ADASChartBuilder implements ChartDrawer {
     private Node buildEquilibriumChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Y (Выпуск)");
-        yAxis.setLabel("P (Цена)");
+        xAxis.setLabel(I18n.t("chart.output"));
+        yAxis.setLabel(I18n.t("chart.price_level"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Равновесие AD-AS");
+        chart.setTitle(I18n.t("chart.adas.equilibrium.title"));
         chart.setAnimated(false);
 
-        addSeriesToChart(chart, chartData, "AD", "AD (Спрос)");
-        addSeriesToChart(chart, chartData, "SRAS", "SRAS (Краткосрочное предложение)");
-        addSeriesToChart(chart, chartData, "LRAS", "LRAS (Долгосрочное предложение)");
+        addSeriesToChart(chart, chartData, "AD", "AD (" + I18n.t("chart.demand") + ")");
+        addSeriesToChart(chart, chartData, "SRAS", "SRAS (" + I18n.t("chart.supply") + ")");
+        addSeriesToChart(chart, chartData, "LRAS", "LRAS (" + I18n.t("chart.supply") + ")");
 
         // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
@@ -99,7 +100,7 @@ public class ADASChartBuilder implements ChartDrawer {
             Number y = eq.get("P");
             if (x != null && y != null) {
                 XYChart.Series<Number, Number> eqPoint = new XYChart.Series<>();
-                eqPoint.setName("Равновесие");
+                eqPoint.setName(I18n.t("chart.equilibrium_point"));
                 eqPoint.getData().add(new XYChart.Data<>(x, y));
                 chart.getData().add(eqPoint);
             }
@@ -114,17 +115,17 @@ public class ADASChartBuilder implements ChartDrawer {
     private Node buildShiftsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Y (Выпуск)");
-        yAxis.setLabel("P (Цена)");
+        xAxis.setLabel(I18n.t("chart.output"));
+        yAxis.setLabel(I18n.t("chart.price_level"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Сдвиги кривых AD/AS");
+        chart.setTitle(I18n.t("chart.adas.shifts.title"));
         chart.setAnimated(false);
 
-        addSeriesToChart(chart, chartData, "AD", "AD (до)");
-        addSeriesToChart(chart, chartData, "AD2", "AD (после)");
-        addSeriesToChart(chart, chartData, "SRAS", "SRAS (до)");
-        addSeriesToChart(chart, chartData, "SRAS2", "SRAS (после)");
+        addSeriesToChart(chart, chartData, "AD", "AD (" + I18n.t("chart.before") + ")");
+        addSeriesToChart(chart, chartData, "AD2", "AD (" + I18n.t("chart.after") + ")");
+        addSeriesToChart(chart, chartData, "SRAS", "SRAS (" + I18n.t("chart.before") + ")");
+        addSeriesToChart(chart, chartData, "SRAS2", "SRAS (" + I18n.t("chart.after") + ")");
         addSeriesToChart(chart, chartData, "LRAS", "LRAS");
 
         return chart;
@@ -137,11 +138,11 @@ public class ADASChartBuilder implements ChartDrawer {
     private Node buildGapsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Y (Выпуск)");
-        yAxis.setLabel("P (Цена)");
+        xAxis.setLabel(I18n.t("chart.output"));
+        yAxis.setLabel(I18n.t("chart.price_level"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Инфляционные/рецессионные разрывы");
+        chart.setTitle(I18n.t("chart.adas.gaps.title"));
         chart.setAnimated(false);
 
         addSeriesToChart(chart, chartData, "AD", "AD");

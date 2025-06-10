@@ -33,7 +33,7 @@ public abstract class BaseService {
         try {
             jsonBody = JsonUtil.toJson(body);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка сериализации: " + e.getMessage(), e);
+            throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.serialization") + e.getMessage(), e);
         }
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(baseUri.resolve(endpoint))
@@ -51,7 +51,7 @@ public abstract class BaseService {
             return JsonUtil.fromJson(resp.body(), respType);
         }
 
-        throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
+        throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class BaseService {
             return JsonUtil.fromJson(resp.body(), respType);
         }
 
-        throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
+        throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class BaseService {
         try {
             jsonBody = JsonUtil.toJson(body);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка сериализации: " + e.getMessage(), e);
+            throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.serialization") + e.getMessage(), e);
         }
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(baseUri.resolve(endpoint))
@@ -117,7 +117,7 @@ public abstract class BaseService {
             return JsonUtil.fromJson(resp.body(), respType);
         }
 
-        throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
+        throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class BaseService {
                 .send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
         if (!(resp.statusCode() >= 200 && resp.statusCode() < 300)) {
-            throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
+            throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
         }
     }
 
