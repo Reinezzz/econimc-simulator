@@ -7,6 +7,5 @@ public record DocumentDto(
         Long userId,
         String name,
         String path,
-        LocalDateTime uploadedAt,
-        String description
+        LocalDateTime uploadedAt
 ) {}

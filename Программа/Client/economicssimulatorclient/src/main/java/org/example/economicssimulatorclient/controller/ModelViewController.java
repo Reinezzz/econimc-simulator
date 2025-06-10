@@ -2,14 +2,17 @@ package org.example.economicssimulatorclient.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.example.economicssimulatorclient.controller.LlmChatComponentController;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,22 +40,53 @@ public class ModelViewController extends BaseController {
     @FXML
     private TextArea descriptionArea;
     @FXML
+    private TextArea formulaArea;
+    @FXML
     private Button runButton;
     @FXML
     private Button editButton;
     @FXML
-    private Button addDocumentButton; // просто добавляем, не реализуем
+    private Button addDocumentButton;
 
     @FXML
     private Label statusLabel;
 
+    // --- LLM Chat Integration ---
+    @FXML
+    private LlmChatComponentController llmChatComponent;
+
+    @FXML
+    private VBox chat;
+
     private Long modelId;
 
+
+
+    private List<ModelParameterDto> pendingExtractionParams = null;
+
     public void initWithModelId(Long id) {
+        initWithModelId(id, null);
+    }
+
+    // Теперь можно передать параметры, которые должны быть применены после загрузки модели:
+    public void initWithModelId(Long id, List<ModelParameterDto> extractedParams) {
         this.modelId = id;
         LastModelStorage.saveLastModelId(modelId);
         clearStatusLabel();
+        this.pendingExtractionParams = extractedParams;
         loadModel();
+        // Очистить чат при смене модели
+        if (llmChatComponent != null) {
+            llmChatComponent.clear();
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
+            VBox chatWindow = loader.load();
+            chat.getChildren().add(chatWindow);
+            llmChatComponent = loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadModel() {
@@ -71,10 +105,43 @@ public class ModelViewController extends BaseController {
         nameLabel.setText(model.name());
         typeLabel.setText(model.modelType());
         descriptionArea.setText(model.description() != null ? model.description() : "");
+        formulaArea.setText(model.formula() != null ? model.formula() : "");
         modelTitle.setText(model.name());
-        fillParameters();
+
+        // --- Основная магия:
+        if (pendingExtractionParams != null && !pendingExtractionParams.isEmpty()) {
+            fillParametersFromExtraction(pendingExtractionParams);
+            pendingExtractionParams = null;
+        } else {
+            fillParameters();
+        }
         setEditMode(false);
+        setupLlmChatComponent();
     }
+
+
+    /** Заполнить значения параметров из LLM extraction (по paramName), остальные оставить как есть */
+    public void fillParametersFromExtraction(List<ModelParameterDto> newParams) {
+        if (newParams == null || newParams.isEmpty()) return;
+        // Сохраняем старый порядок, меняем только значения по paramName
+        for (int i = 0; i < parameters.size(); i++) {
+            ModelParameterDto oldParam = parameters.get(i);
+            String newValue = oldParam.paramValue();
+            for (ModelParameterDto newParam : newParams) {
+                if (oldParam.paramName().equals(newParam.paramName())) {
+                    newValue = String.valueOf(newParam.paramValue());
+                    break;
+                }
+            }
+            parameters.set(i, new ModelParameterDto(
+                    oldParam.id(), oldParam.modelId(), oldParam.paramName(), oldParam.paramType(),
+                    newValue, oldParam.displayName(), oldParam.description(), oldParam.customOrder()
+            ));
+        }
+        fillParameters(); // обновить UI
+        showSuccess(statusLabel, "Параметры из документа подставлены");
+    }
+
 
     private void fillParameters() {
         parameterList.getChildren().clear();
@@ -117,7 +184,10 @@ public class ModelViewController extends BaseController {
         });
 
         addDocumentButton.setOnAction(e -> {
-            SceneManager.switchTo("documents.fxml", DocumentController::initialize);
+            SceneManager.switchTo("documents.fxml", c -> {
+                ((DocumentController) c).initialize();
+                ((DocumentController) c).fromView(true);
+            });
         });
     }
 
@@ -180,7 +250,7 @@ public class ModelViewController extends BaseController {
         runAsync(() -> {
             try {
                 CalculationRequestDto req = new CalculationRequestDto(
-                        modelId, model.modelType(),  parameters
+                        modelId, model.modelType(), parameters
                 );
                 CalculationResponseDto resp = modelService.calculate(req);
                 Platform.runLater(() ->
@@ -192,9 +262,23 @@ public class ModelViewController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка расчета: " + ex.getMessage())));
     }
 
+    private void setupLlmChatComponent() {
+        if (llmChatComponent == null) return;
+        llmChatComponent.setRequestSupplier(() -> new org.example.economicssimulatorclient.dto.LlmChatRequestDto(
+                modelId,
+                "", // сообщение пользователя будет подставлено внутри компонента
+                new ArrayList<>(parameters), // текущие параметры
+                null, // visualizations (на этом экране не нужны)
+                null  // result (на этом экране не нужен)
+        ));
+    }
+
     @Override
     public void clearFields() {
         clearStatusLabel();
-        // reset all user-editable fields (если появятся)
+        if (llmChatComponent != null) {
+            llmChatComponent.clear();
+        }
     }
+
 }

@@ -2,6 +2,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.economicssimulatorclient.controller.DocumentController"
             stylesheets="@documents.css"
@@ -22,25 +24,25 @@
     <!-- Контент -->
     <center>
         <VBox styleClass="content-pane" alignment="TOP_CENTER">
-            <HBox  alignment="CENTER_LEFT">
-                <MenuButton text="Документ"
-                            styleClass="result-combo"
-                            mnemonicParsing="false">
-                    <items>
-                        <MenuItem text="Документ"/>
-                    </items>
-                </MenuButton>
-                <Label text="Сохранённые документы" styleClass="page-title"/>
+            <HBox  alignment="CENTER">
+                <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Сохранённые документы" styleClass="page-title" alignment="CENTER"/>
+                <Region HBox.hgrow="ALWAYS"/>
             </HBox>
-            <Pane styleClass="table-container" VBox.vgrow="ALWAYS">
-                <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-scroll" prefHeight="600">
+                <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-container" VBox.vgrow="ALWAYS">
                     <GridPane fx:id="tableGrid"
                               styleClass="table-grid"
                               gridLinesVisible="true">
-                        <!-- Динамические строки генерирует контроллер -->
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="60" maxWidth="60"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="180"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="260"/>
+                            <ColumnConstraints minWidth="150" maxWidth="150"/>
+                        </columnConstraints>
                     </GridPane>
+
                 </ScrollPane>
-            </Pane>
             <Label fx:id="statusLabel" styleClass="status-label"/>
         </VBox>
     </center>

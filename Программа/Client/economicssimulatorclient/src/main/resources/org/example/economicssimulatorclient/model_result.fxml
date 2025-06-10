@@ -30,7 +30,6 @@
 
             <!-- Центральный блок: Результат вычислений -->
             <VBox styleClass="result-block">
-                <Label text="Результат вычислений" styleClass="block-title"/>
                 <HBox styleClass="result-row">
                     <Label text="Результат:" styleClass="result-label"/>
                 </HBox>
@@ -45,7 +44,10 @@
                 <Label fx:id="statusLabel" styleClass="status-label"/>
             </VBox>
             <Separator orientation="VERTICAL" styleClass="v-separator"/>
+            <VBox fx:id="chat"/>
         </HBox>
+
+
     </center>
     <bottom>
         <VBox>

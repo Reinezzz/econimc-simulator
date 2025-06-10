@@ -16,6 +16,7 @@ module org.example.economicssimulatorclient {
     requires exp4j;
     requires org.mockito;
     requires org.fxyz3d.core;
+    requires javafx.swing;
     opens org.example.economicssimulatorclient.controller to javafx.fxml;
     opens org.example.economicssimulatorclient to javafx.fxml, org.testfx.junit5;
     opens org.example.economicssimulatorclient.config to javafx.fxml;

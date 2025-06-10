@@ -10,5 +10,6 @@ public record EconomicModelDto(
         List<ModelParameterDto> parameters,
         List<ModelResultDto> results,
         String createdAt,
-        String updatedAt
+        String updatedAt,
+        String formula
 ) {}

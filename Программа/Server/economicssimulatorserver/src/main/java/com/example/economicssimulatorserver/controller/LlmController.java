@@ -1,0 +1,71 @@
+package com.example.economicssimulatorserver.controller;
+
+import com.example.economicssimulatorserver.dto.*;
+import com.example.economicssimulatorserver.repository.UserRepository;
+import com.example.economicssimulatorserver.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/llm")
+@RequiredArgsConstructor
+public class LlmController {
+
+    private final LlmService llmService;
+    private final EconomicModelService modelService;
+    private final DocumentService documentService;
+    private final ModelParameterService parameterService;
+    private final ModelCalculationService calculationService;
+    private final UserRepository userRepository;
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            String username = userDetails.getUsername();
+            return userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + username))
+                    .getId();
+        }
+        throw new IllegalStateException("User not authenticated");
+    }
+
+    /**
+     * Извлечение параметров из документа через LLM.
+     * @param req - DTO с modelId и documentId
+     * @return Список ModelParameterDto с новыми значениями
+     */
+
+
+    @PostMapping("/extract-parameters")
+    public ResponseEntity<LlmParameterExtractionResponseDto> extractParameters(
+            @RequestBody LlmParameterExtractionRequestDto req) {
+
+        var model = modelService.getModelById(req.modelId(), getCurrentUserId());
+        var document = documentService.getById(req.documentId());
+        var params = parameterService.getParametersByModelId(req.modelId(), getCurrentUserId());
+
+        LlmParameterExtractionResponseDto response =
+                llmService.extractParameters(req, model, document, params);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Общение с LLM по экономической модели (чат-бот).
+     * @param req - DTO с modelId, userMessage, параметрами, визуализациями, результатом
+     * @return Ответ LLM в виде текста
+     */
+    @PostMapping("/chat")
+    public ResponseEntity<LlmChatResponseDto> chat(
+            @RequestBody LlmChatRequestDto req) {
+
+        var model = modelService.getModelById(req.modelId(), getCurrentUserId());
+
+        LlmChatResponseDto response = llmService.chat(req, model);
+
+        return ResponseEntity.ok(response);
+    }
+}

@@ -68,6 +68,7 @@ public class ElasticityChartBuilder implements ChartDrawer {
             case "elasticity_heatmap":
                 node = buildElasticityHeatmap(chartData);
                 StackPane heatmapContainer = new StackPane(node);
+
                 heatmapContainer.setStyle("-fx-background-color: white;");
                 heatmapContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 StackPane.setAlignment(node, javafx.geometry.Pos.CENTER);
@@ -235,9 +236,15 @@ public class ElasticityChartBuilder implements ChartDrawer {
         hbox.setStyle("-fx-background-color: white;");
         hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         hbox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        HBox.setHgrow(grid, Priority.ALWAYS);
+        HBox.setHgrow(legend, Priority.ALWAYS);
+        grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        legend.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         // Внешняя обертка
         StackPane wrapper = new StackPane(hbox);
+        VBox.setVgrow(wrapper, Priority.ALWAYS);
+        HBox.setHgrow(wrapper, Priority.ALWAYS);
         wrapper.setStyle("-fx-background-color: white;");
         wrapper.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         StackPane.setAlignment(hbox, javafx.geometry.Pos.CENTER_LEFT);

@@ -24,7 +24,7 @@ public class DocumentService extends MainService {
     }
 
     // Загрузить PDF-документ
-    public DocumentDto uploadDocument(File pdfFile, String description) throws IOException, InterruptedException {
+    public DocumentDto uploadDocument(File pdfFile) throws IOException, InterruptedException {
         if (pdfFile == null || !pdfFile.exists()) {
             throw new IllegalArgumentException("Файл не найден.");
         }
@@ -47,13 +47,6 @@ public class DocumentService extends MainService {
         writer.append("\r\n");
         writer.flush();
 
-        // Описание (опционально)
-        if (description != null && !description.isBlank()) {
-            writer.append("--").append(boundary).append("\r\n");
-            writer.append("Content-Disposition: form-data; name=\"description\"\r\n\r\n");
-            writer.append(description).append("\r\n");
-            writer.flush();
-        }
 
         // Конец
         writer.append("--").append(boundary).append("--\r\n");
@@ -69,7 +62,7 @@ public class DocumentService extends MainService {
         HttpResponse<String> response = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 401) {
             if (tryRefreshToken()) {
-                return uploadDocument(pdfFile, description); // retry
+                return uploadDocument(pdfFile); // retry
             } else {
                 throw new IllegalArgumentException("Сессия истекла, войдите заново");
             }

@@ -48,23 +48,15 @@
 
         <GridPane fx:id="mainGrid" styleClass="main-grid">
 
-            <VBox fx:id="tileButton" styleClass="tile-button"
+            <VBox fx:id="tileButton" styleClass="tile-button, tile-button-wide"
                   alignment="CENTER" spacing="14"
-                  GridPane.rowIndex="0" GridPane.columnIndex="0">
+                  GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2">
                 <StackPane styleClass="icon-placeholder">
                     <FontIcon iconLiteral="fa-bar-chart" styleClass="tile-svg"/>
                 </StackPane>
                 <Label text="Последняя модель" styleClass="tile-text"/>
             </VBox>
 
-            <VBox fx:id="tileSimulation" styleClass="tile-button"
-                  alignment="CENTER" spacing="14"
-                  GridPane.rowIndex="0" GridPane.columnIndex="1">
-                <StackPane styleClass="icon-placeholder">
-                    <FontIcon iconLiteral="fa-info-circle" styleClass="tile-svg"/>
-                </StackPane>
-                <Label text="Справка" styleClass="tile-text"/>
-            </VBox>
 
             <VBox fx:id="tileDocuments" styleClass="tile-button, tile-button-wide"
                   alignment="CENTER" spacing="14"

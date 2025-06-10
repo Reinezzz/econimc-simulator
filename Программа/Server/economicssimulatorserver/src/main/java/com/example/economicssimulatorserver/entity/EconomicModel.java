@@ -38,6 +38,9 @@ public class EconomicModel {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(updatable = false)
+    private String formula;
+
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();

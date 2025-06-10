@@ -28,8 +28,4 @@ public class DocumentEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt = LocalDateTime.now();
 
-    @Column
-    private String description;
-
-
 }

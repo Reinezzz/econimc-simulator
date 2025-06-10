@@ -61,7 +61,10 @@ public class MainController extends BaseController {
             }
         });
         tileDocuments.setOnMouseClicked(e -> {
-            SceneManager.switchTo("documents.fxml", DocumentController::initialize);
+            SceneManager.switchTo("documents.fxml", c -> {
+                ((DocumentController) c).initialize();
+                ((DocumentController) c).fromView(false);
+            });
         });
     }
 

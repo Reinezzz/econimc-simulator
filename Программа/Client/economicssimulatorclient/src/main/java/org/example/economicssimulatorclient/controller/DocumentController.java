@@ -4,144 +4,239 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import org.example.economicssimulatorclient.dto.DocumentDto;
+import org.example.economicssimulatorclient.dto.ReportListItemDto;
 import org.example.economicssimulatorclient.service.DocumentService;
+import org.example.economicssimulatorclient.service.ReportService;
+import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.io.*;
+import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentController extends BaseController {
 
-    @FXML
-    private Button backButton;
-
-    @FXML
-    private Button mainButton;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button selectButton;
-
-    @FXML
-    private GridPane tableGrid;
-
-    @FXML
-    protected Label statusLabel; // уже в BaseController
+    @FXML private Button backButton;
+    @FXML private Button mainButton;
+    @FXML private Button addButton;
+    @FXML private Button deleteButton;
+    @FXML private Button selectButton;
+    @FXML private ComboBox<String> typeComboBox;
+    @FXML private GridPane tableGrid;
+    @FXML protected Label statusLabel;
 
     private final DocumentService documentService = new DocumentService();
+    private final ReportService reportService = new ReportService(URI.create("http://localhost:8080")); // замени на свой адрес
 
     private final List<CheckBox> checkBoxes = new ArrayList<>();
     private final List<DocumentDto> documents = new ArrayList<>();
+    private final List<ReportListItemDto> reports = new ArrayList<>();
+    private boolean fromView = false;
+
+    private Long modelId; // id текущей экономической модели (если пришли из ModelView)
 
     @FXML
     public void initialize() {
+
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
 
-        loadDocuments();
+        typeComboBox.getItems().setAll("Документы", "Отчеты");
+        typeComboBox.getSelectionModel().selectFirst();
+        typeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> loadTable());
 
         addButton.setOnAction(e -> onAdd());
         deleteButton.setOnAction(e -> onDelete());
+        selectButton.setVisible(false);
         selectButton.setOnAction(e -> onSelect());
+        Platform.runLater(() -> {
+            System.out.println("backButton: " + backButton.isVisible() + " | opacity=" + backButton.getOpacity() + " | layoutX=" + backButton.getLayoutX());
+            System.out.println("backButton: width=" + backButton.getWidth() + ", height=" + backButton.getHeight());
+            System.out.println("mainButton: width=" + mainButton.getWidth() + ", height=" + mainButton.getHeight());
+        });
     }
 
+    public void fromView(boolean isVisible) {
+        this.fromView = isVisible;
+        selectButton.setVisible(isVisible);
+        if (isVisible) {
+            this.modelId = LastModelStorage.loadLastModelId();
+        }
+    }
+
+    private void loadTable() {
+        String selectedType = typeComboBox.getValue();
+        if ("Документы".equals(selectedType)) {
+            loadDocuments();
+            return;
+        }if("Отчеты".equals(selectedType)){
+            loadReports();
+            return;
+        }
+    }
+
+    // --- ДОКУМЕНТЫ ---
     private void loadDocuments() {
         tableGrid.getChildren().clear();
         checkBoxes.clear();
         documents.clear();
         clearStatusLabel();
-
-        addTableHeader();
+        addTableHeader(false);
 
         runAsync(() -> {
-            List<DocumentDto> docs = null;
+            List<DocumentDto> docs;
             try {
                 docs = documentService.getUserDocuments();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            List<DocumentDto> finalDocs = docs;
-            Platform.runLater(() -> fillTable(finalDocs));
+            Platform.runLater(() -> fillDocumentsTable(docs));
         }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки документов: " + ex.getMessage())));
     }
 
-    private void fillTable(List<DocumentDto> docs) {
+    private void fillDocumentsTable(List<DocumentDto> docs) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         int row = 1;
+        checkBoxes.clear();
+        documents.clear();
         for (DocumentDto doc : docs) {
             CheckBox cb = new CheckBox();
-            checkBoxes.add(cb);
+            cb.getStyleClass().addAll("table-checkbox", "table-cell", "col-checkbox");
+            cb.setMaxWidth(Double.MAX_VALUE);
 
             Label dateLabel = new Label(doc.uploadedAt() != null ? doc.uploadedAt().format(fmt) : "");
+            dateLabel.getStyleClass().addAll("table-cell");
+            dateLabel.setMaxWidth(Double.MAX_VALUE);
+            dateLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
             Label nameLabel = new Label(doc.name());
+            nameLabel.getStyleClass().add("table-cell");
+            nameLabel.setMaxWidth(Double.MAX_VALUE);
+            nameLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
             Button downloadBtn = new Button("⤓");
-            downloadBtn.getStyleClass().add("download-button");
+            downloadBtn.getStyleClass().addAll("download-button", "table-cell", "col-download", "table-cell-last");
+            downloadBtn.setMaxWidth(Double.MAX_VALUE);
 
             final long docId = doc.id();
             final String docName = doc.name();
+            downloadBtn.setOnAction(ev -> onDownloadDocument(docId, docName));
 
-            downloadBtn.setOnAction(ev -> onDownload(docId, docName));
-
-            tableGrid.add(cb,      0, row);
+            tableGrid.add(cb, 0, row);
             tableGrid.add(dateLabel, 1, row);
             tableGrid.add(nameLabel, 2, row);
             tableGrid.add(downloadBtn, 3, row);
 
+            GridPane.setHgrow(cb, Priority.NEVER);
+            GridPane.setHgrow(dateLabel, Priority.ALWAYS);
+            GridPane.setHgrow(nameLabel, Priority.ALWAYS);
+            GridPane.setHgrow(downloadBtn, Priority.NEVER);
+
+            checkBoxes.add(cb);
             documents.add(doc);
             row++;
         }
     }
 
-    private void addTableHeader() {
-        for (int col = 0; col < 4; col++) {
+    // --- ОТЧЕТЫ ---
+    private void loadReports() {
+        tableGrid.getChildren().clear();
+        checkBoxes.clear();
+        reports.clear();
+        clearStatusLabel();
+        addTableHeader(true);
+
+        runAsync(() -> {
+            List<ReportListItemDto> list;
+            try {
+                list = reportService.getReports();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Platform.runLater(() -> fillReportsTable(list));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка загрузки отчетов: " + ex.getMessage())));
+    }
+
+    private void fillReportsTable(List<ReportListItemDto> reportList) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        int row = 1;
+        checkBoxes.clear();
+        reports.clear();
+        for (ReportListItemDto report : reportList) {
+            CheckBox cb = new CheckBox();
+            cb.getStyleClass().addAll("table-checkbox", "table-cell", "col-checkbox");
+            cb.setMaxWidth(Double.MAX_VALUE);
+
+            Label dateLabel = new Label(report.createdAt() != null ? report.createdAt().format(fmt) : "");
+            dateLabel.getStyleClass().addAll("table-cell");
+            dateLabel.setMaxWidth(Double.MAX_VALUE);
+            dateLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
+            Label nameLabel = new Label(report.name());
+            nameLabel.getStyleClass().add("table-cell");
+            nameLabel.setMaxWidth(Double.MAX_VALUE);
+            nameLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
+            Button downloadBtn = new Button("⤓");
+            downloadBtn.getStyleClass().addAll("download-button", "table-cell", "col-download", "table-cell-last");
+            downloadBtn.setMaxWidth(Double.MAX_VALUE);
+
+            final long reportId = report.id();
+            final String reportName = report.name() + ".pdf";
+            downloadBtn.setOnAction(ev -> onDownloadReport(reportId, reportName));
+
+            tableGrid.add(cb, 0, row);
+            tableGrid.add(dateLabel, 1, row);
+            tableGrid.add(nameLabel, 2, row);
+            tableGrid.add(downloadBtn, 3, row);
+
+            GridPane.setHgrow(cb, Priority.NEVER);
+            GridPane.setHgrow(dateLabel, Priority.ALWAYS);
+            GridPane.setHgrow(nameLabel, Priority.ALWAYS);
+            GridPane.setHgrow(downloadBtn, Priority.NEVER);
+
+            checkBoxes.add(cb);
+            reports.add(report);
+            row++;
+        }
+    }
+
+    private void addTableHeader(boolean isReport) {
+        tableGrid.getChildren().clear();
+        String[] headers = isReport ?
+                new String[]{"", "Дата", "Имя", "Скачать"}
+                : new String[]{"", "Дата", "Документ", "Скачать"};
+        for (int col = 0; col < headers.length; col++) {
             Label header = new Label(headers[col]);
             header.getStyleClass().add("table-header");
+            if (col == 0) header.getStyleClass().add("col-checkbox");
+            if (col == headers.length - 1) header.getStyleClass().addAll("col-download", "table-cell-last");
+            header.setMaxWidth(Double.MAX_VALUE);
+            header.setAlignment(javafx.geometry.Pos.CENTER);
             tableGrid.add(header, col, 0);
+            GridPane.setHgrow(header, Priority.ALWAYS);
         }
-// Добавить псевдо-линию:
-        Rectangle line = new Rectangle();
-        line.setHeight(2);
-        line.setFill(Color.web("#b2b1b1"));
-        GridPane.setColumnSpan(line, 4);
-        tableGrid.add(line, 0, 1);
-        tableGrid.add(new Label(""),                  0, 0);
-        Label dateHeader = new Label("Дата");
-        dateHeader.getStyleClass().add("table-header");
-        tableGrid.add(dateHeader, 1, 0);
-        Label nameHeader = new Label("Документ");
-        nameHeader.getStyleClass().add("table-header");
-        tableGrid.add(nameHeader, 2, 0);
-        Label downloadHeader = new Label("Скачать");
-        downloadHeader.getStyleClass().add("table-header");
-        tableGrid.add(downloadHeader, 3, 0);
     }
 
     private void onAdd() {
+        if (!"Документы".equals(typeComboBox.getValue())) {
+            showError(statusLabel, "Добавлять можно только документы");
+            return;
+        }
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Выберите файл");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File file = chooser.showOpenDialog(tableGrid.getScene().getWindow());
         if (file != null) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setHeaderText("Введите описание");
-            dialog.getEditor().setText("");
-            dialog.showAndWait();
-            String description = dialog.getResult();
 
             runAsync(() -> {
                 try {
-                    documentService.uploadDocument(file, description);
+                    documentService.uploadDocument(file);
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -161,32 +256,44 @@ public class DocumentController extends BaseController {
             }
         }
         if (indicesToDelete.isEmpty()) {
-            showError(statusLabel, "Выбран для удаления");
+            showError(statusLabel, "Выберите элементы для удаления");
             return;
         }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, tr("documents.confirmDelete"), ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Подтвердите удаление");
-        confirm.showAndWait();
-        if (confirm.getResult() != ButtonType.YES) return;
-
-        runAsync(() -> {
-            for (int idx : indicesToDelete) {
-                DocumentDto doc = documents.get(idx);
-                try {
-                    documentService.deleteDocument(doc.id());
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
+        if ("Документы".equals(typeComboBox.getValue())) {
+            runAsync(() -> {
+                for (int idx : indicesToDelete) {
+                    DocumentDto doc = documents.get(idx);
+                    try {
+                        documentService.deleteDocument(doc.id());
+                    } catch (IOException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-            Platform.runLater(() -> {
-                showSuccess(statusLabel, "Документ удален");
-                loadDocuments();
-            });
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
+                Platform.runLater(() -> {
+                    showSuccess(statusLabel, "Документ(ы) удален(ы)");
+                    loadDocuments();
+                });
+            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
+        } else {
+            runAsync(() -> {
+                for (int idx : indicesToDelete) {
+                    ReportListItemDto report = reports.get(idx);
+                    try {
+                        reportService.deleteReport(report.id());
+                    } catch (IOException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                Platform.runLater(() -> {
+                    showSuccess(statusLabel, "Отчет(ы) удален(ы)");
+                    loadReports();
+                });
+            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка удаления: " + ex.getMessage())));
+        }
     }
 
-    private void onDownload(long docId, String docName) {
+    private void onDownloadDocument(long docId, String docName) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Сохранить как");
         chooser.setInitialFileName(docName);
@@ -196,11 +303,7 @@ public class DocumentController extends BaseController {
             runAsync(() -> {
                 try (InputStream in = documentService.downloadDocument(docId);
                      FileOutputStream out = new FileOutputStream(saveFile)) {
-                    try {
-                        in.transferTo(out);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    in.transferTo(out);
                     Platform.runLater(() -> showSuccess(statusLabel, "Документ скачан"));
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
@@ -209,19 +312,59 @@ public class DocumentController extends BaseController {
         }
     }
 
+    private void onDownloadReport(long reportId, String reportName) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Сохранить как");
+        chooser.setInitialFileName(reportName);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        File saveFile = chooser.showSaveDialog(tableGrid.getScene().getWindow());
+        if (saveFile != null) {
+            runAsync(() -> {
+                try (FileOutputStream out = new FileOutputStream(saveFile)) {
+                    byte[] data = reportService.downloadReport(reportId);
+                    out.write(data);
+                    Platform.runLater(() -> showSuccess(statusLabel, "Отчет скачан"));
+                } catch (InterruptedException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка скачивания: " + ex.getMessage())));
+        }
+    }
+
+    // Оставляем старую логику выбора для извлечения параметров только для документов!
     private void onSelect() {
-        List<DocumentDto> selected = new ArrayList<>();
+        int selectedIdx = -1;
         for (int i = 0; i < checkBoxes.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
-                selected.add(documents.get(i));
+                if (selectedIdx != -1) {
+                    showError(statusLabel, "Выберите только один документ!");
+                    return;
+                }
+                selectedIdx = i;
             }
         }
-        if (selected.isEmpty()) {
-            showError(statusLabel, "Выберите хотя бы 1");
+        if (selectedIdx == -1) {
+            showError(statusLabel, "Выберите документ для извлечения параметров");
             return;
         }
-        String names = selected.stream().map(DocumentDto::name).reduce((a, b) -> a + ", " + b).orElse("");
-        showSuccess(statusLabel, "Выбраны: " + names); // или tr("documents.selected") + names;
+        DocumentDto selectedDoc = documents.get(selectedIdx);
+        if (modelId == null) {
+            showError(statusLabel, "Неизвестна модель для извлечения параметров");
+            return;
+        }
+        selectButton.setDisable(true);
+        runAsync(() -> {
+            try {
+                // Реализуй свою логику LLM извлечения параметров по выбранному документу
+                // ...
+                Platform.runLater(() -> showSuccess(statusLabel, "Параметры извлечены")); // пример
+            } finally {
+                Platform.runLater(() -> selectButton.setDisable(false));
+            }
+        }, ex -> Platform.runLater(() -> {
+            showError(statusLabel, "Ошибка при извлечении: " + ex.getMessage());
+            selectButton.setDisable(false);
+        }));
     }
 
     @Override

@@ -56,7 +56,6 @@ public class DocumentService {
             entity.setName(file.getOriginalFilename());
             entity.setPath(filename);
             entity.setUploadedAt(LocalDateTime.now());
-            entity.setDescription(description);
 
             documentRepository.save(entity);
 
@@ -105,6 +104,12 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
+    public DocumentDto getById(Long documentId) {
+        DocumentEntity entity = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Документ не найден: " + documentId));
+        return toDto(entity);
+    }
+
     private DocumentEntity getUserDocumentOrThrow(Long docId, Long userId) {
         return documentRepository.findById(docId)
                 .filter(doc -> doc.getUserId().equals(userId))
@@ -117,8 +122,7 @@ public class DocumentService {
                 entity.getUserId(),
                 entity.getName(),
                 entity.getPath(),
-                entity.getUploadedAt(),
-                entity.getDescription()
+                entity.getUploadedAt()
         );
     }
 

@@ -2,58 +2,57 @@ package org.example.economicssimulatorclient.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import org.example.economicssimulatorclient.chart.ChartDrawer;
 import org.example.economicssimulatorclient.chart.ChartDrawerFactory;
-import org.example.economicssimulatorclient.dto.CalculationRequestDto;
-import org.example.economicssimulatorclient.dto.CalculationResponseDto;
-import org.example.economicssimulatorclient.dto.EconomicModelDto;
-import org.example.economicssimulatorclient.dto.ModelParameterDto;
-import org.example.economicssimulatorclient.dto.ModelResultDto;
+import org.example.economicssimulatorclient.dto.*;
+import org.example.economicssimulatorclient.parser.ParserFactory;
+import org.example.economicssimulatorclient.parser.ResultParser;
+import org.example.economicssimulatorclient.util.ReportImageUtil;
 import org.example.economicssimulatorclient.service.EconomicModelService;
+import org.example.economicssimulatorclient.service.ReportService;
 import org.example.economicssimulatorclient.util.ChartDataConverter;
-import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
 
 public class ModelResultController extends BaseController {
 
     private final EconomicModelService modelService = get(EconomicModelService.class);
+    private final ReportService reportService = new ReportService(URI.create("http://localhost:8080"));
 
-    @FXML
-    private Button backButton;
-    @FXML
-    private Button mainButton;
-    @FXML
-    private VBox parameterList;
-    @FXML
-    private TextArea resultArea;
-    @FXML
-    private ComboBox<String> typeComboBox;
-    @FXML
-    private Pane chartPane;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button repeatButton;
-    @FXML
-    private Label statusLabel;
+    @FXML private Button backButton;
+    @FXML private Button mainButton;
+    @FXML private VBox parameterList;
+    @FXML private TextArea resultArea;
+    @FXML private ComboBox<String> typeComboBox;
+    @FXML private Pane chartPane;
+    @FXML private Button saveButton;
+    @FXML private Button repeatButton;
+    @FXML private Label statusLabel;
+    @FXML private VBox chat;
+
+    @FXML private LlmChatComponentController llmChatComponent;
 
     private CalculationResponseDto response;
     private List<ModelParameterDto> parameters = new ArrayList<>();
     private EconomicModelDto model;
     private String selectedChartKey;
+    private Map<String, Map<String, Object>> chartDataMap = new HashMap<>();
+    private final Map<String, Node> chartNodes = new HashMap<>();
+    private final Set<String> selectedAssistantMessages = new LinkedHashSet<>();
 
-    /**
-     * Вызови этот метод из SceneManager.switchTo("model_result.fxml", c -> c.initWithResult(...));
-     */
     public void initWithResult(CalculationResponseDto response, EconomicModelDto model) {
         this.response = response;
         this.parameters = new ArrayList<>(response.updatedParameters());
@@ -62,6 +61,21 @@ public class ModelResultController extends BaseController {
         fillParameters();
         fillResult();
         fillCharts();
+
+        chat.getChildren().clear();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
+            VBox chatWindow = loader.load();
+            chat.getChildren().add(chatWindow);
+            llmChatComponent = loader.getController();
+            llmChatComponent.setOnAssistantMessageAppended(this::setupAddToReportButtonForChat);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setupLlmChatComponent();
+
+        // Обновляем слушатель для появления кнопок "Добавить в отчет"
+        setupAddToReportButtonForChat();
     }
 
     private void fillParameters() {
@@ -97,8 +111,8 @@ public class ModelResultController extends BaseController {
 
     private void fillResult() {
         ModelResultDto result = response.result();
-        resultArea.setText(result != null && result.resultData() != null
-                ? result.resultData() : "Нет результата");
+        ResultParser parser = ParserFactory.getParser(model.modelType());
+        resultArea.setText(parser.parse(result.resultData()));
     }
 
     private void fillCharts() {
@@ -106,10 +120,11 @@ public class ModelResultController extends BaseController {
         if (result == null || result.resultData() == null) {
             chartPane.getChildren().clear();
             typeComboBox.getItems().clear();
+            chartDataMap.clear();
             return;
         }
-        // Получаем Map: chartKey -> Map с данными для визуализации
-        Map<String, Map<String, Object>> chartDataMap = ChartDataConverter.parseRawChartData(result);
+        chartDataMap = ChartDataConverter.parseRawChartData(result);
+        chartNodes.clear();
 
         typeComboBox.getItems().clear();
         typeComboBox.getItems().addAll(chartDataMap.keySet());
@@ -123,13 +138,13 @@ public class ModelResultController extends BaseController {
 
     private void showChart(Map<String, Map<String, Object>> chartDataMap, String chartKey) {
         chartPane.getChildren().clear();
+        this.selectedChartKey = chartKey;
         if (chartKey == null || !chartDataMap.containsKey(chartKey) || model == null) return;
-
-        // Получаем визуализатор для нужной модели
         ChartDrawer drawer = ChartDrawerFactory.getDrawer(model.modelType());
         Node chart = drawer != null ? drawer.buildChart(chartKey, chartDataMap.get(chartKey)) : null;
         if (chart != null) {
             chartPane.getChildren().add(chart);
+            chartNodes.put(chartKey, chart);
             if (chart instanceof Region region) {
                 region.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 region.setMinSize(0, 0);
@@ -146,9 +161,8 @@ public class ModelResultController extends BaseController {
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(model.id())));
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
-
         repeatButton.setOnAction(e -> repeatCalculation());
-        saveButton.setOnAction(e -> showError(statusLabel, "Сохранение отчёта пока не реализовано"));
+        saveButton.setOnAction(e -> onSaveReport());
     }
 
     private void repeatCalculation() {
@@ -167,6 +181,140 @@ public class ModelResultController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка при повторном расчете: " + ex.getMessage())));
     }
 
+    /**
+     * Связывает Supplier для чата (актуальные параметры, графики, результат).
+     */
+    private void setupLlmChatComponent() {
+        if (llmChatComponent == null) return;
+        llmChatComponent.setRequestSupplier(() -> new LlmChatRequestDto(
+                model.id(),
+                "", // сообщение пользователя подставится внутри компонента
+                new ArrayList<>(parameters),
+                buildVisualizations(),
+                response.result()
+        ));
+    }
+
+    private List<LlmVisualizationDto> buildVisualizations() {
+        List<LlmVisualizationDto> visualizations = new ArrayList<>();
+        if (chartDataMap != null && !chartDataMap.isEmpty()) {
+            for (Map.Entry<String, Map<String, Object>> entry : chartDataMap.entrySet()) {
+                String chartKey = entry.getKey();
+                Map<String, Object> data = entry.getValue();
+                String chartTitle = chartKey;
+                visualizations.add(new LlmVisualizationDto(chartKey, chartTitle, data));
+            }
+        }
+        return visualizations;
+    }
+
+    /**
+     * Добавляет кнопки "Добавить в отчет" к assistant-сообщениям.
+     */
+    private void setupAddToReportButtonForChat() {
+        Platform.runLater(() -> {
+            if (llmChatComponent == null) return;
+            VBox chatArea = llmChatComponent.getChatArea();
+            if (chatArea == null) return;
+
+            for (Node node : chatArea.getChildren()) {
+                if (node instanceof HBox row) {
+                    if (row.getStyleClass().contains("llm-chat-msg-row-assistant")) {
+                        Label lbl = (Label) row.getChildren().get(0);
+                        String messageText = lbl.getText();
+                        boolean alreadyHasButton = row.getChildren().stream().anyMatch(child ->
+                                child instanceof Button btn &&
+                                        ("+".equals(btn.getText()) || "-".equals(btn.getText()))
+                        );
+                        if (alreadyHasButton) continue;
+                        Button addBtn = new Button(selectedAssistantMessages.contains(messageText) ? "-" : "+");
+                        addBtn.setVisible(false);
+                        addBtn.getStyleClass().add("llm-add-report-btn");
+                        addBtn.setOnAction(e -> {
+                            if (selectedAssistantMessages.contains(messageText)) {
+                                selectedAssistantMessages.remove(messageText);
+                                addBtn.setText("+");
+                            } else {
+                                selectedAssistantMessages.add(messageText);
+                                addBtn.setText("-");
+                            }
+                        });
+                        row.setOnMouseEntered(ev -> addBtn.setVisible(true));
+                        row.setOnMouseExited(ev -> addBtn.setVisible(false));
+                        row.getChildren().add(addBtn);
+                    }
+                }
+            }
+        });
+    }
+
+
+
+    @FXML
+    private void onSaveReport() {
+        saveButton.setDisable(true);
+
+        // 1. Сохрани выбранный график
+        String prevSelectedKey = typeComboBox.getSelectionModel().getSelectedItem();
+
+        List<ReportChartImageDto> chartImages = new ArrayList<>();
+        List<String> chartKeys = new ArrayList<>(chartDataMap.keySet());
+
+        Platform.runLater(() -> {
+            for (String chartKey : chartKeys) {
+                typeComboBox.getSelectionModel().select(chartKey);
+                showChart(chartDataMap, chartKey);
+                chartPane.layout();
+                Node chartNode = chartPane.getChildren().isEmpty() ? null : chartPane.getChildren().get(0);
+                if (chartNode != null) {
+                    String base64 = ReportImageUtil.toBase64Png(chartNode, 500, 300);
+                    chartImages.add(new ReportChartImageDto(chartKey, base64));
+                }
+            }
+
+            // 2. После цикла верни выбор к исходному значению
+            if (prevSelectedKey != null && chartDataMap.containsKey(prevSelectedKey)) {
+                typeComboBox.getSelectionModel().select(prevSelectedKey);
+                showChart(chartDataMap, prevSelectedKey);
+            }
+
+            // После этого — сформируй и отправь отчет (оставшаяся логика)
+            List<LlmChatResponseDto> selectedLlmResponses = new ArrayList<>();
+            for (String msg : selectedAssistantMessages) {
+                selectedLlmResponses.add(new LlmChatResponseDto(msg));
+            }
+            String parsedResult = resultArea.getText();
+
+            ReportCreateRequestDto req = new ReportCreateRequestDto(
+                    model.id(),
+                    model.name(),
+                    "",
+                    Locale.getDefault().getLanguage(),
+                    new ArrayList<>(parameters),
+                    response.result(),
+                    chartImages,
+                    selectedLlmResponses,
+                    parsedResult
+            );
+
+            runAsync(() -> {
+                try {
+                    reportService.createReport(req);
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                Platform.runLater(() -> {
+                    saveButton.setDisable(false);
+                });
+            }, ex -> Platform.runLater(() -> {
+                saveButton.setDisable(false);
+            }));
+        });
+    }
+
+
+
+
     @Override
     public void clearFields() {
         clearStatusLabel();
@@ -174,5 +322,7 @@ public class ModelResultController extends BaseController {
         chartPane.getChildren().clear();
         parameterList.getChildren().clear();
         typeComboBox.getItems().clear();
+        chat.getChildren().clear();
+        selectedAssistantMessages.clear();
     }
 }

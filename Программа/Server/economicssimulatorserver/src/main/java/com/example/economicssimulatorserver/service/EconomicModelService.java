@@ -82,7 +82,8 @@ public class EconomicModelService {
                 paramDtos,
                 resultDtos,
                 model.getCreatedAt() != null ? model.getCreatedAt().toString() : null,
-                model.getUpdatedAt() != null ? model.getUpdatedAt().toString() : null
+                model.getUpdatedAt() != null ? model.getUpdatedAt().toString() : null,
+                model.getFormula()
         );
     }
 

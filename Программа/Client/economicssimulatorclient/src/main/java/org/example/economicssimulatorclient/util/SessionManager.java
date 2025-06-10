@@ -1,7 +1,9 @@
 package org.example.economicssimulatorclient.util;
 
 import lombok.Getter;
+import org.example.economicssimulatorclient.config.AppConfig;
 
+import java.net.URI;
 import java.util.prefs.Preferences;
 
 /**
@@ -82,4 +84,7 @@ public class SessionManager {
         return getAccessToken() != null && getRefreshToken() != null;
     }
 
+    public URI getBaseUri() {
+        return URI.create(AppConfig.getBaseUrl());
+    }
 }
