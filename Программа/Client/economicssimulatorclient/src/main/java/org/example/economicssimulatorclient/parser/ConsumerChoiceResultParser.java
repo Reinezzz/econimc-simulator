@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,7 +15,7 @@ public class ConsumerChoiceResultParser implements ResultParser {
         if (curvesObj != null) {
             JSONArray curves = curvesObj.optJSONArray("indifference_curves");
             if (curves != null && curves.length() > 0) {
-                sb.append("Кривые безразличия (utility):\n");
+                sb.append(I18n.t("result.consumer.curves_title")).append("\n");
                 for (int i = 0; i < curves.length(); i++) {
                     JSONArray curve = curves.getJSONArray(i);
                     if (curve.length() > 0) {
@@ -24,7 +25,7 @@ public class ConsumerChoiceResultParser implements ResultParser {
                         double qMax = last.optDouble("quantity", Double.NaN);
                         double pMin = first.optDouble("price", Double.NaN);
                         double pMax = last.optDouble("price", Double.NaN);
-                        sb.append(String.format("  • Кривая %d: кол-во от %.2f до %.2f, цена от %.2f до %.2f\n",
+                        sb.append(String.format(I18n.t("result.consumer.curve"),
                                 i + 1, qMin, qMax, pMin, pMax));
                     }
                 }
@@ -43,8 +44,8 @@ public class ConsumerChoiceResultParser implements ResultParser {
             double qMax = last.optDouble("quantity", Double.NaN);
             double pMin = first.optDouble("price", Double.NaN);
             double pMax = last.optDouble("price", Double.NaN);
-            sb.append("\nБюджетное ограничение:\n");
-            sb.append(String.format("  • Кол-во от %.2f до %.2f, цена от %.2f до %.2f\n", qMin, qMax, pMin, pMax));
+            sb.append("\n").append(I18n.t("result.consumer.budget_title")).append("\n");
+            sb.append(String.format(I18n.t("result.consumer.budget"), qMin, qMax, pMin, pMax));
         }
 
         // Оптимум на карте
@@ -54,8 +55,8 @@ public class ConsumerChoiceResultParser implements ResultParser {
             if (opt != null) {
                 double qOpt = opt.optDouble("x", Double.NaN);
                 double pOpt = opt.optDouble("y", Double.NaN);
-                sb.append("\nТочка максимума полезности (оптимум):\n");
-                sb.append(String.format("  • Оптимальное количество: %.2f, цена: %.2f\n", qOpt, pOpt));
+                sb.append("\n").append(I18n.t("result.consumer.optimum_title")).append("\n");
+                sb.append(String.format(I18n.t("result.consumer.optimum"), qOpt, pOpt));
             }
         }
 
@@ -76,14 +77,14 @@ public class ConsumerChoiceResultParser implements ResultParser {
                 double qInc = inc.optDouble("x", Double.NaN);
                 double pInc = inc.optDouble("y", Double.NaN);
 
-                sb.append("\nРазложение эффекта изменения цены:\n");
-                sb.append(String.format("  • Эффект замещения: оптимум изменился до (%.2f; %.2f)\n", qSub, pSub));
-                sb.append(String.format("  • Эффект дохода: оптимум изменился до (%.2f; %.2f)\n", qInc, pInc));
+                sb.append("\n").append(I18n.t("result.consumer.effect_title")).append("\n");
+                sb.append(String.format(I18n.t("result.consumer.substitution"), qSub, pSub));
+                sb.append(String.format(I18n.t("result.consumer.income"), qInc, pInc));
             }
         }
 
         if (sb.length() == 0) {
-            sb.append("Нет данных для отображения (Consumer Choice).");
+            sb.append(I18n.t("result.consumer.no_data"));
         }
 
         return sb.toString().trim();

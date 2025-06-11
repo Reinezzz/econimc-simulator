@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,8 +21,8 @@ public class CAPMResultParser implements ResultParser {
                 double riskMax = max.optDouble("risk", Double.NaN);
                 double retMin = min.optDouble("return", Double.NaN);
                 double retMax = max.optDouble("return", Double.NaN);
-                sb.append("Security Market Line (SML):\n");
-                sb.append(String.format("  • Доходность от %.2f%% до %.2f%% при риске %.2f до %.2f\n",
+                sb.append(I18n.t("result.capm.sml_title")).append("\n");
+                sb.append(String.format(I18n.t("result.capm.range"),
                         retMin * 100, retMax * 100, riskMin, riskMax));
             }
         }
@@ -37,8 +38,8 @@ public class CAPMResultParser implements ResultParser {
                 double riskMax = max.optDouble("risk", Double.NaN);
                 double retMin = min.optDouble("return", Double.NaN);
                 double retMax = max.optDouble("return", Double.NaN);
-                sb.append("\nЭффективная граница:\n");
-                sb.append(String.format("  • Доходность от %.2f%% до %.2f%% при риске %.2f до %.2f\n",
+                sb.append("\n").append(I18n.t("result.capm.frontier_title")).append("\n");
+                sb.append(String.format(I18n.t("result.capm.range"),
                         retMin * 100, retMax * 100, riskMin, riskMax));
             }
         }
@@ -48,19 +49,19 @@ public class CAPMResultParser implements ResultParser {
         if (decomposition != null) {
             JSONArray arr = decomposition.optJSONArray("decomposition");
             if (arr != null && arr.length() > 0) {
-                sb.append("\nДекомпозиция портфеля:\n");
+                sb.append("\n").append(I18n.t("result.capm.decomposition_title")).append("\n");
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject comp = arr.getJSONObject(i);
-                    String label = comp.optString("label", "Без названия");
+                    String label = comp.optString("label", I18n.t("result.capm.no_name"));
                     double alpha = comp.optDouble("alpha", Double.NaN);
                     double beta = comp.optDouble("beta", Double.NaN);
-                    sb.append(String.format("  • %s: alpha = %.2f, beta = %.2f\n", label, alpha, beta));
+                    sb.append(String.format(I18n.t("result.capm.decomposition_item"), label, alpha, beta));
                 }
             }
         }
 
         if (sb.length() == 0) {
-            sb.append("Нет данных для отображения (CAPM).");
+            sb.append(I18n.t("result.capm.no_data"));
         }
 
         return sb.toString().trim();

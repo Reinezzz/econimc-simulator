@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -9,44 +10,41 @@ public class DemandSupplyResultParser implements ResultParser {
     public String parse(String json) {
         JSONObject root = new JSONObject(json);
         JSONObject sd = root.optJSONObject("supply_demand");
-        if (sd == null) return "Нет данных по модели спроса и предложения.";
+        if (sd == null) return I18n.t("result.demand.no_data");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Результаты модели \"Спрос и предложение\":\n\n");
+        sb.append(I18n.t("result.demand.title")).append("\n\n");
 
         // 1. Равновесие рынка
         JSONObject eq = sd.optJSONObject("equilibrium");
         if (eq != null) {
             double eqQ = eq.optDouble("quantity", Double.NaN);
             double eqP = eq.optDouble("price", Double.NaN);
-            sb.append(String.format(
-                    "• Равновесие рынка:\n  - Количество: %.2f\n  - Цена: %.2f\n\n", eqQ, eqP
-            ));
+            sb.append(String.format(I18n.t("result.demand.equilibrium"), eqQ, eqP));
         }
 
         // 2. Пример точек спроса и предложения
         JSONArray demand = sd.optJSONArray("demand");
         JSONArray supply = sd.optJSONArray("supply");
         if (demand != null && supply != null) {
-            sb.append("• Примеры точек:\n");
+            sb.append(I18n.t("result.demand.examples_title")).append("\n");
             int points = Math.min(3, Math.min(demand.length(), supply.length()));
             for (int i = 0; i < points; i++) {
                 JSONObject d = demand.getJSONObject(i);
                 JSONObject s = supply.getJSONObject(i);
-                sb.append(String.format(
-                        "  - Спрос: Q=%.2f, P=%.2f | Предложение: Q=%.2f, P=%.2f\n",
+                sb.append(String.format(I18n.t("result.demand.example_point"),
                         d.optDouble("quantity"), d.optDouble("price"),
                         s.optDouble("quantity"), s.optDouble("price")
                 ));
             }
-            sb.append("  ...\n\n");
+            sb.append(I18n.t("result.demand.ellipsis")).append("\n\n");
         }
 
         // 3. Излишки
         if (sd.has("consumer_surplus_area") || sd.has("producer_surplus_area")) {
-            sb.append("• Рыночные излишки (графически отображены на графике):\n");
-            if (sd.has("consumer_surplus_area")) sb.append("  - Излишек потребителя\n");
-            if (sd.has("producer_surplus_area")) sb.append("  - Излишек производителя\n");
+            sb.append(I18n.t("result.demand.surplus_title")).append("\n");
+            if (sd.has("consumer_surplus_area")) sb.append(I18n.t("result.demand.consumer_surplus")).append("\n");
+            if (sd.has("producer_surplus_area")) sb.append(I18n.t("result.demand.producer_surplus")).append("\n");
             sb.append("\n");
         }
 
@@ -58,13 +56,12 @@ public class DemandSupplyResultParser implements ResultParser {
             int sShifts = shift.optJSONArray("supply_shifts") != null ?
                     shift.getJSONArray("supply_shifts").length() : 0;
             if (dShifts > 1 || sShifts > 1) {
-                sb.append("• Были рассчитаны сдвиги спроса/предложения и новые равновесные точки.\n\n");
+                sb.append(I18n.t("result.demand.shift_calc")).append("\n\n");
             }
         }
 
         // 5. Краткое summary
-        sb.append("Вы можете подробнее рассмотреть кривые спроса и предложения на графике. В таблице выше представлены ключевые расчетные значения: равновесие, примеры точек, а также рыночные излишки.\n");
-
+        sb.append(I18n.t("result.demand.summary")).append("\n");
         return sb.toString();
     }
 }

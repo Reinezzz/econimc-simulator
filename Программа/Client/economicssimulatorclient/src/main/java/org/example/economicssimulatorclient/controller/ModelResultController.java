@@ -65,7 +65,11 @@ public class ModelResultController extends BaseController {
 
         chat.getChildren().clear();
         try {
+            I18n.setLocale(Locale.forLanguageTag("ru"));
+            Locale locale = I18n.getLocale();
+            ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
+            loader.setResources(bundle);
             VBox chatWindow = loader.load();
             chat.getChildren().add(chatWindow);
             llmChatComponent = loader.getController();

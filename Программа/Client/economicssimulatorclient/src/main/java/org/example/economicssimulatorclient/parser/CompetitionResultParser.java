@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,10 +18,10 @@ public class CompetitionResultParser implements ResultParser {
             if (competition != null && monopoly != null && competition.length() > 0 && monopoly.length() > 0) {
                 JSONObject compMax = competition.getJSONObject(competition.length() - 1);
                 JSONObject monoMax = monopoly.getJSONObject(0);
-                sb.append("Кривые прибыли:\n");
-                sb.append(String.format("  • Конкуренция: макс. прибыль %.2f при выпуске %.2f\n",
+                sb.append(I18n.t("result.competition.profit_title")).append("\n");
+                sb.append(String.format(I18n.t("result.competition.profit_competition"),
                         compMax.optDouble("profit", Double.NaN), compMax.optDouble("quantity", Double.NaN)));
-                sb.append(String.format("  • Монополия: макс. прибыль %.2f при выпуске %.2f\n",
+                sb.append(String.format(I18n.t("result.competition.profit_monopoly"),
                         monoMax.optDouble("profit", Double.NaN), monoMax.optDouble("quantity", Double.NaN)));
             }
         }
@@ -31,13 +32,13 @@ public class CompetitionResultParser implements ResultParser {
             JSONArray categories = hist.optJSONArray("categories");
             JSONArray competition = hist.optJSONArray("competition");
             JSONArray monopoly = hist.optJSONArray("monopoly");
-            sb.append("\nСравнение конкуренции и монополии (гистограмма):\n");
+            sb.append("\n").append(I18n.t("result.competition.comparison_title")).append("\n");
             if (categories != null && competition != null && monopoly != null) {
                 for (int i = 0; i < categories.length(); i++) {
                     String cat = categories.optString(i, "");
                     double compVal = competition.optDouble(i, Double.NaN);
                     double monoVal = monopoly.optDouble(i, Double.NaN);
-                    sb.append(String.format("  • %s: конкуренция %.2f, монополия %.2f\n", cat, compVal, monoVal));
+                    sb.append(String.format(I18n.t("result.competition.comparison_item"), cat, compVal, monoVal));
                 }
             }
         }
@@ -47,21 +48,21 @@ public class CompetitionResultParser implements ResultParser {
         if (deadweight != null) {
             double monopolyQ = deadweight.optDouble("monopolyQ", Double.NaN);
             double competitionQ = deadweight.optDouble("competitionQ", Double.NaN);
-            sb.append("\nОбласть мертвого груза (deadweight loss):\n");
-            sb.append(String.format("  • Объем при монополии: %.2f\n", monopolyQ));
-            sb.append(String.format("  • Объем при конкуренции: %.2f\n", competitionQ));
+            sb.append("\n").append(I18n.t("result.competition.deadweight_title")).append("\n");
+            sb.append(String.format(I18n.t("result.competition.deadweight_monopoly"), monopolyQ));
+            sb.append(String.format(I18n.t("result.competition.deadweight_competition"), competitionQ));
             JSONArray demand = deadweight.optJSONArray("demand");
             JSONArray supply = deadweight.optJSONArray("supply");
             if (demand != null && supply != null && demand.length() > 0 && supply.length() > 0) {
                 JSONObject dFirst = demand.getJSONObject(0);
                 JSONObject sFirst = supply.getJSONObject(0);
-                sb.append(String.format("  • Начальная цена: спрос %.2f, предложение %.2f\n",
+                sb.append(String.format(I18n.t("result.competition.deadweight_start"),
                         dFirst.optDouble("price", Double.NaN), sFirst.optDouble("price", Double.NaN)));
             }
         }
 
         if (sb.length() == 0) {
-            sb.append("Нет данных для Competition vs Monopoly.");
+            sb.append(I18n.t("result.competition.no_data"));
         }
 
         return sb.toString().trim();

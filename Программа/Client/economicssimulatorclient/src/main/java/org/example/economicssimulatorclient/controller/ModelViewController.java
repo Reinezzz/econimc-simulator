@@ -16,6 +16,8 @@ import org.example.economicssimulatorclient.util.SceneManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class ModelViewController extends BaseController {
 
@@ -81,7 +83,11 @@ public class ModelViewController extends BaseController {
             llmChatComponent.clear();
         }
         try {
+            I18n.setLocale(Locale.forLanguageTag("ru"));
+            Locale locale = I18n.getLocale();
+            ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
+            loader.setResources(bundle);
             VBox chatWindow = loader.load();
             chat.getChildren().add(chatWindow);
             llmChatComponent = loader.getController();

@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,7 +12,7 @@ public class PhillipsCurveResultParser implements ResultParser {
         JSONObject root = new JSONObject(json);
 
         // Краткое описание результата
-        sb.append("Кривая Филлипса:\n");
+        sb.append(I18n.t("result.phillips.title")).append("\n");
 
         // 1. Диапазоны инфляции и безработицы
         JSONObject scatter = root.optJSONObject("scatter");
@@ -26,12 +27,8 @@ public class PhillipsCurveResultParser implements ResultParser {
                 double unMin = p0.optDouble("unemployment");
                 double unMax = p1.optDouble("unemployment");
 
-                sb.append(String.format(
-                        "  • Диапазон инфляции: %.2f%% ... %.2f%%\n", infMin, infMax
-                ));
-                sb.append(String.format(
-                        "  • Диапазон безработицы: %.2f%% ... %.2f%%\n", unMin, unMax
-                ));
+                sb.append(String.format(I18n.t("result.phillips.inflation_range"), infMin, infMax));
+                sb.append(String.format(I18n.t("result.phillips.unemployment_range"), unMin, unMax));
             }
         }
 
@@ -46,10 +43,10 @@ public class PhillipsCurveResultParser implements ResultParser {
                 JSONObject unStart = unArr.getJSONObject(0);
                 JSONObject unEnd = unArr.getJSONObject(unArr.length() - 1);
 
-                sb.append("\nДинамика по годам:\n");
-                sb.append(String.format("  • В начале: инфляция = %.2f%%, безработица = %.2f%%\n",
+                sb.append("\n").append(I18n.t("result.phillips.dynamics_title")).append("\n");
+                sb.append(String.format(I18n.t("result.phillips.dynamics_start"),
                         infStart.optDouble("inflation"), unStart.optDouble("unemployment")));
-                sb.append(String.format("  • В конце: инфляция = %.2f%%, безработица = %.2f%%\n",
+                sb.append(String.format(I18n.t("result.phillips.dynamics_end"),
                         infEnd.optDouble("inflation"), unEnd.optDouble("unemployment")));
             }
         }
@@ -62,9 +59,8 @@ public class PhillipsCurveResultParser implements ResultParser {
             if (shortRun != null && shortRun.length() > 0) {
                 JSONObject p0 = shortRun.getJSONObject(0);
                 JSONObject p1 = shortRun.getJSONObject(shortRun.length() - 1);
-                sb.append("\nКраткосрочная кривая:\n");
-                sb.append(String.format(
-                        "  • От инфляции %.2f%% до %.2f%% при безработице %.2f%% ... %.2f%%\n",
+                sb.append("\n").append(I18n.t("result.phillips.short_run_title")).append("\n");
+                sb.append(String.format(I18n.t("result.phillips.short_run_range"),
                         p0.optDouble("inflation"), p1.optDouble("inflation"),
                         p0.optDouble("unemployment"), p1.optDouble("unemployment")
                 ));
@@ -73,16 +69,15 @@ public class PhillipsCurveResultParser implements ResultParser {
                 double lrInfl = longRun.getJSONObject(0).optDouble("inflation");
                 JSONObject p0 = longRun.getJSONObject(0);
                 JSONObject p1 = longRun.getJSONObject(longRun.length() - 1);
-                sb.append("Долгосрочная кривая:\n");
-                sb.append(String.format(
-                        "  • Инфляция стабилизируется на %.2f%% при росте безработицы с %.2f%% до %.2f%%\n",
+                sb.append(I18n.t("result.phillips.long_run_title")).append("\n");
+                sb.append(String.format(I18n.t("result.phillips.long_run_desc"),
                         lrInfl, p0.optDouble("unemployment"), p1.optDouble("unemployment")
                 ));
             }
         }
 
         if (sb.length() == 0) {
-            sb.append("Нет данных для отображения (Phillips Curve).");
+            sb.append(I18n.t("result.phillips.no_data"));
         }
 
         return sb.toString().trim();

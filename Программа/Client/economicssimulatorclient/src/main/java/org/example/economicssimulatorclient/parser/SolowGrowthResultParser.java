@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,13 +22,13 @@ public class SolowGrowthResultParser implements ResultParser {
                 JSONObject outStart = outputArr.getJSONObject(0);
                 JSONObject outEnd = outputArr.getJSONObject(outputArr.length() - 1);
 
-                sb.append("Траектория роста капитала:\n");
-                sb.append(String.format("  • В начальный момент (t=%.0f): капитал = %.2f\n", capStart.optDouble("time"), capStart.optDouble("capital")));
-                sb.append(String.format("  • В конце периода (t=%.0f): капитал = %.2f\n", capEnd.optDouble("time"), capEnd.optDouble("capital")));
+                sb.append(I18n.t("result.solow.capital_title")).append("\n");
+                sb.append(String.format(I18n.t("result.solow.capital_start"), capStart.optDouble("time"), capStart.optDouble("capital")));
+                sb.append(String.format(I18n.t("result.solow.capital_end"), capEnd.optDouble("time"), capEnd.optDouble("capital")));
                 sb.append("\n");
-                sb.append("Траектория роста выпуска:\n");
-                sb.append(String.format("  • В начальный момент (t=%.0f): выпуск = %.2f\n", outStart.optDouble("time"), outStart.optDouble("output")));
-                sb.append(String.format("  • В конце периода (t=%.0f): выпуск = %.2f\n", outEnd.optDouble("time"), outEnd.optDouble("output")));
+                sb.append(I18n.t("result.solow.output_title")).append("\n");
+                sb.append(String.format(I18n.t("result.solow.output_start"), outStart.optDouble("time"), outStart.optDouble("output")));
+                sb.append(String.format(I18n.t("result.solow.output_end"), outEnd.optDouble("time"), outEnd.optDouble("output")));
                 sb.append("\n");
             }
         }
@@ -40,10 +41,10 @@ public class SolowGrowthResultParser implements ResultParser {
                 JSONObject phStart = phaseArr.getJSONObject(0);
                 JSONObject phEnd = phaseArr.getJSONObject(phaseArr.length() - 1);
 
-                sb.append("Фазовая динамика капитала:\n");
-                sb.append(String.format("  • В начале: капитал = %.2f, изменение = %.2f\n",
+                sb.append(I18n.t("result.solow.phase_title")).append("\n");
+                sb.append(String.format(I18n.t("result.solow.phase_start"),
                         phStart.optDouble("capital"), phStart.optDouble("capital_change")));
-                sb.append(String.format("  • В конце: капитал = %.2f, изменение = %.2f\n",
+                sb.append(String.format(I18n.t("result.solow.phase_end"),
                         phEnd.optDouble("capital"), phEnd.optDouble("capital_change")));
                 sb.append("\n");
             }
@@ -59,9 +60,9 @@ public class SolowGrowthResultParser implements ResultParser {
                 if (baseline != null && baseline.length() > 0) {
                     JSONObject start = baseline.getJSONObject(0);
                     JSONObject end = baseline.getJSONObject(baseline.length() - 1);
-                    sb.append("Базовый сценарий выпуска:\n");
-                    sb.append(String.format("  • В начальный момент: выпуск = %.2f\n", start.optDouble("output")));
-                    sb.append(String.format("  • В конце периода: выпуск = %.2f\n", end.optDouble("output")));
+                    sb.append(I18n.t("result.solow.baseline_title")).append("\n");
+                    sb.append(String.format(I18n.t("result.solow.scenario_start"), start.optDouble("output")));
+                    sb.append(String.format(I18n.t("result.solow.scenario_end"), end.optDouble("output")));
                     sb.append("\n");
                 }
                 // high_savings (если есть)
@@ -69,16 +70,16 @@ public class SolowGrowthResultParser implements ResultParser {
                 if (highSavings != null && highSavings.length() > 0) {
                     JSONObject start = highSavings.getJSONObject(0);
                     JSONObject end = highSavings.getJSONObject(highSavings.length() - 1);
-                    sb.append("Сценарий с высоким сбережением:\n");
-                    sb.append(String.format("  • В начальный момент: выпуск = %.2f\n", start.optDouble("output")));
-                    sb.append(String.format("  • В конце периода: выпуск = %.2f\n", end.optDouble("output")));
+                    sb.append(I18n.t("result.solow.high_savings_title")).append("\n");
+                    sb.append(String.format(I18n.t("result.solow.scenario_start"), start.optDouble("output")));
+                    sb.append(String.format(I18n.t("result.solow.scenario_end"), end.optDouble("output")));
                     sb.append("\n");
                 }
             }
         }
 
         if (sb.length() == 0) {
-            sb.append("Нет данных для отображения (Solow Growth).");
+            sb.append(I18n.t("result.solow.no_data"));
         }
 
         return sb.toString().trim();

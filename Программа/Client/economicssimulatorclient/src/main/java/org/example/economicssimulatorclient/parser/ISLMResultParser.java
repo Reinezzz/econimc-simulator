@@ -1,5 +1,6 @@
 package org.example.economicssimulatorclient.parser;
 
+import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,9 +16,9 @@ public class ISLMResultParser implements ResultParser {
             // Равновесие
             JSONObject equilibrium = islm.optJSONObject("equilibrium");
             if (equilibrium != null) {
-                sb.append("Равновесие IS-LM:\n");
-                sb.append(String.format("  • Ставка: %.4f\n", equilibrium.optDouble("rate")));
-                sb.append(String.format("  • Доход: %.2f\n", equilibrium.optDouble("income")));
+                sb.append(I18n.t("result.islm.equilibrium_title")).append("\n");
+                sb.append(String.format(I18n.t("result.islm.rate"), equilibrium.optDouble("rate")));
+                sb.append(String.format(I18n.t("result.islm.income"), equilibrium.optDouble("income")));
                 sb.append("\n");
             }
 
@@ -30,14 +31,14 @@ public class ISLMResultParser implements ResultParser {
                 JSONObject lmStart = lmCurve.getJSONObject(0);
                 JSONObject lmEnd = lmCurve.getJSONObject(lmCurve.length() - 1);
 
-                sb.append("Кривая IS:\n");
-                sb.append(String.format("  • Начало: ставка %.4f, доход %.2f\n", isStart.optDouble("rate"), isStart.optDouble("income")));
-                sb.append(String.format("  • Конец:  ставка %.4f, доход %.2f\n", isEnd.optDouble("rate"), isEnd.optDouble("income")));
+                sb.append(I18n.t("result.islm.is_curve_title")).append("\n");
+                sb.append(String.format(I18n.t("result.islm.curve_start"), isStart.optDouble("rate"), isStart.optDouble("income")));
+                sb.append(String.format(I18n.t("result.islm.curve_end"), isEnd.optDouble("rate"), isEnd.optDouble("income")));
                 sb.append("\n");
 
-                sb.append("Кривая LM:\n");
-                sb.append(String.format("  • Начало: ставка %.4f, доход %.2f\n", lmStart.optDouble("rate"), lmStart.optDouble("income")));
-                sb.append(String.format("  • Конец:  ставка %.4f, доход %.2f\n", lmEnd.optDouble("rate"), lmEnd.optDouble("income")));
+                sb.append(I18n.t("result.islm.lm_curve_title")).append("\n");
+                sb.append(String.format(I18n.t("result.islm.curve_start"), lmStart.optDouble("rate"), lmStart.optDouble("income")));
+                sb.append(String.format(I18n.t("result.islm.curve_end"), lmEnd.optDouble("rate"), lmEnd.optDouble("income")));
                 sb.append("\n");
             }
         }
@@ -49,9 +50,9 @@ public class ISLMResultParser implements ResultParser {
             if (policy != null && policy.length() > 0) {
                 double startIncome = policy.getJSONObject(0).optDouble("income");
                 double endIncome = policy.getJSONObject(policy.length() - 1).optDouble("income");
-                sb.append("Динамика дохода под действием политики:\n");
-                sb.append(String.format("  • Начало: %.2f\n", startIncome));
-                sb.append(String.format("  • Конец:  %.2f\n", endIncome));
+                sb.append(I18n.t("result.islm.dynamics_title")).append("\n");
+                sb.append(String.format(I18n.t("result.islm.dynamics_start"), startIncome));
+                sb.append(String.format(I18n.t("result.islm.dynamics_end"), endIncome));
                 sb.append("\n");
             }
         }
@@ -61,13 +62,13 @@ public class ISLMResultParser implements ResultParser {
         if (surface != null) {
             JSONArray slices = surface.optJSONArray("slices");
             if (slices != null && slices.length() > 0) {
-                sb.append("Диапазон поверхностей IS-LM:\n");
+                sb.append(I18n.t("result.islm.surface_title")).append("\n");
                 for (int i = 0; i < slices.length(); i++) {
                     JSONArray slice = slices.getJSONArray(i);
                     if (slice.length() > 0) {
                         JSONObject start = slice.getJSONObject(0);
                         JSONObject end = slice.getJSONObject(slice.length() - 1);
-                        sb.append(String.format("  • Срез %d: от (%.4f, %.2f) до (%.4f, %.2f)\n",
+                        sb.append(String.format(I18n.t("result.islm.slice"),
                                 i + 1,
                                 start.optDouble("rate"), start.optDouble("income"),
                                 end.optDouble("rate"), end.optDouble("income")));
@@ -79,7 +80,7 @@ public class ISLMResultParser implements ResultParser {
 
         // Если ничего не извлечено, выводим предупреждение
         if (sb.length() == 0) {
-            sb.append("Нет данных для отображения (IS-LM).");
+            sb.append(I18n.t("result.islm.no_data"));
         }
 
         return sb.toString().trim();
