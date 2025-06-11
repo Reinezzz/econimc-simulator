@@ -2,64 +2,99 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.economicssimulatorclient.controller.DocumentController"
             stylesheets="@documents.css"
             styleClass="screen">
 
-    <!-- Top bar -->
     <top>
+
         <VBox>
+
             <HBox styleClass="top-bar">
+
                 <Button fx:id="backButton" text="%common.back" styleClass="topbar-button"/>
+
                 <Region HBox.hgrow="ALWAYS"/>
+
                 <Button fx:id="mainButton" text="%main.title" styleClass="topbar-button"/>
+
             </HBox>
+
             <Separator styleClass="top-separator"/>
+
         </VBox>
+
     </top>
 
-    <!-- Контент -->
     <center>
-        <VBox styleClass="content-pane" alignment="TOP_CENTER">
-            <HBox  alignment="CENTER">
-                <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="%docs.saved" styleClass="page-title" alignment="CENTER"/>
-                <Region HBox.hgrow="ALWAYS"/>
-            </HBox>
-                <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-container" VBox.vgrow="ALWAYS">
-                    <GridPane fx:id="tableGrid"
-                              styleClass="table-grid"
-                              gridLinesVisible="true">
-                        <columnConstraints>
-                            <ColumnConstraints minWidth="60" maxWidth="60"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="180"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="260"/>
-                            <ColumnConstraints minWidth="150" maxWidth="150"/>
-                        </columnConstraints>
-                    </GridPane>
 
-                </ScrollPane>
+        <VBox styleClass="content-pane" alignment="TOP_CENTER">
+
+            <HBox alignment="CENTER">
+
+                <ComboBox fx:id="typeComboBox" styleClass="result-combo"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label text="%docs.saved" styleClass="page-title" alignment="CENTER"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+            </HBox>
+
+            <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="table-container" VBox.vgrow="ALWAYS">
+
+                <GridPane fx:id="tableGrid" styleClass="table-grid" gridLinesVisible="true">
+
+                    <columnConstraints>
+
+                        <ColumnConstraints minWidth="60" maxWidth="60"/>
+
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="180"/>
+
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="260"/>
+
+                        <ColumnConstraints minWidth="150" maxWidth="150"/>
+
+                    </columnConstraints>
+
+                </GridPane>
+
+            </ScrollPane>
+
             <Label fx:id="statusLabel" styleClass="status-label"/>
+
         </VBox>
+
     </center>
 
-    <!-- Нижняя панель -->
     <bottom>
+
         <VBox>
+
             <Separator styleClass="bottom-separator"/>
+
             <HBox styleClass="bottom-bar">
+
                 <Region HBox.hgrow="ALWAYS"/>
+
                 <HBox styleClass="bottom-center-buttons" spacing="24">
-                    <Button fx:id="selectButton"  text="%docs.select"  styleClass="topbar-button"/>
-                    <Button fx:id="addButton"     text="%docs.add" styleClass="topbar-button"/>
-                    <Button fx:id="deleteButton"  text="%docs.delete"  styleClass="danger-button"/>
+
+                    <Button fx:id="selectButton" text="%docs.select" styleClass="topbar-button"/>
+
+                    <Button fx:id="addButton" text="%docs.add" styleClass="topbar-button"/>
+
+                    <Button fx:id="deleteButton" text="%docs.delete" styleClass="danger-button"/>
+
                 </HBox>
+
                 <Region HBox.hgrow="ALWAYS"/>
+
             </HBox>
+
         </VBox>
+
     </bottom>
+
 </BorderPane>

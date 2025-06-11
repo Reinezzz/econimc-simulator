@@ -10,9 +10,6 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для модели CAPM (Capital Asset Pricing Model).
- */
 public class CAPMChartBuilder implements ChartDrawer {
 
     @Override
@@ -94,10 +91,6 @@ public class CAPMChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. Линия рынка ценных бумаг (SML)
-     * chartData: "sml": List<Map<String, Number>> (x = "risk" (бета), y = "return")
-     */
     private Node buildSMLChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -124,11 +117,6 @@ public class CAPMChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. Scatter plot портфелей — эффективная граница Марковица
-     * chartData: "portfolios": List<Map<String, Number>> (x = "risk" (stddev), y = "return")
-     * Опционально: "frontier": List<Map<String, Number>> — сама эффективная граница
-     */
     private Node buildEfficientFrontierChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -139,7 +127,6 @@ public class CAPMChartBuilder implements ChartDrawer {
         chart.setTitle(I18n.t("chart.capm.efficient_frontier.title"));
         chart.setAnimated(false);
 
-        // Сами портфели
         if (chartData.containsKey("portfolios")) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get("portfolios");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -153,7 +140,6 @@ public class CAPMChartBuilder implements ChartDrawer {
             }
             chart.getData().add(series);
         }
-        // Эффективная граница (линия)
         if (chartData.containsKey("frontier")) {
             List<Map<String, Number>> frontier = (List<Map<String, Number>>) chartData.get("frontier");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -165,16 +151,11 @@ public class CAPMChartBuilder implements ChartDrawer {
                     series.getData().add(new XYChart.Data<>(sigma, ret));
                 }
             }
-            // LineChart бы выглядел красивее, но для scatter добавляем как отдельную серию
             chart.getData().add(series);
         }
         return chart;
     }
 
-    /**
-     * 3. Столбчатая диаграмма — декомпозиция доходности (альфа, бета)
-     * chartData: "decomposition": List<Map<String, Object>> с "label", "alpha", "beta"
-     */
     private Node buildDecompositionChart(Map<String, Object> chartData) {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();

@@ -14,10 +14,6 @@ import org.example.economicssimulatorclient.util.Validator;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-/**
- * Контроллер для экрана регистрации нового пользователя.
- * Обеспечивает валидацию и логику пошаговой регистрации с подтверждением email.
- */
 public class RegistrationController extends BaseController {
 
     @FXML
@@ -35,10 +31,6 @@ public class RegistrationController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
-    /**
-     * Обрабатывает попытку регистрации пользователя, валидацию полей,
-     * отправку кода и подтверждение email.
-     */
     @FXML
     void doRegister() {
         statusLabel.setText("");
@@ -104,12 +96,9 @@ public class RegistrationController extends BaseController {
         }));
     }
 
-    /**
-     * Переход к экрану авторизации.
-     */
     @FXML
     void openLogin() {
-        SceneManager.switchTo("authorization.fxml",  c -> {
+        SceneManager.switchTo("authorization.fxml", c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();
         });
@@ -117,16 +106,12 @@ public class RegistrationController extends BaseController {
 
     @Override
     public void clearFields() {
-        if(usernameField != null) usernameField.clear();
-        if(emailField != null) emailField.clear();
-        if(passwordField != null) passwordField.clear();
-        if(repeatPasswordField != null) repeatPasswordField.clear();
+        if (usernameField != null) usernameField.clear();
+        if (emailField != null) emailField.clear();
+        if (passwordField != null) passwordField.clear();
+        if (repeatPasswordField != null) repeatPasswordField.clear();
     }
 
-    /**
-     * Открывает диалог подтверждения email-кода при регистрации.
-     * @return введенный пользователем код, либо null при отмене
-     */
     String showVerificationDialog() {
         try {
             ResourceBundle bundle = I18n.bundle;

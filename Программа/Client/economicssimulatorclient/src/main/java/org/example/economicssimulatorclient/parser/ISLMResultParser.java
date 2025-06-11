@@ -13,7 +13,6 @@ public class ISLMResultParser implements ResultParser {
 
         JSONObject islm = root.optJSONObject("is_lm");
         if (islm != null) {
-            // Равновесие
             JSONObject equilibrium = islm.optJSONObject("equilibrium");
             if (equilibrium != null) {
                 sb.append(I18n.t("result.islm.equilibrium_title")).append("\n");
@@ -22,10 +21,9 @@ public class ISLMResultParser implements ResultParser {
                 sb.append("\n");
             }
 
-            // Диапазон доходов/ставок по IS/LM (выводим крайние значения)
             JSONArray isCurve = islm.optJSONArray("IS");
             JSONArray lmCurve = islm.optJSONArray("LM");
-            if (isCurve != null && isCurve.length() > 0 && lmCurve != null && lmCurve.length() > 0) {
+            if (isCurve != null && !isCurve.isEmpty() && lmCurve != null && !lmCurve.isEmpty()) {
                 JSONObject isStart = isCurve.getJSONObject(0);
                 JSONObject isEnd = isCurve.getJSONObject(isCurve.length() - 1);
                 JSONObject lmStart = lmCurve.getJSONObject(0);
@@ -43,11 +41,10 @@ public class ISLMResultParser implements ResultParser {
             }
         }
 
-        // Timeseries: политика во времени
         JSONObject timeseries = root.optJSONObject("timeseries");
         if (timeseries != null) {
             JSONArray policy = timeseries.optJSONArray("policy");
-            if (policy != null && policy.length() > 0) {
+            if (policy != null && !policy.isEmpty()) {
                 double startIncome = policy.getJSONObject(0).optDouble("income");
                 double endIncome = policy.getJSONObject(policy.length() - 1).optDouble("income");
                 sb.append(I18n.t("result.islm.dynamics_title")).append("\n");
@@ -57,15 +54,14 @@ public class ISLMResultParser implements ResultParser {
             }
         }
 
-        // Поверхность (если есть несколько срезов)
         JSONObject surface = root.optJSONObject("surface");
         if (surface != null) {
             JSONArray slices = surface.optJSONArray("slices");
-            if (slices != null && slices.length() > 0) {
+            if (slices != null && !slices.isEmpty()) {
                 sb.append(I18n.t("result.islm.surface_title")).append("\n");
                 for (int i = 0; i < slices.length(); i++) {
                     JSONArray slice = slices.getJSONArray(i);
-                    if (slice.length() > 0) {
+                    if (!slice.isEmpty()) {
                         JSONObject start = slice.getJSONObject(0);
                         JSONObject end = slice.getJSONObject(slice.length() - 1);
                         sb.append(String.format(I18n.t("result.islm.slice"),
@@ -78,8 +74,7 @@ public class ISLMResultParser implements ResultParser {
             }
         }
 
-        // Если ничего не извлечено, выводим предупреждение
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.islm.no_data"));
         }
 

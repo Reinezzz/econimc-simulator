@@ -10,9 +10,6 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для модели Блэка-Шоулза.
- */
 public class BlackScholesChartBuilder implements ChartDrawer {
 
     @Override
@@ -69,11 +66,6 @@ public class BlackScholesChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. "3D поверхность" — цена опциона от цены актива и времени
-     * chartData: ключи "surface" : List<List<Map<String, Number>>>
-     *  - Каждый List<Map<>>: серия по времени или цене (например, timeSlices)
-     */
     private Node buildSurfaceChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -103,10 +95,6 @@ public class BlackScholesChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. "Временной распад" — цена опциона по времени
-     * chartData: "decay": List<Map<String, Number>> с полями "t" (time), "C" (цена)
-     */
     private Node buildTimeDecayChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -133,10 +121,6 @@ public class BlackScholesChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 3. "Греки опциона" — чувствительность к параметрам (дельта, тета, вега, гамма)
-     * chartData: "greeks": Map<String, List<Map<String, Number>>> (ключ — грек, значения — точки)
-     */
     private Node buildGreeksChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();

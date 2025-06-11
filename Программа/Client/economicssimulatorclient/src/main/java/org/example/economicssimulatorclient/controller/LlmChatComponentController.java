@@ -21,17 +21,21 @@ public class LlmChatComponentController {
 
     @FXML
     VBox root;
-    @FXML private Label titleLabel;
+    @FXML
+    private Label titleLabel;
     @Getter
-    @FXML private VBox chatArea;
-    @FXML private ScrollPane chatScroll;
-    @FXML private TextField inputField;
-    @FXML private VBox sendButton;
+    @FXML
+    private VBox chatArea;
+    @FXML
+    private ScrollPane chatScroll;
+    @FXML
+    private TextField inputField;
+    @FXML
+    private VBox sendButton;
 
-    // История сообщений (в рантайме)
     private final List<Message> chatHistory = new ArrayList<>();
+    @Setter
     private Runnable onAssistantMessageAppended;
-    // Внешний контроллер обязан передать сюда supplier с правильным LlmChatRequestDto
     @Setter
     private Supplier<LlmChatRequestDto> requestSupplier;
 
@@ -49,9 +53,7 @@ public class LlmChatComponentController {
         sendButton.setDisable(true);
         inputField.setDisable(true);
 
-        // Получаем актуальный request с данными (параметры, визуализации и т.д.)
         LlmChatRequestDto req = requestSupplier.get();
-        // Переписываем сообщение пользователя на то, что ввели сейчас
         req = new LlmChatRequestDto(
                 req.modelId(),
                 text,
@@ -75,9 +77,6 @@ public class LlmChatComponentController {
                 });
             }
         }).start();
-    }
-    public void setOnAssistantMessageAppended(Runnable listener) {
-        this.onAssistantMessageAppended = listener;
     }
 
 
@@ -108,16 +107,15 @@ public class LlmChatComponentController {
         Platform.runLater(() -> chatScroll.setVvalue(1.0));
     }
 
-    /** Позволяет очистить историю чата извне (например, при переключении модели) */
     public void clear() {
         chatHistory.clear();
         chatArea.getChildren().clear();
     }
 
-    // Внутренняя структура для истории (не сериализуется)
     private static class Message {
         final String role;
         final String text;
+
         Message(String role, String text) {
             this.role = role;
             this.text = text;

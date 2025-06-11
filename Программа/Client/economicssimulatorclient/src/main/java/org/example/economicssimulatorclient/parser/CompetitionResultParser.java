@@ -10,12 +10,11 @@ public class CompetitionResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
 
-        // 1. Кривые прибыли для конкуренции и монополии
         JSONObject profitCurves = root.optJSONObject("profit_curves");
         if (profitCurves != null) {
             JSONArray competition = profitCurves.optJSONArray("competition");
             JSONArray monopoly = profitCurves.optJSONArray("monopoly");
-            if (competition != null && monopoly != null && competition.length() > 0 && monopoly.length() > 0) {
+            if (competition != null && monopoly != null && !competition.isEmpty() && !monopoly.isEmpty()) {
                 JSONObject compMax = competition.getJSONObject(competition.length() - 1);
                 JSONObject monoMax = monopoly.getJSONObject(0);
                 sb.append(I18n.t("result.competition.profit_title")).append("\n");
@@ -26,7 +25,6 @@ public class CompetitionResultParser implements ResultParser {
             }
         }
 
-        // 2. Гистограмма сравнения
         JSONObject hist = root.optJSONObject("comparison_hist");
         if (hist != null) {
             JSONArray categories = hist.optJSONArray("categories");
@@ -43,7 +41,6 @@ public class CompetitionResultParser implements ResultParser {
             }
         }
 
-        // 3. Мертвый груз (deadweight area)
         JSONObject deadweight = root.optJSONObject("deadweight_area");
         if (deadweight != null) {
             double monopolyQ = deadweight.optDouble("monopolyQ", Double.NaN);
@@ -53,7 +50,7 @@ public class CompetitionResultParser implements ResultParser {
             sb.append(String.format(I18n.t("result.competition.deadweight_competition"), competitionQ));
             JSONArray demand = deadweight.optJSONArray("demand");
             JSONArray supply = deadweight.optJSONArray("supply");
-            if (demand != null && supply != null && demand.length() > 0 && supply.length() > 0) {
+            if (demand != null && supply != null && !demand.isEmpty() && !supply.isEmpty()) {
                 JSONObject dFirst = demand.getJSONObject(0);
                 JSONObject sFirst = supply.getJSONObject(0);
                 sb.append(String.format(I18n.t("result.competition.deadweight_start"),
@@ -61,7 +58,7 @@ public class CompetitionResultParser implements ResultParser {
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.competition.no_data"));
         }
 

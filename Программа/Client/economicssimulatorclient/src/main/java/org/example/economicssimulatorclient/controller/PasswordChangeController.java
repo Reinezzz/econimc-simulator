@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.example.economicssimulatorclient.dto.PasswordResetConfirm;
 import org.example.economicssimulatorclient.dto.PasswordResetRequest;
 import org.example.economicssimulatorclient.service.AuthService;
@@ -15,10 +14,6 @@ import javafx.util.Pair;
 
 import java.util.ResourceBundle;
 
-/**
- * Контроллер для экрана сброса пароля пользователя.
- * Позволяет отправить код на email и сменить пароль через диалоговое окно.
- */
 public class PasswordChangeController extends BaseController {
 
     @FXML
@@ -30,10 +25,6 @@ public class PasswordChangeController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
-    /**
-     * Обрабатывает отправку запроса на сброс пароля по email.
-     * Вызывает открытие диалога для подтверждения кода.
-     */
     @FXML
     void sendCode() {
         statusLabel.setText("");
@@ -60,10 +51,6 @@ public class PasswordChangeController extends BaseController {
         }).start();
     }
 
-    /**
-     * Открывает диалог подтверждения сброса пароля (код + новый пароль).
-     * @param email email пользователя
-     */
     void openDialog(String email) {
         try {
             ResourceBundle bundle = I18n.bundle;
@@ -87,7 +74,6 @@ public class PasswordChangeController extends BaseController {
                 return null;
             });
 
-            // При закрытии/отмене — удаляем токен на сервере
             dialog.setOnCloseRequest(ev -> {
                 if (dialog.getResult() == null) {
                     new Thread(() -> auth.cancelPasswordReset(email)).start();
@@ -99,19 +85,15 @@ public class PasswordChangeController extends BaseController {
                 Pair<String, String> pair = result.get();
                 confirmReset(email, pair.getKey(), pair.getValue());
             } else {
-                // После отмены ничего не делаем (или можно вернуть на экран авторизации)
             }
         } catch (Exception ex) {
             showError(statusLabel, tr("error.base") + ex.getMessage());
         }
     }
 
-    /**
-     * Переход назад на экран авторизации.
-     */
     @FXML
     void goBack() {
-        SceneManager.switchTo("authorization.fxml",   c -> {
+        SceneManager.switchTo("authorization.fxml", c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();
         });
@@ -119,15 +101,9 @@ public class PasswordChangeController extends BaseController {
 
     @Override
     public void clearFields() {
-        if(emailField != null) emailField.clear();
+        if (emailField != null) emailField.clear();
     }
 
-    /**
-     * Подтверждение смены пароля: отправляет код и новый пароль на сервер.
-     * @param email email пользователя
-     * @param code  одноразовый код из письма
-     * @param password новый пароль
-     */
     void confirmReset(String email, String code, String password) {
         statusLabel.setText("");
         new Thread(() -> {
@@ -135,7 +111,7 @@ public class PasswordChangeController extends BaseController {
                 auth.resetPasswordConfirm(new PasswordResetConfirm(email, code, password));
                 Platform.runLater(() -> {
                     showSuccess(statusLabel, "msg.password_changed");
-                    SceneManager.switchTo("authorization.fxml",   c -> {
+                    SceneManager.switchTo("authorization.fxml", c -> {
                         ((BaseController) c).clearStatusLabel();
                         ((BaseController) c).clearFields();
                     });

@@ -1,7 +1,6 @@
 package org.example.economicssimulatorclient.service;
 
 import javafx.application.Platform;
-import org.example.economicssimulatorclient.controller.AuthorizationController;
 import org.example.economicssimulatorclient.controller.BaseController;
 import org.example.economicssimulatorclient.util.SceneManager;
 import org.example.economicssimulatorclient.util.SessionManager;
@@ -9,10 +8,6 @@ import org.example.economicssimulatorclient.util.SessionManager;
 import java.io.IOException;
 import java.net.URI;
 
-/**
- * Базовый сервис для основного экрана и всех его потомков.
- * Все методы post/get всегда авторизованы, при 401 — попытка refresh токена.
- */
 public class MainService extends BaseService {
 
     @Override

@@ -11,12 +11,11 @@ public class SolowGrowthResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
 
-        // 1. Основная траектория капитала и выпуска (выводим старт и конец)
         JSONObject trajectories = root.optJSONObject("trajectories");
         if (trajectories != null) {
             JSONArray capitalArr = trajectories.optJSONArray("capital");
             JSONArray outputArr = trajectories.optJSONArray("output");
-            if (capitalArr != null && capitalArr.length() > 0 && outputArr != null && outputArr.length() > 0) {
+            if (capitalArr != null && !capitalArr.isEmpty() && outputArr != null && !outputArr.isEmpty()) {
                 JSONObject capStart = capitalArr.getJSONObject(0);
                 JSONObject capEnd = capitalArr.getJSONObject(capitalArr.length() - 1);
                 JSONObject outStart = outputArr.getJSONObject(0);
@@ -33,11 +32,10 @@ public class SolowGrowthResultParser implements ResultParser {
             }
         }
 
-        // 2. Фазовые изменения капитала
         JSONObject phase = root.optJSONObject("phase");
         if (phase != null) {
             JSONArray phaseArr = phase.optJSONArray("phase");
-            if (phaseArr != null && phaseArr.length() > 0) {
+            if (phaseArr != null && !phaseArr.isEmpty()) {
                 JSONObject phStart = phaseArr.getJSONObject(0);
                 JSONObject phEnd = phaseArr.getJSONObject(phaseArr.length() - 1);
 
@@ -50,14 +48,12 @@ public class SolowGrowthResultParser implements ResultParser {
             }
         }
 
-        // 3. Сценарии для выпуска (baseline, high_savings)
         JSONObject statics = root.optJSONObject("statics");
         if (statics != null) {
             JSONObject scenarios = statics.optJSONObject("scenarios");
             if (scenarios != null) {
-                // baseline
                 JSONArray baseline = scenarios.optJSONArray("baseline");
-                if (baseline != null && baseline.length() > 0) {
+                if (baseline != null && !baseline.isEmpty()) {
                     JSONObject start = baseline.getJSONObject(0);
                     JSONObject end = baseline.getJSONObject(baseline.length() - 1);
                     sb.append(I18n.t("result.solow.baseline_title")).append("\n");
@@ -65,9 +61,8 @@ public class SolowGrowthResultParser implements ResultParser {
                     sb.append(String.format(I18n.t("result.solow.scenario_end"), end.optDouble("output")));
                     sb.append("\n");
                 }
-                // high_savings (если есть)
                 JSONArray highSavings = scenarios.optJSONArray("high_savings");
-                if (highSavings != null && highSavings.length() > 0) {
+                if (highSavings != null && !highSavings.isEmpty()) {
                     JSONObject start = highSavings.getJSONObject(0);
                     JSONObject end = highSavings.getJSONObject(highSavings.length() - 1);
                     sb.append(I18n.t("result.solow.high_savings_title")).append("\n");
@@ -78,7 +73,7 @@ public class SolowGrowthResultParser implements ResultParser {
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.solow.no_data"));
         }
 

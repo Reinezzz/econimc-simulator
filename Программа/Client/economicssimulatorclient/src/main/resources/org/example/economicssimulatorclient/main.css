@@ -2,11 +2,10 @@
     -fx-background-color: #fff;
 }
 
-/* TOP BAR */
 .top-bar {
     -fx-background-color: transparent;
     -fx-pref-height: 60px;
-    -fx-padding: 0 0 0 32;     /* ТОЛЬКО слева, как у блока моделей */
+    -fx-padding: 0 0 0 32;
     -fx-alignment: center-left;
 }
 .status-label {
@@ -36,8 +35,6 @@
     -fx-min-height: 1;
 }
 
-
-/* SIDE PANEL */
 .side-panel { -fx-padding: 52 32 0 32; }
 .section-title {
     -fx-font-size: 32px;
@@ -47,7 +44,6 @@
     -fx-padding: 0 0 32 0;
 }
 
-/* MODEL BUTTONS */
 .model-list-button {
     -fx-background-color: #fff;
     -fx-border-color: #cdc9c9;
@@ -66,7 +62,6 @@
 }
 .model-list-button:hover { -fx-background-color: #f5f5ff; }
 
-/* GRID & TILES */
 .main-grid { -fx-hgap: 24; -fx-vgap: 24; -fx-padding: 32 32 32 32; -fx-alignment: top-center; }
 .tile-button {
     -fx-background-color: #1e0acb;
@@ -89,7 +84,6 @@
     -fx-pref-height: 500px;
 }
 
-/* SEPARATOR */
 .separator {
     -fx-background-color: #cdc9c9;
     -fx-pref-width: 1;

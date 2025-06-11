@@ -10,9 +10,6 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для модели роста Солоу.
- */
 public class SolowGrowthChartBuilder implements ChartDrawer {
 
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
@@ -68,11 +65,6 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. Экспоненциальный график — траектории роста капитала и выпуска.
-     * chartData: "capital": List<Map<String, Number>> ("time", "capital")
-     *            "output": List<Map<String, Number>> ("time", "output")
-     */
     private Node buildTrajectoriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -110,10 +102,6 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. Фазовая диаграмма — сходимость к устойчивому состоянию.
-     * chartData: "phase": List<Map<String, Number>> ("capital", "capital_change")
-     */
     private Node buildPhaseDiagram(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -139,10 +127,6 @@ public class SolowGrowthChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 3. Сравнительная статика — влияние параметров на долгосрочный рост.
-     * chartData: "scenarios": Map<String, List<Map<String, Number>>> (ключ - сценарий, value - List<"time","output">)
-     */
     private Node buildComparativeStaticsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();

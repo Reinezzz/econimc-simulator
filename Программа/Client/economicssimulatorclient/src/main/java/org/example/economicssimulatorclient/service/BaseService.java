@@ -8,18 +8,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-/**
- * Базовый сервис для выполнения HTTP-запросов к серверу API.
- * Реализует общую логику GET и POST с учетом авторизации и локализации.
- */
 public abstract class BaseService {
 
-    /** HTTP-клиент для отправки запросов. */
     protected HttpClient httpClient = HttpClientProvider.instance();
 
-    /**
-     * Выполнить POST-запрос и вернуть десериализованный ответ.
-     */
     protected <T> T post(
             URI baseUri,
             String endpoint,
@@ -54,9 +46,6 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
-    /**
-     * Выполнить GET-запрос и вернуть десериализованный ответ.
-     */
     protected <T> T get(
             URI baseUri,
             String endpoint,
@@ -83,9 +72,6 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
-    /**
-     * Выполнить PUT-запрос и вернуть десериализованный ответ.
-     */
     protected <T> T put(
             URI baseUri,
             String endpoint,
@@ -120,9 +106,6 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
-    /**
-     * Выполнить DELETE-запрос.
-     */
     protected void delete(
             URI baseUri,
             String endpoint,

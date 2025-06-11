@@ -10,7 +10,6 @@ public class CAPMResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
 
-        // SML: Security Market Line
         JSONObject sml = root.optJSONObject("sml");
         if (sml != null) {
             JSONArray smlArr = sml.optJSONArray("sml");
@@ -27,11 +26,10 @@ public class CAPMResultParser implements ResultParser {
             }
         }
 
-        // Efficient Frontier
         JSONObject frontier = root.optJSONObject("efficient_frontier");
         if (frontier != null) {
             JSONArray portfolios = frontier.optJSONArray("portfolios");
-            if (portfolios != null && portfolios.length() > 0) {
+            if (portfolios != null && !portfolios.isEmpty()) {
                 JSONObject min = portfolios.getJSONObject(0);
                 JSONObject max = portfolios.getJSONObject(portfolios.length() - 1);
                 double riskMin = min.optDouble("risk", Double.NaN);
@@ -43,12 +41,10 @@ public class CAPMResultParser implements ResultParser {
                         retMin * 100, retMax * 100, riskMin, riskMax));
             }
         }
-
-        // Decomposition: alpha, beta, labels
         JSONObject decomposition = root.optJSONObject("decomposition");
         if (decomposition != null) {
             JSONArray arr = decomposition.optJSONArray("decomposition");
-            if (arr != null && arr.length() > 0) {
+            if (arr != null && !arr.isEmpty()) {
                 sb.append("\n").append(I18n.t("result.capm.decomposition_title")).append("\n");
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject comp = arr.getJSONObject(i);
@@ -60,7 +56,7 @@ public class CAPMResultParser implements ResultParser {
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.capm.no_data"));
         }
 

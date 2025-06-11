@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 
 <BorderPane xmlns:fx="http://javafx.com/javafx"
             fx:controller="org.example.economicssimulatorclient.controller.ModelResultController"
@@ -22,13 +20,10 @@
 
     <center>
         <HBox styleClass="main-content">
-            <!-- Левый блок: Параметры -->
             <ScrollPane fitToWidth="true" styleClass="parameter-scroll">
                 <VBox fx:id="parameterList" styleClass="parameter-list"/>
             </ScrollPane>
             <Separator orientation="VERTICAL" styleClass="v-separator"/>
-
-            <!-- Центральный блок: Результат вычислений -->
             <VBox styleClass="result-block">
                 <HBox styleClass="result-row">
                     <Label text="%result.result" styleClass="result-label"/>

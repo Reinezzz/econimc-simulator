@@ -7,7 +7,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -18,9 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для Модели спроса и предложения.
- */
 public class DemandSupplyChartBuilder implements ChartDrawer {
 
     @Override
@@ -45,24 +41,17 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
                 return errorPane;
         }
 
-        // Если это StackPane (например, есть overlay) — стилизуем сам StackPane,
-        // а внутри ищем LineChart и стилизуем его!
         if (node instanceof StackPane) {
             StackPane pane = (StackPane) node;
             pane.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #fff;");
             pane.setPadding(new Insets(0));
             pane.setPrefSize(750, 500);
 
-            // Стилизуем LineChart внутри (но не возвращаем его, а только стилизуем)
             pane.getChildren().stream()
                     .filter(child -> child instanceof LineChart)
                     .forEach(child -> styleChart((LineChart<?, ?>) child));
-
-            // Вернуть сам StackPane!
             return pane;
         }
-
-        // Если просто LineChart — стилизуем его:
         if (node instanceof LineChart) {
             styleChart((LineChart<?, ?>) node);
         }
@@ -96,15 +85,6 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-
-
-
-    /**
-     * 1. Линейный график - кривые спроса и предложения с точкой равновесия.
-     * chartData: "demand": List<Map<String, Number>> (x="quantity", y="price")
-     *            "supply": List<Map<String, Number>> (x="quantity", y="price")
-     *            "equilibrium": Map<String, Number> ("quantity", "price")
-     */
     private Node buildSupplyDemandChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -118,7 +98,6 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         addSeries(chart, chartData, "demand", I18n.t("chart.demand"));
         addSeries(chart, chartData, "supply", I18n.t("chart.supply"));
 
-        // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
             Map<String, Number> eq = (Map<String, Number>) chartData.get("equilibrium");
             Number q = eq.get("quantity");
@@ -146,7 +125,6 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         addSeries(chart, chartData, "demand", I18n.t("chart.demand"));
         addSeries(chart, chartData, "supply", I18n.t("chart.supply"));
 
-        // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
             Map<String, Number> eq = (Map<String, Number>) chartData.get("equilibrium");
             Number q = eq.get("quantity");
@@ -161,11 +139,9 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
 
         StackPane root = new StackPane(chart);
 
-        // Список полигонов для повторного построения при resize
         List<Polygon> polygons = new ArrayList<>();
 
         Runnable updatePolygons = () -> {
-            // Удалить старые полигоны
             root.getChildren().removeAll(polygons);
             polygons.clear();
 
@@ -182,17 +158,14 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
             root.getChildren().addAll(polygons);
         };
 
-        // Ждём layout, затем рисуем полигоны и подписываемся на изменение осей
         chart.layout();
         Platform.runLater(updatePolygons);
 
-        // Реакция на изменение границ осей (при изменении размера, данных и т.д.)
         xAxis.lowerBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
         xAxis.upperBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
         yAxis.lowerBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
         yAxis.upperBoundProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
 
-        // Ещё можно добавить listener на widthProperty/heightProperty chart, если хочется "железобетонно"
         chart.widthProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
         chart.heightProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(updatePolygons));
 
@@ -214,15 +187,7 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         return poly;
     }
 
-    /**
-     * 3. Анимация сдвига кривых — как изменения параметров влияют на равновесие.
-     * chartData:
-     *   - "demand_shifts": List<List<Map<String, Number>>>
-     *   - "supply_shifts": List<List<Map<String, Number>>>
-     *   - "equilibriums": List<Map<String, Number>>
-     */
     private Node buildShiftAnimation(Map<String, Object> chartData) {
-        // Всё делаем поверх LineChart, шаги — по таймеру
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel(I18n.t("chart.quantity"));
@@ -269,8 +234,6 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    // Вспомогательные методы
-
     private void addSeries(LineChart<Number, Number> chart, Map<String, Object> data, String key, String name) {
         if (data.containsKey(key)) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) data.get(key);
@@ -290,19 +253,4 @@ public class DemandSupplyChartBuilder implements ChartDrawer {
         chart.getData().add(series);
     }
 
-    private Polygon makeAreaPolygon(LineChart<Number, Number> chart,
-                                    NumberAxis xAxis, NumberAxis yAxis,
-                                    List<Map<String, Number>> pts, Color color) {
-        Polygon poly = new Polygon();
-        for (Map<String, Number> pt : pts) {
-            double x = xAxis.getDisplayPosition(pt.get("quantity"));
-            double y = yAxis.getDisplayPosition(pt.get("price"));
-            poly.getPoints().addAll(x, y);
-        }
-        poly.setFill(color);
-        poly.setStroke(Color.GRAY);
-        poly.setStrokeWidth(1);
-        poly.setMouseTransparent(true);
-        return poly;
-    }
 }

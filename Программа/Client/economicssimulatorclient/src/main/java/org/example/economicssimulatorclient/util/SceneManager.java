@@ -3,64 +3,30 @@ package org.example.economicssimulatorclient.util;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.example.economicssimulatorclient.controller.BaseController;
-import org.example.economicssimulatorclient.controller.MainController;
 
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Кэширует FXML и переключает root у Scene — без мелькания окна.
- * Управляет загрузкой и переключением сцен приложения.
- */
 public final class SceneManager {
 
-    /**
-     * Главный Stage приложения.
-     */
     private static Stage primary;
-    /**
-     * Кэш для загруженных FXML-деревьев.
-     */
     private static final Map<String, Parent> cache = new HashMap<>();
-    /**
-     * Главная сцена.
-     */
     private static final Scene scene = new Scene(new javafx.scene.Group());
-    /**
-     * Префикс пути к FXML-файлам.
-     */
     public static final String ROOT = "/org/example/economicssimulatorclient/";
 
-    // Добавить в класс SceneManager
     private static final Deque<String> history = new ArrayDeque<>();
     private static String currentFxml = null;
     private static SceneManager INSTANCE = new SceneManager();
 
-
-    /**
-     * Приватный конструктор для запрета создания экземпляров.
-     */
     private SceneManager() {
     }
 
-    /**
-     * Инициализация менеджера сцен (один раз из MainApp).
-     *
-     * @param stage основной Stage приложения
-     */
     public static void init(Stage stage) {
         primary = stage;
         primary.setScene(scene);
     }
 
-    /**
-     * Переключиться на заданный FXML (из ресурсов).
-     *
-     * @param fxml имя FXML-файла
-     */
     public static void switchToWithoutContorller(String fxml) {
         try {
             Parent root = cache.computeIfAbsent(fxml, SceneManager::load);
@@ -71,12 +37,6 @@ public final class SceneManager {
         }
     }
 
-    /**
-     * Загружает и локализует FXML-файл.
-     *
-     * @param fxml имя файла
-     * @return {@link Parent} корневой элемент сцены
-     */
     private static Parent load(String fxml) {
         try {
             I18n.setLocale(Locale.forLanguageTag("ru"));
@@ -90,15 +50,6 @@ public final class SceneManager {
         }
     }
 
-    /**
-     * Переключиться на заданный FXML с передачей контроллеру инициализирующей функции.
-     * Не ломает кэш, работает с root-сценой.
-     * Не кэширует такие сцены!
-     *
-     * @param fxml               имя FXML-файла
-     * @param controllerConsumer действие с контроллером
-     * @param <T>                тип контроллера
-     */
     public static <T> void switchTo(String fxml, java.util.function.Consumer<T> controllerConsumer) {
         try {
             if (currentFxml != null)

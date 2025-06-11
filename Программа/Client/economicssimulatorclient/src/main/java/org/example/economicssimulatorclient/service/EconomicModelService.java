@@ -1,6 +1,5 @@
 package org.example.economicssimulatorclient.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.example.economicssimulatorclient.dto.*;
@@ -12,12 +11,10 @@ import java.util.List;
 
 public class EconomicModelService extends MainService {
 
-    // ВАЖНО: BASE_API должен включать полный путь для клиента, смотри AppConfig.getBaseUrl()
     private static final String BASE_API = "/api/models";
-    private final URI baseUri = URI.create(AppConfig.getBaseUrl() + BASE_API+ "/");
+    private final URI baseUri = URI.create(AppConfig.getBaseUrl() + BASE_API + "/");
     private static final ObjectMapper objectMapper = AppConfig.objectMapper;
 
-    // ===== EconomicModel CRUD =====
 
     public List<EconomicModelDto> getAllModels() throws IOException, InterruptedException {
         String endpoint = "";
@@ -29,9 +26,6 @@ public class EconomicModelService extends MainService {
         String endpoint = String.valueOf(id);
         return get(baseUri, endpoint, EconomicModelDto.class, true, null);
     }
-
-
-    // ===== ModelParameter CRUD =====
 
     public List<ModelParameterDto> getParametersByModelId(Long modelId) throws IOException, InterruptedException {
         String endpoint = modelId + "/parameters";
@@ -45,12 +39,6 @@ public class EconomicModelService extends MainService {
         return put(baseUri, endpoint, dto, ModelParameterDto.class, true, null);
     }
 
-    public void deleteParameter(Long paramId) throws IOException, InterruptedException {
-        String endpoint = "/parameters/" + paramId;
-        super.delete(baseUri, endpoint, true, null);
-    }
-
-    // ===== Calculation =====
 
     public CalculationResponseDto calculate(CalculationRequestDto request) throws IOException, InterruptedException {
         String endpoint = "calculate";

@@ -4,9 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-/**
- * Контроллер диалога ввода кода подтверждения email.
- */
 public class VerificationCodeDialogController extends BaseController {
 
     @FXML
@@ -20,9 +17,6 @@ public class VerificationCodeDialogController extends BaseController {
     @FXML
     ButtonType cancelBtn;
 
-    /**
-     * Инициализация диалога — настройка поведения кнопок.
-     */
     @FXML
     void initialize() {
         Platform.runLater(() -> {
@@ -43,13 +37,9 @@ public class VerificationCodeDialogController extends BaseController {
 
     @Override
     public void clearFields() {
-        if(codeField != null) codeField.clear();
+        if (codeField != null) codeField.clear();
     }
 
-    /**
-     * Получает введённый пользователем код.
-     * @return код подтверждения
-     */
     public String getCode() {
         return codeField.getText().trim();
     }

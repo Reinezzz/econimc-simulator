@@ -10,15 +10,14 @@ public class ConsumerChoiceResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
 
-        // Кривые безразличия
         JSONObject curvesObj = root.optJSONObject("indifference_curves");
         if (curvesObj != null) {
             JSONArray curves = curvesObj.optJSONArray("indifference_curves");
-            if (curves != null && curves.length() > 0) {
+            if (curves != null && !curves.isEmpty()) {
                 sb.append(I18n.t("result.consumer.curves_title")).append("\n");
                 for (int i = 0; i < curves.length(); i++) {
                     JSONArray curve = curves.getJSONArray(i);
-                    if (curve.length() > 0) {
+                    if (!curve.isEmpty()) {
                         JSONObject first = curve.getJSONObject(0);
                         JSONObject last = curve.getJSONObject(curve.length() - 1);
                         double qMin = first.optDouble("quantity", Double.NaN);
@@ -32,12 +31,11 @@ public class ConsumerChoiceResultParser implements ResultParser {
             }
         }
 
-        // Бюджетное ограничение
         JSONArray budgetArr = null;
         if (curvesObj != null) {
             budgetArr = curvesObj.optJSONArray("budget");
         }
-        if (budgetArr != null && budgetArr.length() > 0) {
+        if (budgetArr != null && !budgetArr.isEmpty()) {
             JSONObject first = budgetArr.getJSONObject(0);
             JSONObject last = budgetArr.getJSONObject(budgetArr.length() - 1);
             double qMin = first.optDouble("quantity", Double.NaN);
@@ -48,7 +46,6 @@ public class ConsumerChoiceResultParser implements ResultParser {
             sb.append(String.format(I18n.t("result.consumer.budget"), qMin, qMax, pMin, pMax));
         }
 
-        // Оптимум на карте
         JSONObject optMap = root.optJSONObject("optimum_map");
         if (optMap != null) {
             JSONObject opt = optMap.optJSONObject("optimum");
@@ -60,7 +57,6 @@ public class ConsumerChoiceResultParser implements ResultParser {
             }
         }
 
-        // Эффект дохода и замещения
         JSONObject incomeSubObj = root.optJSONObject("income_substitution");
         if (incomeSubObj != null) {
             JSONArray subArr = incomeSubObj.optJSONArray("substitution");
@@ -83,7 +79,7 @@ public class ConsumerChoiceResultParser implements ResultParser {
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.consumer.no_data"));
         }
 

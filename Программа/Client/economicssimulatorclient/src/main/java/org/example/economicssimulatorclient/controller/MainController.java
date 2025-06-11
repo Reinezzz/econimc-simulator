@@ -14,7 +14,6 @@ import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
 import org.example.economicssimulatorclient.util.SceneManager;
-import org.example.economicssimulatorclient.util.SessionManager;
 
 import java.util.List;
 
@@ -29,21 +28,19 @@ public class MainController extends BaseController {
     private VBox modelList;
 
     @FXML
-    private Button exitButton; // onExitButtonClicked уже реализован, НЕ трогаем!
+    private Button exitButton;
 
     @FXML
     private GridPane mainGrid;
 
-    // Для "Последняя модель"
     @FXML
-    private VBox tileButton; // первая кнопка в mainGrid (fx:id добавлен в FXML)
+    private VBox tileButton;
     @FXML
     private Pane iconLastModel;
 
     @FXML
     protected Label statusLabel;
 
-    // Для хранения id последней открытой модели
     private Long lastModelId = null;
 
     @FXML
@@ -53,7 +50,6 @@ public class MainController extends BaseController {
 
         long lastModelId = LastModelStorage.loadLastModelId();
         tileButton.setDisable(lastModelId == -1);
-        // "Последняя модель" — переход к просмотру последней модели, если есть
         tileButton.setOnMouseClicked(e -> {
             if (lastModelId != -1) {
                 SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(lastModelId));
@@ -69,9 +65,6 @@ public class MainController extends BaseController {
         });
     }
 
-    /**
-     * Загружает список моделей и строит кнопки в левой панели.
-     */
     public void loadModelList() {
         runAsync(() -> {
             try {
@@ -83,9 +76,6 @@ public class MainController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("main.load_error") + ex.getMessage())));
     }
 
-    /**
-     * Динамически создает кнопки для моделей, добавляет тултипы и обработчики перехода.
-     */
     private void populateModelList(List<EconomicModelDto> models) {
         modelList.getChildren().clear();
         for (EconomicModelDto model : models) {
@@ -96,8 +86,6 @@ public class MainController extends BaseController {
             Tooltip.install(btn, tooltip);
             btn.setOnAction(e -> {
                 lastModelId = model.id();
-                // Сохраняем в SessionManager — например, если нужно между сессиями
-                // SessionManager.getInstance().setLastModelId(lastModelId);
                 SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(model.id()));
             });
             modelList.getChildren().add(btn);
@@ -107,18 +95,17 @@ public class MainController extends BaseController {
     @Override
     public void clearFields() {
         clearStatusLabel();
-        // очищать можно поля поиска, если они будут добавлены
     }
 
-    // Обработчик выхода НЕ трогаем!
     @FXML
     private void onExitButtonClicked() {
         new Thread(() -> {
             try {
                 authService.logout();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             Platform.runLater(() -> {
-                SceneManager.switchTo("authorization.fxml",   c -> {
+                SceneManager.switchTo("authorization.fxml", c -> {
                     ((BaseController) c).clearStatusLabel();
                     ((BaseController) c).clearFields();
                 });

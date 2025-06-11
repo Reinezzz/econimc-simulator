@@ -1,9 +1,7 @@
-/* --- Базовый фон для всего окна --- */
 .background-pane {
     -fx-background-color: #f7f7f9;
 }
 
-/* --- Карточка входа --- */
 .card {
     -fx-background-color: #fff;
     -fx-background-radius: 20;
@@ -15,12 +13,10 @@
     -fx-min-width: 680px;
     -fx-max-height: 870;
     -fx-min-height: 800;
-    /* Для центрирования */
     -fx-layout-x: 50%;
     -fx-layout-y: 50%;
 }
 
-/* --- Заголовок --- */
 .title {
     -fx-font-family: "Segoe UI Semibold", "Helvetica", sans-serif;
     -fx-font-size: 38px;
@@ -29,7 +25,6 @@
     -fx-alignment: center;
 }
 
-/* --- Подписи к полям --- */
 .form-label {
     -fx-font-family: "Actor Regular", "Segoe UI", sans-serif;
     -fx-font-size: 18px;
@@ -38,7 +33,6 @@
     -fx-alignment: center-left;
 }
 
-/* --- Поля ввода --- */
 .text-field {
     -fx-background-color: #fff;
     -fx-border-color: #00000022;
@@ -55,14 +49,12 @@
     -fx-border-width: 2;
 }
 
-/* --- Сообщения об ошибке/статусе --- */
 .status-label {
     -fx-font-size: 16px;
     -fx-text-fill: #e74c3c;
     -fx-padding: 6 0 6 0;
 }
 
-/* --- Кнопка Войти --- */
 .primary-button {
     -fx-background-color: #1e0acb;
     -fx-background-radius: 16;
@@ -83,7 +75,6 @@
     -fx-background-color: #17038e;
 }
 
-/* --- Гиперссылки --- */
 .link {
     -fx-text-fill: #1e0acb;
     -fx-font-size: 17px;
@@ -96,7 +87,6 @@
     -fx-text-fill: #2736d8;
 }
 
-/* --- Нижняя строка с регистрацией --- */
 .footer-text {
     -fx-alignment: center;
     -fx-spacing: 6;

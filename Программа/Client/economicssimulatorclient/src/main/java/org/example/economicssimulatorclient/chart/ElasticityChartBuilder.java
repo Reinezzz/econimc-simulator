@@ -11,9 +11,6 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для модели эластичности спроса.
- */
 public class ElasticityChartBuilder implements ChartDrawer {
 
     @Override
@@ -30,12 +27,9 @@ public class ElasticityChartBuilder implements ChartDrawer {
                     chart.setVerticalGridLinesVisible(true);
                     chart.lookupAll(".chart-plot-background").forEach(bg ->
                             bg.setStyle("-fx-background-color: white;"));
-                    // Сетка светло-серая
                     chart.lookupAll(".chart-horizontal-grid-lines, .chart-vertical-grid-lines")
                             .forEach(grid -> grid.setStyle("-fx-stroke: #ececec;"));
-                    // Убираем padding
                     chart.setPadding(javafx.geometry.Insets.EMPTY);
-                    // Прямые линии, без точек
                     for (Object seriesObj : chart.getData()) {
                         XYChart.Series<?, ?> series = (XYChart.Series<?, ?>) seriesObj;
                         for (Object dataObj : series.getData()) {
@@ -44,7 +38,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
                             if (symbol != null) symbol.setVisible(false);
                         }
                     }
-                    // Легенда на белом
                     Node legend = chart.lookup(".chart-legend");
                     if (legend != null) legend.setStyle("-fx-background-color: white;");
                 }
@@ -83,11 +76,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
         return node;
     }
 
-
-    /**
-     * 1. Кривые эластичности (по всем категориям).
-     * chartData: ключи "elastic", "inelastic", "seriesN" → List<Map<String, Number>> (x="price", y="quantity")
-     */
     private Node buildElasticityCurves(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -98,7 +86,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
         chart.setTitle(I18n.t("chart.elasticity.elasticity_curves.title"));
         chart.setAnimated(false);
 
-        // Добавляем все имеющиеся серии (elastic, inelastic, seriesN)
         for (String key : chartData.keySet()) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) chartData.get(key);
             String name = switch (key) {
@@ -111,10 +98,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. Столбчатая диаграмма — выручка до и после по всем категориям.
-     * chartData: "categories": List<String>, "revenue0": List<Number>, "revenue1": List<Number>
-     */
     private Node buildRevenueBarChart(Map<String, Object> chartData) {
         List<String> categories = (List<String>) chartData.get("categories");
         List<Number> revenue0 = (List<Number>) chartData.get("revenue0");
@@ -153,16 +136,12 @@ public class ElasticityChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 3. Тепловая карта — эластичность для разных товарных категорий.
-     * chartData: "categories": List<String>, "elasticity": List<Number>
-     */
     private Node buildElasticityHeatmap(Map<String, Object> chartData) {
         List<String> categories = (List<String>) chartData.get("categories");
         List<Number> elasticity = (List<Number>) chartData.get("elasticity");
 
         if (categories == null || elasticity == null) {
-            Label lbl = new Label("Нет данных для тепловой карты");
+            Label lbl = new Label(I18n.t("chart.heatmap.no_data"));
             return new StackPane(lbl);
         }
 
@@ -182,7 +161,7 @@ public class ElasticityChartBuilder implements ChartDrawer {
             Rectangle rect = new Rectangle(cellWidth, cellHeight, color);
             rect.setArcWidth(6);
             rect.setArcHeight(6);
-            rect.setStroke(Color.rgb(210,210,210));
+            rect.setStroke(Color.rgb(210, 210, 210));
             rect.setStrokeWidth(1);
 
             Label valLabel = new Label(String.format("%.2f", value.doubleValue()));
@@ -194,7 +173,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
             GridPane.setHgrow(cell, javafx.scene.layout.Priority.ALWAYS);
         }
 
-        // Подписи категорий снизу
         for (int i = 0; i < n; i++) {
             Label catLabel = new Label(categories.get(i));
             catLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #222;");
@@ -208,17 +186,16 @@ public class ElasticityChartBuilder implements ChartDrawer {
         grid.setHgap(8);
         grid.setVgap(5);
 
-        // Легенда справа
         javafx.scene.layout.VBox legend = new javafx.scene.layout.VBox(0);
         legend.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         int scaleHeight = cellHeight * 2;
         javafx.scene.canvas.Canvas scale = new javafx.scene.canvas.Canvas(20, scaleHeight);
         javafx.scene.canvas.GraphicsContext gc = scale.getGraphicsContext2D();
         for (int y = 0; y < scaleHeight; y++) {
-            double frac = 1 - y / (double) (scaleHeight-1);
+            double frac = 1 - y / (double) (scaleHeight - 1);
             Color c = frac < 0.5
-                    ? Color.color(0.3, 0.7, 1.0, 0.8 * (0.5-frac) + 0.8 * frac) // синий -> белый
-                    : Color.color(1.0, 0.5*(1.5-frac), 0.5*(1.5-frac), 0.8 * frac); // белый -> красный
+                    ? Color.color(0.3, 0.7, 1.0, 0.8 * (0.5 - frac) + 0.8 * frac) // синий -> белый
+                    : Color.color(1.0, 0.5 * (1.5 - frac), 0.5 * (1.5 - frac), 0.8 * frac); // белый -> красный
             gc.setStroke(c);
             gc.strokeLine(0, y, 20, y);
         }
@@ -231,7 +208,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
         legend.getChildren().addAll(top, scale, bot);
         legend.setAlignment(javafx.geometry.Pos.CENTER);
 
-        // Всё вместе в HBox, который тоже растягивается
         javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(grid, legend);
         hbox.setSpacing(20);
         hbox.setStyle("-fx-background-color: white;");
@@ -242,7 +218,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
         grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         legend.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        // Внешняя обертка
         StackPane wrapper = new StackPane(hbox);
         VBox.setVgrow(wrapper, Priority.ALWAYS);
         HBox.setHgrow(wrapper, Priority.ALWAYS);
@@ -252,7 +227,6 @@ public class ElasticityChartBuilder implements ChartDrawer {
 
         return wrapper;
     }
-
 
 
     private Color elasticityColor(double value) {

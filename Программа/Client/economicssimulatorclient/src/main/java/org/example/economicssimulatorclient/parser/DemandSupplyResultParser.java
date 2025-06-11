@@ -15,7 +15,6 @@ public class DemandSupplyResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         sb.append(I18n.t("result.demand.title")).append("\n\n");
 
-        // 1. Равновесие рынка
         JSONObject eq = sd.optJSONObject("equilibrium");
         if (eq != null) {
             double eqQ = eq.optDouble("quantity", Double.NaN);
@@ -23,7 +22,6 @@ public class DemandSupplyResultParser implements ResultParser {
             sb.append(String.format(I18n.t("result.demand.equilibrium"), eqQ, eqP));
         }
 
-        // 2. Пример точек спроса и предложения
         JSONArray demand = sd.optJSONArray("demand");
         JSONArray supply = sd.optJSONArray("supply");
         if (demand != null && supply != null) {
@@ -40,7 +38,6 @@ public class DemandSupplyResultParser implements ResultParser {
             sb.append(I18n.t("result.demand.ellipsis")).append("\n\n");
         }
 
-        // 3. Излишки
         if (sd.has("consumer_surplus_area") || sd.has("producer_surplus_area")) {
             sb.append(I18n.t("result.demand.surplus_title")).append("\n");
             if (sd.has("consumer_surplus_area")) sb.append(I18n.t("result.demand.consumer_surplus")).append("\n");
@@ -48,7 +45,6 @@ public class DemandSupplyResultParser implements ResultParser {
             sb.append("\n");
         }
 
-        // 4. Объяснение сдвигов (если есть shift_animation)
         JSONObject shift = root.optJSONObject("shift_animation");
         if (shift != null) {
             int dShifts = shift.optJSONArray("demand_shifts") != null ?
@@ -60,7 +56,6 @@ public class DemandSupplyResultParser implements ResultParser {
             }
         }
 
-        // 5. Краткое summary
         sb.append(I18n.t("result.demand.summary")).append("\n");
         return sb.toString();
     }

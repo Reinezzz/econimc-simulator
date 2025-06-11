@@ -5,11 +5,11 @@ import java.util.List;
 public record ReportCreateRequestDto(
         Long modelId,
         String modelName,
-        String name,                 // Имя отчёта (формируется автоматически)
-        String language,             // "ru" или "en"
+        String name,
+        String language,
         List<ModelParameterDto> parameters,
         ModelResultDto result,
         List<ReportChartImageDto> charts,
         List<LlmChatResponseDto> llmMessages,
-        String parsedResult// Сообщения, выбранные для отчёта
+        String parsedResult
 ) {}

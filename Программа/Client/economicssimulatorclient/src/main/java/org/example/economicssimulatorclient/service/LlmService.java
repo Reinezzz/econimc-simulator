@@ -14,7 +14,8 @@ public class LlmService extends MainService {
 
     private static final String BASE_PATH = "/api/llm";
 
-    private LlmService() {}
+    private LlmService() {
+    }
 
     public static synchronized LlmService getInstance() {
         if (instance == null) {
@@ -23,12 +24,6 @@ public class LlmService extends MainService {
         return instance;
     }
 
-    /**
-     * Чат с LLM: для экрана просмотра модели и экрана результата.
-     * @param baseUri корень API (обычно SessionManager.getInstance().getBaseUri())
-     * @param request  DTO с id модели, сообщением, параметрами, визуализациями и т.д.
-     * @return ответ от LLM (LlmChatResponseDto)
-     */
     public LlmChatResponseDto chat(URI baseUri, LlmChatRequestDto request)
             throws IOException, InterruptedException {
         return post(
@@ -36,17 +31,11 @@ public class LlmService extends MainService {
                 BASE_PATH + "/chat",
                 request,
                 LlmChatResponseDto.class,
-                true,  // всегда авторизован
-                null   // токен автоматом подхватится из MainService
+                true,
+                null
         );
     }
 
-    /**
-     * Извлечение параметров из документа через LLM (на экране выбора документа).
-     * @param baseUri корень API
-     * @param request DTO с modelId и documentId
-     * @return список параметров с новыми значениями (LlmParameterExtractionResponseDto)
-     */
     public LlmParameterExtractionResponseDto extractParameters(URI baseUri, LlmParameterExtractionRequestDto request)
             throws IOException, InterruptedException {
         return post(

@@ -10,11 +10,10 @@ public class BlackScholesResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
 
-        // Поверхность цен call-опциона
         JSONObject surfaceObj = root.optJSONObject("surface");
         if (surfaceObj != null) {
             JSONArray surfaceArr = surfaceObj.optJSONArray("surface");
-            if (surfaceArr != null && surfaceArr.length() > 0) {
+            if (surfaceArr != null && !surfaceArr.isEmpty()) {
                 JSONArray SRow = surfaceArr.getJSONArray(0);
                 JSONArray CCol = surfaceArr.getJSONArray(surfaceArr.length() - 1);
                 JSONObject minC = SRow.getJSONObject(0);
@@ -29,11 +28,10 @@ public class BlackScholesResultParser implements ResultParser {
             }
         }
 
-        // Время жизни опциона и распад
         JSONObject decayObj = root.optJSONObject("decay");
         if (decayObj != null) {
             JSONArray decayArr = decayObj.optJSONArray("decay");
-            if (decayArr != null && decayArr.length() > 0) {
+            if (decayArr != null && !decayArr.isEmpty()) {
                 JSONObject first = decayArr.getJSONObject(0);
                 JSONObject last = decayArr.getJSONObject(decayArr.length() - 1);
                 double Tmax = first.optDouble("T", Double.NaN);
@@ -45,7 +43,6 @@ public class BlackScholesResultParser implements ResultParser {
             }
         }
 
-        // Греки: delta, gamma, vega, theta, rho
         JSONObject greeksObj = root.optJSONObject("greeks");
         if (greeksObj != null) {
             JSONObject greeks = greeksObj.optJSONObject("greeks");
@@ -53,13 +50,13 @@ public class BlackScholesResultParser implements ResultParser {
                 sb.append("\n").append(I18n.t("result.bs.greeks_title")).append("\n");
                 appendGreek(sb, greeks, "delta", I18n.t("result.bs.delta"));
                 appendGreek(sb, greeks, "gamma", I18n.t("result.bs.gamma"));
-                appendGreek(sb, greeks, "vega",  I18n.t("result.bs.vega"));
+                appendGreek(sb, greeks, "vega", I18n.t("result.bs.vega"));
                 appendGreek(sb, greeks, "theta", I18n.t("result.bs.theta"));
-                appendGreek(sb, greeks, "rho",   I18n.t("result.bs.rho"));
+                appendGreek(sb, greeks, "rho", I18n.t("result.bs.rho"));
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.bs.no_data"));
         }
 
@@ -68,7 +65,7 @@ public class BlackScholesResultParser implements ResultParser {
 
     private void appendGreek(StringBuilder sb, JSONObject greeks, String key, String label) {
         JSONArray arr = greeks.optJSONArray(key);
-        if (arr != null && arr.length() > 0) {
+        if (arr != null && !arr.isEmpty()) {
             double minVal = arr.getJSONObject(0).optDouble("value", Double.NaN);
             double maxVal = arr.getJSONObject(arr.length() - 1).optDouble("value", Double.NaN);
             sb.append(String.format(I18n.t("result.bs.greek_range"), label, minVal, maxVal));

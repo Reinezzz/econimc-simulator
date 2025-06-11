@@ -15,52 +15,41 @@
            fx:controller="org.example.economicssimulatorclient.controller.RegistrationController"
            stylesheets="@registration.css">
 
-
-    <!-- Фон -->
     <Pane styleClass="background-pane"/>
 
-    <!-- Карточка регистрации -->
     <VBox styleClass="card"
           spacing="20" alignment="CENTER">
-        <!-- Заголовок -->
         <Label text="%reg.title" styleClass="title"/>
 
-        <!-- Поле «Email» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="%common.status_field" styleClass="form-label" fx:id="statusLabel"/>
         </VBox>
 
-        <!-- Поле «Имя» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="%reg.label.username" styleClass="form-label"/>
             <TextField promptText="%prompt.username" styleClass="text-field" fx:id="usernameField"/>
         </VBox>
 
-        <!-- Поле «Email» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="%reg.label.email" styleClass="form-label"/>
             <TextField promptText="%prompt.email" styleClass="text-field" fx:id="emailField"/>
         </VBox>
 
-        <!-- Поле «Пароль» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="%reg.label.password" styleClass="form-label"/>
             <PasswordField styleClass="text-field" fx:id="passwordField"/>
         </VBox>
 
-        <!-- Поле «Повтор пароля» -->
         <VBox spacing="8" prefWidth="400">
             <Label text="%reg.label.repeat_password" styleClass="form-label"/>
             <PasswordField styleClass="text-field" fx:id="repeatPasswordField"/>
         </VBox>
 
-        <!-- Кнопка регистрации -->
         <Button fx:id="registerButton"
                 text="%reg.button.register"
                 styleClass="primary-button"
                 prefWidth="240" prefHeight="40" onAction="#doRegister"/>
 
-        <!-- Нижняя строка с ссылкой на вход -->
         <HBox spacing="5" alignment="CENTER">
             <Label text="%reg.label.have_account" styleClass="footer-text"/>
             <Hyperlink fx:id="loginLink" text="%reg.link.login" styleClass="link" onAction="#openLogin"/>

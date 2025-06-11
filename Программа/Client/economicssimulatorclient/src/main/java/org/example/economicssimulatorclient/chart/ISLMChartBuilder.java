@@ -1,26 +1,14 @@
 package org.example.economicssimulatorclient.chart;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.*;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.DrawMode;
-import javafx.scene.transform.Rotate;
-import org.fxyz3d.shapes.primitives.SurfacePlotMesh;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-/**
- * Визуализатор для IS-LM модели, включая 3D surface через FXyz3D.
- */
 public class ISLMChartBuilder implements ChartDrawer {
 
     @Override
@@ -77,9 +65,6 @@ public class ISLMChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. IS/LM график с равновесием
-     */
     private Node buildISLMChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -96,7 +81,6 @@ public class ISLMChartBuilder implements ChartDrawer {
         addSeries(chart, chartData, "IS", "IS", "#FF5E3A", 3.0);
         addSeries(chart, chartData, "LM", "LM", "#FFC800", 3.0);
 
-        // Точка равновесия
         if (chartData.containsKey("equilibrium")) {
             Map<String, Number> eq = (Map<String, Number>) chartData.get("equilibrium");
             Number x = eq.get("income");
@@ -118,14 +102,7 @@ public class ISLMChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. 3D поверхность — эмуляция как серия 2D-кривых (например, фиксированная ставка или доход)
-     * chartData: "surface": List<List<Map<String, Number>>>
-     *      каждая List<Map<>> — линия по одному из параметров (например, для разных i)
-     */
     private Node buildSurfaceChart(Map<String, Object> chartData) {
-        // chartData — это {"slices": [ … ]}, значит:
-        @SuppressWarnings("unchecked")
         List<List<Map<String, Number>>> slices =
                 (List<List<Map<String, Number>>>) chartData.get("slices");
 
@@ -146,7 +123,7 @@ public class ISLMChartBuilder implements ChartDrawer {
                 series.setName(org.example.economicssimulatorclient.util.I18n.t("chart.slice") + " " + (++idx));
                 for (Map<String, Number> pt : slice) {
                     Number income = pt.get("income");
-                    Number rate   = pt.get("rate");
+                    Number rate = pt.get("rate");
                     if (income != null && rate != null) {
                         series.getData().add(new XYChart.Data<>(income, rate));
                     }
@@ -157,10 +134,6 @@ public class ISLMChartBuilder implements ChartDrawer {
         return chart;
     }
 
-
-    /**
-     * 3. Временные ряды — динамика равновесия при изменении политики
-     */
     private Node buildTimeSeriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -174,7 +147,6 @@ public class ISLMChartBuilder implements ChartDrawer {
         chart.setLegendVisible(true);
         chart.setStyle("-fx-background-color: white; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #ebebeb;");
 
-        // Временной ряд дохода
         if (chartData.containsKey("policy")) {
             List<Map<String, Number>> seriesPts = (List<Map<String, Number>>) chartData.get("policy");
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -204,7 +176,6 @@ public class ISLMChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    // Вспомогательная функция с цветом/толщиной
     private void addSeries(LineChart<Number, Number> chart, Map<String, Object> data, String key, String name, String color, double width) {
         if (data.containsKey(key)) {
             List<Map<String, Number>> pts = (List<Map<String, Number>>) data.get(key);
@@ -218,7 +189,6 @@ public class ISLMChartBuilder implements ChartDrawer {
             }
             chart.getData().add(series);
 
-            // Стилизуем линию после отрисовки
             series.nodeProperty().addListener((obs, oldNode, newNode) -> {
                 if (newNode != null) {
                     newNode.setStyle(String.format("-fx-stroke: %s; -fx-stroke-width: %.1f;", color, width));

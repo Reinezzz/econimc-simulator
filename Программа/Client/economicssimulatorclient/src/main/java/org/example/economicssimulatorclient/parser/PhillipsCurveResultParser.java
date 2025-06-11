@@ -10,15 +10,12 @@ public class PhillipsCurveResultParser implements ResultParser {
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();
         JSONObject root = new JSONObject(json);
-
-        // Краткое описание результата
         sb.append(I18n.t("result.phillips.title")).append("\n");
 
-        // 1. Диапазоны инфляции и безработицы
         JSONObject scatter = root.optJSONObject("scatter");
         if (scatter != null) {
             JSONArray points = scatter.optJSONArray("points");
-            if (points != null && points.length() > 0) {
+            if (points != null && !points.isEmpty()) {
                 JSONObject p0 = points.getJSONObject(0);
                 JSONObject p1 = points.getJSONObject(points.length() - 1);
 
@@ -32,12 +29,11 @@ public class PhillipsCurveResultParser implements ResultParser {
             }
         }
 
-        // 2. Временные ряды: старт и конец периода
         JSONObject timeseries = root.optJSONObject("timeseries");
         if (timeseries != null) {
             JSONArray infArr = timeseries.optJSONArray("inflation");
             JSONArray unArr = timeseries.optJSONArray("unemployment");
-            if (infArr != null && infArr.length() > 0 && unArr != null && unArr.length() > 0) {
+            if (infArr != null && !infArr.isEmpty() && unArr != null && !unArr.isEmpty()) {
                 JSONObject infStart = infArr.getJSONObject(0);
                 JSONObject infEnd = infArr.getJSONObject(infArr.length() - 1);
                 JSONObject unStart = unArr.getJSONObject(0);
@@ -51,12 +47,11 @@ public class PhillipsCurveResultParser implements ResultParser {
             }
         }
 
-        // 3. Краткосрочная и долгосрочная кривая
         JSONObject loops = root.optJSONObject("loops");
         if (loops != null) {
             JSONArray shortRun = loops.optJSONArray("short_run");
             JSONArray longRun = loops.optJSONArray("long_run");
-            if (shortRun != null && shortRun.length() > 0) {
+            if (shortRun != null && !shortRun.isEmpty()) {
                 JSONObject p0 = shortRun.getJSONObject(0);
                 JSONObject p1 = shortRun.getJSONObject(shortRun.length() - 1);
                 sb.append("\n").append(I18n.t("result.phillips.short_run_title")).append("\n");
@@ -65,7 +60,7 @@ public class PhillipsCurveResultParser implements ResultParser {
                         p0.optDouble("unemployment"), p1.optDouble("unemployment")
                 ));
             }
-            if (longRun != null && longRun.length() > 0) {
+            if (longRun != null && !longRun.isEmpty()) {
                 double lrInfl = longRun.getJSONObject(0).optDouble("inflation");
                 JSONObject p0 = longRun.getJSONObject(0);
                 JSONObject p1 = longRun.getJSONObject(longRun.length() - 1);
@@ -76,7 +71,7 @@ public class PhillipsCurveResultParser implements ResultParser {
             }
         }
 
-        if (sb.length() == 0) {
+        if (sb.isEmpty()) {
             sb.append(I18n.t("result.phillips.no_data"));
         }
 

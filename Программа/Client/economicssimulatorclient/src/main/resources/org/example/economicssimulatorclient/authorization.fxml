@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
@@ -10,57 +9,59 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 
-<?import java.net.URL?>
 <StackPane
            xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="org.example.economicssimulatorclient.controller.AuthorizationController"
            stylesheets="@authorization.css">
 
-
-
-    <!-- Фоновый слой -->
     <Pane styleClass="background-pane"/>
 
-    <!-- Карточка входа -->
-    <VBox styleClass="card"
-          spacing="20" alignment="CENTER">
-        <!-- Заголовок -->
+    <VBox styleClass="card" spacing="20" alignment="CENTER">
+
         <Label text="%auth.title" styleClass="title"/>
 
-        <!-- Поле «Имя или Email» -->
         <VBox spacing="8" prefWidth="400">
+
             <Label text="%common.status_field" styleClass="form-label" fx:id="statusLabel"/>
+
         </VBox>
 
-        <!-- Поле «Имя или Email» -->
         <VBox spacing="8" prefWidth="400">
+
             <Label text="%auth.label.username_or_email" styleClass="form-label"/>
+
             <TextField  styleClass="text-field" fx:id="usernameEmailField"/>
+
         </VBox>
 
-        <!-- Поле «Пароль» + ссылка «Забыли пароль?» -->
         <VBox spacing="8" prefWidth="400">
+
             <Label text="%auth.label.password" styleClass="form-label"/>
+
             <PasswordField styleClass="text-field" fx:id="passwordField"/>
+
             <HBox alignment="CENTER_RIGHT">
-                <Hyperlink text="%auth.link.forgot" styleClass="link"
-                           fx:id="forgotLink" onAction="#openReset"/>
+
+                <Hyperlink text="%auth.link.forgot" styleClass="link" fx:id="forgotLink" onAction="#openReset"/>
+
             </HBox>
         </VBox>
 
-        <!-- Кнопка входа -->
         <Button fx:id="loginButton"
                 text="%auth.button.login"
                 styleClass="primary-button"
                 prefWidth="200" prefHeight="40"
-        onAction="#doLogin"/>
+                onAction="#doLogin"/>
 
-        <!-- Нижняя строка с регистрацией -->
         <HBox spacing="5" alignment="CENTER">
+
             <Label text="%auth.label.no_account" styleClass="footer-text"/>
-            <Hyperlink text="%auth.link.register" styleClass="link"
-                       onAction="#openRegister" fx:id="registerLink"/>
+
+            <Hyperlink text="%auth.link.register" styleClass="link" onAction="#openRegister" fx:id="registerLink"/>
+
         </HBox>
+
     </VBox>
+
 </StackPane>

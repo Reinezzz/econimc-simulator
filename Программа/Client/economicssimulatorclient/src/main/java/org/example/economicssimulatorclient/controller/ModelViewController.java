@@ -4,9 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.example.economicssimulatorclient.controller.LlmChatComponentController;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.I18n;
@@ -54,7 +52,6 @@ public class ModelViewController extends BaseController {
     @FXML
     private Label statusLabel;
 
-    // --- LLM Chat Integration ---
     @FXML
     private LlmChatComponentController llmChatComponent;
 
@@ -64,21 +61,18 @@ public class ModelViewController extends BaseController {
     private Long modelId;
 
 
-
     private List<ModelParameterDto> pendingExtractionParams = null;
 
     public void initWithModelId(Long id) {
         initWithModelId(id, null);
     }
 
-    // Теперь можно передать параметры, которые должны быть применены после загрузки модели:
     public void initWithModelId(Long id, List<ModelParameterDto> extractedParams) {
         this.modelId = id;
         LastModelStorage.saveLastModelId(modelId);
         clearStatusLabel();
         this.pendingExtractionParams = extractedParams;
         loadModel();
-        // Очистить чат при смене модели
         if (llmChatComponent != null) {
             llmChatComponent.clear();
         }
@@ -115,7 +109,6 @@ public class ModelViewController extends BaseController {
         formulaArea.setText(model.formula() != null ? model.formula() : "");
         modelTitle.setText(localizedValue(model.name()));
 
-        // --- Основная магия:
         if (pendingExtractionParams != null && !pendingExtractionParams.isEmpty()) {
             fillParametersFromExtraction(pendingExtractionParams);
             pendingExtractionParams = null;
@@ -126,11 +119,8 @@ public class ModelViewController extends BaseController {
         setupLlmChatComponent();
     }
 
-
-    /** Заполнить значения параметров из LLM extraction (по paramName), остальные оставить как есть */
     public void fillParametersFromExtraction(List<ModelParameterDto> newParams) {
         if (newParams == null || newParams.isEmpty()) return;
-        // Сохраняем старый порядок, меняем только значения по paramName
         for (int i = 0; i < parameters.size(); i++) {
             ModelParameterDto oldParam = parameters.get(i);
             String newValue = oldParam.paramValue();
@@ -145,10 +135,9 @@ public class ModelViewController extends BaseController {
                     newValue, oldParam.displayName(), oldParam.description(), oldParam.customOrder()
             ));
         }
-        fillParameters(); // обновить UI
+        fillParameters();
         showSuccess(statusLabel, "model.params_from_doc");
     }
-
 
     private void fillParameters() {
         parameterList.getChildren().clear();
@@ -211,7 +200,6 @@ public class ModelViewController extends BaseController {
         if (!editMode) {
             setEditMode(true);
         } else {
-            // Сохраняем новые значения параметров
             List<ModelParameterDto> updated = new ArrayList<>();
             boolean valid = true;
             for (int i = 0; i < parameters.size(); i++) {
@@ -273,10 +261,10 @@ public class ModelViewController extends BaseController {
         if (llmChatComponent == null) return;
         llmChatComponent.setRequestSupplier(() -> new org.example.economicssimulatorclient.dto.LlmChatRequestDto(
                 modelId,
-                "", // сообщение пользователя будет подставлено внутри компонента
-                new ArrayList<>(parameters), // текущие параметры
-                null, // visualizations (на этом экране не нужны)
-                null  // result (на этом экране не нужен)
+                "",
+                new ArrayList<>(parameters),
+                null,
+                null
         ));
     }
 

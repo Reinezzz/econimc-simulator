@@ -1,6 +1,5 @@
 package org.example.economicssimulatorclient.controller;
 
-import javafx.scene.layout.StackPane;
 import org.example.economicssimulatorclient.dto.LoginRequest;
 import org.example.economicssimulatorclient.service.AuthService;
 import org.example.economicssimulatorclient.service.EconomicModelService;
@@ -9,10 +8,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-/**
- * Контроллер экрана авторизации пользователя.
- * Отвечает за обработку логина, переход к регистрации и сбросу пароля.
- */
 public class AuthorizationController extends BaseController {
 
     @FXML
@@ -28,13 +23,9 @@ public class AuthorizationController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
-    /**
-     * Обрабатывает попытку входа пользователя по нажатию кнопки.
-     * Выполняет валидацию, асинхронный вызов сервиса и отображение результата.
-     */
     @FXML
     public void doLogin() {
-        showError(statusLabel, ""); // очистка статуса
+        showError(statusLabel, "");
         String login = usernameEmailField.getText().trim();
         String pass = passwordField.getText();
 
@@ -65,9 +56,6 @@ public class AuthorizationController extends BaseController {
         }).start();
     }
 
-    /**
-     * Переход на экран регистрации.
-     */
     @FXML
     public void openRegister() {
         SceneManager.switchTo("registration.fxml", c -> {
@@ -76,12 +64,9 @@ public class AuthorizationController extends BaseController {
         });
     }
 
-    /**
-     * Переход на экран сброса пароля.
-     */
     @FXML
     public void openReset() {
-        SceneManager.switchTo("password_change.fxml",  c -> {
+        SceneManager.switchTo("password_change.fxml", c -> {
             ((BaseController) c).clearStatusLabel();
             ((BaseController) c).clearFields();
         });

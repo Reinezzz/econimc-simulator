@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -8,7 +7,6 @@
             stylesheets="@model_view.css"
             styleClass="screen">
 
-    <!-- Top bar -->
     <top>
         <VBox>
             <HBox styleClass="top-bar">
@@ -22,14 +20,12 @@
 
     <center>
         <HBox styleClass="main-content">
-            <!-- Left: Параметры -->
             <ScrollPane styleClass="parameter-scroll" fitToWidth="true" >
                 <VBox fx:id="parameterList" styleClass="parameter-list"/>
             </ScrollPane>
 
             <Separator orientation="VERTICAL" styleClass="v-separator"/>
 
-            <!-- Center: Модель -->
             <VBox styleClass="model-block" prefWidth="640">
                 <Label fx:id="modelTitle" text="%model.title" styleClass="model-title"/>
                 <HBox styleClass="model-row">

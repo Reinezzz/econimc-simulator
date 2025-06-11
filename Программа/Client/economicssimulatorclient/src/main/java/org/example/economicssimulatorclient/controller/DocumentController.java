@@ -22,14 +22,22 @@ import java.util.List;
 
 public class DocumentController extends BaseController {
 
-    @FXML private Button backButton;
-    @FXML private Button mainButton;
-    @FXML private Button addButton;
-    @FXML private Button deleteButton;
-    @FXML private Button selectButton;
-    @FXML private ComboBox<String> typeComboBox;
-    @FXML private GridPane tableGrid;
-    @FXML protected Label statusLabel;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button mainButton;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button selectButton;
+    @FXML
+    private ComboBox<String> typeComboBox;
+    @FXML
+    private GridPane tableGrid;
+    @FXML
+    protected Label statusLabel;
 
     private final DocumentService documentService = new DocumentService();
     private final ReportService reportService = new ReportService(URI.create("http://localhost:8080")); // замени на свой адрес
@@ -73,13 +81,13 @@ public class DocumentController extends BaseController {
         if (I18n.t("docs.type.documents").equals(selectedType)) {
             loadDocuments();
             return;
-        }if (I18n.t("docs.type.reports").equals(selectedType)) {
+        }
+        if (I18n.t("docs.type.reports").equals(selectedType)) {
             loadReports();
             return;
         }
     }
 
-    // --- ДОКУМЕНТЫ ---
     private void loadDocuments() {
         tableGrid.getChildren().clear();
         checkBoxes.clear();
@@ -142,7 +150,6 @@ public class DocumentController extends BaseController {
         }
     }
 
-    // --- ОТЧЕТЫ ---
     private void loadReports() {
         tableGrid.getChildren().clear();
         checkBoxes.clear();
@@ -259,7 +266,7 @@ public class DocumentController extends BaseController {
             return;
         }
 
-        if ("Документы".equals(typeComboBox.getValue())) {
+        if (I18n.t("docs.type.documents").equals(typeComboBox.getValue())) {
             runAsync(() -> {
                 for (int idx : indicesToDelete) {
                     DocumentDto doc = documents.get(idx);
@@ -294,7 +301,7 @@ public class DocumentController extends BaseController {
 
     private void onDownloadDocument(long docId, String docName) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Сохранить как");
+        chooser.setTitle(I18n.t("docs.save_as"));
         chooser.setInitialFileName(docName);
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File saveFile = chooser.showSaveDialog(tableGrid.getScene().getWindow());
@@ -313,7 +320,7 @@ public class DocumentController extends BaseController {
 
     private void onDownloadReport(long reportId, String reportName) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Сохранить как");
+        chooser.setTitle(I18n.t("docs.save_as"));
         chooser.setInitialFileName(reportName);
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         File saveFile = chooser.showSaveDialog(tableGrid.getScene().getWindow());
@@ -330,7 +337,6 @@ public class DocumentController extends BaseController {
         }
     }
 
-    // Оставляем старую логику выбора для извлечения параметров только для документов!
     private void onSelect() {
         int selectedIdx = -1;
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -354,9 +360,7 @@ public class DocumentController extends BaseController {
         selectButton.setDisable(true);
         runAsync(() -> {
             try {
-                // Реализуй свою логику LLM извлечения параметров по выбранному документу
-                // ...
-                Platform.runLater(() -> showSuccess(statusLabel, "docs.params_extracted")); // пример
+                Platform.runLater(() -> showSuccess(statusLabel, "docs.params_extracted"));
             } finally {
                 Platform.runLater(() -> selectButton.setDisable(false));
             }

@@ -11,7 +11,6 @@ public class ElasticityResultParser implements ResultParser {
         StringBuilder sb = new StringBuilder();
         sb.append(I18n.t("result.elasticity.title")).append("\n\n");
 
-        // 1. Эластичность спроса (пример расчёта)
         JSONObject curves = root.optJSONObject("elasticity_curves");
         if (curves != null) {
             JSONArray elastic = curves.optJSONArray("elastic");
@@ -26,15 +25,13 @@ public class ElasticityResultParser implements ResultParser {
             }
         }
 
-        // 2. Выручка по категориям (если есть)
         JSONObject revenue = root.optJSONObject("revenue_bars");
         if (revenue != null) {
             JSONArray categories = revenue.optJSONArray("categories");
             JSONArray revenue0 = revenue.optJSONArray("revenue0");
             JSONArray revenue1 = revenue.optJSONArray("revenue1");
-            if (categories != null && categories.length() > 0) {
+            if (categories != null && !categories.isEmpty()) {
                 sb.append(I18n.t("result.elasticity.revenue_title")).append("\n");
-                // Если есть только один товар
                 for (int i = 0; i < categories.length(); i++) {
                     String cat = categories.getString(i);
                     double rev0 = revenue0 != null && revenue0.length() > i ? revenue0.optDouble(i) : Double.NaN;
@@ -49,7 +46,6 @@ public class ElasticityResultParser implements ResultParser {
             }
         }
 
-        // 3. Значения эластичности
         JSONObject heatmap = root.optJSONObject("elasticity_heatmap");
         if (heatmap != null) {
             JSONArray cats = heatmap.optJSONArray("categories");
@@ -65,7 +61,6 @@ public class ElasticityResultParser implements ResultParser {
             }
         }
 
-        // Итоговое пояснение
         sb.append(I18n.t("result.elasticity.elastic_range_elastic")).append("\n");
         sb.append(I18n.t("result.elasticity.elastic_range_inelastic")).append("\n");
 

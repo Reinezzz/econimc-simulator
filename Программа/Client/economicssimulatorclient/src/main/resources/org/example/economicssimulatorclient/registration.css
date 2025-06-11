@@ -2,7 +2,6 @@
     -fx-background-color: #faf8f8;
 }
 
-/* Карточка регистрации */
 .card {
     -fx-background-color: #fff;
     -fx-padding: 48 36 36 36;
@@ -14,13 +13,10 @@
     -fx-min-width: 680px;
     -fx-max-height: 870;
     -fx-min-height: 800;
-    /* Для центрирования */
     -fx-layout-x: 50%;
     -fx-layout-y: 50%;
 }
 
-
-/* Заголовок "Регистрация" */
 .title {
     -fx-font-family: "Segoe UI Semibold", "Helvetica", sans-serif;
     -fx-font-size: 38px;
@@ -29,7 +25,6 @@
     -fx-alignment: center;
 }
 
-/* Лейблы над полями */
 .form-label {
     -fx-font-family: "Actor Regular", "Segoe UI", sans-serif;
     -fx-font-size: 18px;
@@ -38,7 +33,6 @@
     -fx-alignment: center-left;
 }
 
-/* Текстовые поля */
 .text-field {
     -fx-background-color: #fff;
     -fx-border-color: #00000022;
@@ -60,7 +54,6 @@
     -fx-padding: 6 0 6 0;
 }
 
-/* Кнопка регистрации */
 .primary-button {
     -fx-background-color: #1e0acb;
     -fx-background-radius: 16;
@@ -80,7 +73,6 @@
     -fx-background-color: #17038e;
 }
 
-/* Текст-ссылка ("Войти") */
 .link {
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
     -fx-font-size: 17px;
@@ -90,7 +82,6 @@
     -fx-padding: 0 0 0 6;
 }
 
-/* Текст "Уже есть аккаунт?" */
 .footer-text {
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
     -fx-font-size: 17px;

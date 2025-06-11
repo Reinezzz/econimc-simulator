@@ -4,19 +4,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для модели AD-AS (Aggregate Demand - Aggregate Supply).
- */
 public class ADASChartBuilder implements ChartDrawer {
 
     @Override
@@ -74,11 +69,6 @@ public class ADASChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. Пересечение кривых - равновесие совокупного спроса и предложения.
-     * chartData ожидает Map<String, List<Map<String, Number>>>
-     * где ключи: "AD", "SRAS", "LRAS", "equilibrium"
-     */
     private Node buildEquilibriumChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -108,10 +98,6 @@ public class ADASChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. Сдвиги кривых - влияние шоков спроса/предложения.
-     * chartData: ключи "AD", "AD2", "SRAS", "SRAS2", "LRAS"
-     */
     private Node buildShiftsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -131,10 +117,6 @@ public class ADASChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 3. Инфляционные/рецессионные разрывы - отклонения от потенциального ВВП.
-     * chartData: ключи "AD", "SRAS", "LRAS", "potentialY", "actualY"
-     */
     private Node buildGapsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -149,7 +131,6 @@ public class ADASChartBuilder implements ChartDrawer {
         addSeriesToChart(chart, chartData, "SRAS", "SRAS");
         addSeriesToChart(chart, chartData, "LRAS", "LRAS");
 
-        // Подсветка разрыва
         if (chartData.containsKey("potentialY") && chartData.containsKey("actualY")) {
             double potentialY = ((Number) chartData.get("potentialY")).doubleValue();
             double actualY = ((Number) chartData.get("actualY")).doubleValue();
@@ -161,15 +142,11 @@ public class ADASChartBuilder implements ChartDrawer {
             gap.setWidth(Math.abs(potentialY - actualY));
             gap.setHeight(maxP - minP);
             gap.setFill(Color.rgb(255, 150, 150, 0.3));
-            // Для простоты — можно использовать Line или Label для обозначения разрыва
             chart.setTitle(chart.getTitle() + String.format(" (Разрыв: %.2f)", actualY - potentialY));
         }
         return chart;
     }
 
-    /**
-     * Добавляет линию на график, если есть такие данные.
-     */
     private void addSeriesToChart(LineChart<Number, Number> chart, Map<String, Object> data, String key, String title) {
         if (data.containsKey(key)) {
             List<Map<String, Number>> points = (List<Map<String, Number>>) data.get(key);

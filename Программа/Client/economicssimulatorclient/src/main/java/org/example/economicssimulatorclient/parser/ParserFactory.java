@@ -1,15 +1,9 @@
 package org.example.economicssimulatorclient.parser;
 
-/**
- * Фабрика парсеров результатов экономических моделей.
- */
+import org.example.economicssimulatorclient.util.I18n;
+
 public class ParserFactory {
 
-    /**
-     * Возвращает парсер по типу экономической модели.
-     * @param modelType Тип модели (например, "DemandSupply", "Elasticity" и т.д.)
-     * @return Реализация ResultParser для данного типа модели.
-     */
     public static ResultParser getParser(String modelType) {
         if (modelType == null) {
             return new DefaultResultParser();
@@ -40,13 +34,10 @@ public class ParserFactory {
         }
     }
 
-    /**
-     * Стандартный парсер на случай неизвестного типа модели.
-     */
     private static class DefaultResultParser implements ResultParser {
         @Override
         public String parse(String json) {
-            return "Результат (неизвестный тип модели):\n" + json;
+            return I18n.t("result.unknown") + "\n" + json;
         }
     }
 }

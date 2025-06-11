@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -33,18 +30,29 @@ public class ModelResultController extends BaseController {
     private final EconomicModelService modelService = get(EconomicModelService.class);
     private final ReportService reportService = new ReportService(URI.create("http://localhost:8080"));
 
-    @FXML private Button backButton;
-    @FXML private Button mainButton;
-    @FXML private VBox parameterList;
-    @FXML private TextArea resultArea;
-    @FXML private ComboBox<String> typeComboBox;
-    @FXML private Pane chartPane;
-    @FXML private Button saveButton;
-    @FXML private Button repeatButton;
-    @FXML private Label statusLabel;
-    @FXML private VBox chat;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button mainButton;
+    @FXML
+    private VBox parameterList;
+    @FXML
+    private TextArea resultArea;
+    @FXML
+    private ComboBox<String> typeComboBox;
+    @FXML
+    private Pane chartPane;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button repeatButton;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private VBox chat;
 
-    @FXML private LlmChatComponentController llmChatComponent;
+    @FXML
+    private LlmChatComponentController llmChatComponent;
 
     private CalculationResponseDto response;
     private List<ModelParameterDto> parameters = new ArrayList<>();
@@ -79,7 +87,6 @@ public class ModelResultController extends BaseController {
         }
         setupLlmChatComponent();
 
-        // Обновляем слушатель для появления кнопок "Добавить в отчет"
         setupAddToReportButtonForChat();
     }
 
@@ -171,7 +178,7 @@ public class ModelResultController extends BaseController {
                 region.prefHeightProperty().bind(chartPane.heightProperty());
             }
         } else {
-            Label lbl = new Label("Нет визуализации для выбранного графика.");
+            Label lbl = new Label(I18n.t("chart.no_visualization"));
             chartPane.getChildren().add(lbl);
         }
     }
@@ -195,19 +202,16 @@ public class ModelResultController extends BaseController {
                 CalculationResponseDto resp = modelService.calculate(req);
                 Platform.runLater(() -> initWithResult(resp, model));
             } catch (Exception ex) {
-                Platform.runLater(() -> showError(statusLabel, "Ошибка при повторном расчете: " + ex.getMessage()));
+                Platform.runLater(() -> showError(statusLabel, "error.repeat_calculations" + ex.getMessage()));
             }
-        }, ex -> Platform.runLater(() -> showError(statusLabel, "Ошибка при повторном расчете: " + ex.getMessage())));
+        }, ex -> Platform.runLater(() -> showError(statusLabel, "error.repeat_calculations" + ex.getMessage())));
     }
 
-    /**
-     * Связывает Supplier для чата (актуальные параметры, графики, результат).
-     */
     private void setupLlmChatComponent() {
         if (llmChatComponent == null) return;
         llmChatComponent.setRequestSupplier(() -> new LlmChatRequestDto(
                 model.id(),
-                "", // сообщение пользователя подставится внутри компонента
+                "",
                 new ArrayList<>(parameters),
                 buildVisualizations(),
                 response.result()
@@ -227,9 +231,6 @@ public class ModelResultController extends BaseController {
         return visualizations;
     }
 
-    /**
-     * Добавляет кнопки "Добавить в отчет" к assistant-сообщениям.
-     */
     private void setupAddToReportButtonForChat() {
         Platform.runLater(() -> {
             if (llmChatComponent == null) return;
@@ -268,12 +269,10 @@ public class ModelResultController extends BaseController {
     }
 
 
-
     @FXML
     private void onSaveReport() {
         saveButton.setDisable(true);
 
-        // 1. Сохрани выбранный график
         String prevSelectedKey = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<ReportChartImageDto> chartImages = new ArrayList<>();
@@ -291,13 +290,11 @@ public class ModelResultController extends BaseController {
                 }
             }
 
-            // 2. После цикла верни выбор к исходному значению
             if (prevSelectedKey != null && chartDataMap.containsKey(prevSelectedKey)) {
                 typeComboBox.getSelectionModel().select(prevSelectedKey);
                 showChart(chartDataMap, prevSelectedKey);
             }
 
-            // После этого — сформируй и отправь отчет (оставшаяся логика)
             List<LlmChatResponseDto> selectedLlmResponses = new ArrayList<>();
             for (String msg : selectedAssistantMessages) {
                 selectedLlmResponses.add(new LlmChatResponseDto(msg));
@@ -330,8 +327,6 @@ public class ModelResultController extends BaseController {
             }));
         });
     }
-
-
 
 
     @Override

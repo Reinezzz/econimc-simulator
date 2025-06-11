@@ -4,16 +4,11 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import org.example.economicssimulatorclient.util.I18n;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для Теории потребительского выбора.
- */
 public class ConsumerChoiceChartBuilder implements ChartDrawer {
 
     @Override
@@ -35,32 +30,25 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
                 return new StackPane(lbl);
         }
 
-        // Универсальная стилизация для всех графиков LineChart/BarChart
         if (node instanceof Chart) {
             Chart chart = (Chart) node;
-            // Белый фон
             chart.setStyle("-fx-background-color: white;");
 
-            // Растягиваем на всю доступную область
             chart.setMinSize(0, 0);
             chart.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
             chart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-            // Стилизация области построения
             chart.lookupAll(".chart-plot-background")
                     .forEach(bg -> bg.setStyle("-fx-background-color: white;"));
 
-            // Светлая серая сетка
             chart.lookupAll(".chart-vertical-grid-lines, .chart-horizontal-grid-lines")
                     .forEach(grid -> grid.setStyle("-fx-stroke: #e6e6e6;"));
             chart.lookupAll(".chart-horizontal-zero-line, .chart-vertical-zero-line")
                     .forEach(zero -> zero.setStyle("-fx-stroke: #bfbfbf; -fx-stroke-width: 1px;"));
 
-            // Легенда на белом фоне
             chart.lookupAll(".chart-legend")
                     .forEach(legend -> legend.setStyle("-fx-background-color: white; -fx-border-radius: 8px; -fx-background-radius: 8px;"));
 
-            // Убрать точки для LineChart (только линии)
             if (chart instanceof LineChart) {
                 LineChart<?, ?> lineChart = (LineChart<?, ?>) chart;
                 for (Object objSeries : lineChart.getData()) {
@@ -77,12 +65,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         return node;
     }
 
-    /**
-     * Кривые безразличия — семейство кривых + бюджетная линия.
-     * chartData:
-     *   - "indifference_curves": List<List<Map<String, Number>>> (quantity, price)
-     *   - "budget": List<Map<String, Number>> (quantity, price)
-     */
     private Node buildIndifferenceCurvesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -93,7 +75,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         chart.setTitle(I18n.t("chart.consumer.indifference_curves.title"));
         chart.setAnimated(false);
 
-        // Семейство кривых безразличия
         if (chartData.containsKey("indifference_curves")) {
             List<List<Map<String, Number>>> curves = (List<List<Map<String, Number>>>) chartData.get("indifference_curves");
             int i = 1;
@@ -110,7 +91,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
             }
         }
 
-        // Бюджетная линия
         if (chartData.containsKey("budget")) {
             List<Map<String, Number>> budget = (List<Map<String, Number>>) chartData.get("budget");
             XYChart.Series<Number, Number> budgetSeries = new XYChart.Series<>();
@@ -126,13 +106,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * Карта оптимума — точка касания как оптимальный выбор.
-     * chartData:
-     *   - "indifference_curve": List<Map<String, Number>> (quantity, price)
-     *   - "budget": List<Map<String, Number>> (quantity, price)
-     *   - "optimum": Map<String, Number> (x, y)
-     */
     private Node buildOptimumMapChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -143,7 +116,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         chart.setTitle(I18n.t("chart.consumer.optimum_map.title"));
         chart.setAnimated(false);
 
-        // Кривая безразличия
         if (chartData.containsKey("indifference_curve")) {
             List<Map<String, Number>> curve = (List<Map<String, Number>>) chartData.get("indifference_curve");
             XYChart.Series<Number, Number> curveSeries = new XYChart.Series<>();
@@ -156,7 +128,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
             }
             chart.getData().add(curveSeries);
         }
-        // Бюджетная линия
         if (chartData.containsKey("budget")) {
             List<Map<String, Number>> budget = (List<Map<String, Number>>) chartData.get("budget");
             XYChart.Series<Number, Number> budgetSeries = new XYChart.Series<>();
@@ -169,7 +140,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
             }
             chart.getData().add(budgetSeries);
         }
-        // Точка оптимума
         if (chartData.containsKey("optimum")) {
             Map<String, Number> pt = (Map<String, Number>) chartData.get("optimum");
             if (pt.get("x") != null && pt.get("y") != null) {
@@ -182,14 +152,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * Эффект дохода/замещения — разложение изменения спроса
-     * chartData:
-     *   - "before": List<Map<String, Number>> (quantity, price)
-     *   - "after": List<Map<String, Number>> (quantity, price)
-     *   - "substitution": List<Map<String, Number>> (quantity, price)
-     *   - "income": List<Map<String, Number>> (quantity, price)
-     */
     private Node buildIncomeSubstitutionChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -214,7 +176,6 @@ public class ConsumerChoiceChartBuilder implements ChartDrawer {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
             series.setName(name);
             for (Map<String, Number> pt : points) {
-                // Предпочитаем x/y, если есть, иначе quantity/price
                 Number x = pt.containsKey("x") ? pt.get("x") : pt.get("quantity");
                 Number y = pt.containsKey("y") ? pt.get("y") : pt.get("price");
                 if (x != null && y != null)

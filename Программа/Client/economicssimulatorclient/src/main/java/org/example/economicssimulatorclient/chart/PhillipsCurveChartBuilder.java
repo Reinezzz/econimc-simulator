@@ -10,9 +10,6 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Визуализатор для Кривой Филлипса.
- */
 public class PhillipsCurveChartBuilder implements ChartDrawer {
 
     @Override
@@ -43,7 +40,7 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
         return node;
     }
 
-    private void styleChart(ScatterChart<?,?> chart) {
+    private void styleChart(ScatterChart<?, ?> chart) {
         chart.setPrefWidth(760);
         chart.setPrefHeight(420);
         chart.setStyle("-fx-background-color: white; -fx-border-color: transparent;");
@@ -94,10 +91,6 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
         chart.setPadding(new Insets(0, 0, 0, 0));
     }
 
-    /**
-     * 1. Scatter plot — связь инфляции и безработицы по историческим данным
-     * chartData: "points": List<Map<String, Number>> ("unemployment", "inflation")
-     */
     private Node buildScatterChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -123,11 +116,6 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 2. Временные ряды — эволюция соотношения по годам
-     * chartData: "unemployment": List<Map<String, Number>> ("year", "unemployment")
-     *            "inflation": List<Map<String, Number>> ("year", "inflation")
-     */
     private Node buildTimeSeriesChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -165,11 +153,6 @@ public class PhillipsCurveChartBuilder implements ChartDrawer {
         return chart;
     }
 
-    /**
-     * 3. Петли — краткосрочные vs долгосрочные траектории
-     * chartData: "short_run": List<Map<String, Number>> ("unemployment", "inflation")
-     *            "long_run": List<Map<String, Number>> ("unemployment", "inflation")
-     */
     private Node buildLoopsChart(Map<String, Object> chartData) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
