@@ -16,12 +16,9 @@ class JwtUtilTest {
     @BeforeEach
     void setup() {
         JwtConfig jwtConfig = new JwtConfig();
-        // Должен быть секрет не короче 32 байт (256 бит) и в Base64:
-        // Пример простого Base64 для теста: "YXNkZmdoamtscXdlcnR5dWlvcGFzZGdmZ2g=" (24 байта, но лучше больше)
         jwtConfig.setSecret("c2VjcmV0c2VjcmV0c2VjcmV0c2VjcmV0MTIzNDU2Nzg5MA==");
         jwtConfig.setAccessTokenExpirationMinutes(10L);
         this.jwtUtil = new JwtUtil(jwtConfig);
-        // Поднимет signingKey на init
         jwtUtil.init();
     }
 

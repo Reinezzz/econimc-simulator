@@ -3,7 +3,6 @@ package com.example.economicssimulatorserver.service;
 import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.entity.RefreshToken;
 import com.example.economicssimulatorserver.entity.User;
-import com.example.economicssimulatorserver.repository.RefreshTokenRepository;
 import com.example.economicssimulatorserver.repository.UserRepository;
 import com.example.economicssimulatorserver.util.JwtUtil;
 import com.example.economicssimulatorserver.exception.LocalizedException;
@@ -20,9 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Optional;
 
-/**
- * Сервис для обработки регистрации, верификации email, аутентификации и сброса пароля.
- */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -39,11 +35,6 @@ public class AuthService {
 
     private static final String REG_CACHE = "registrations";
 
-    /**
-     * Регистрирует нового пользователя, отправляет код подтверждения на email и сохраняет временные данные в кэше.
-     * @param req DTO с параметрами регистрации
-     * @return ApiResponse с результатом и сообщением
-     */
     @Transactional
     public ApiResponse register(RegistrationRequest req) {
         if (userRepo.existsByEmail(req.email()))
@@ -74,11 +65,6 @@ public class AuthService {
         return new ApiResponse(true, "msg.verification_code_sent");
     }
 
-    /**
-     * Подтверждает регистрацию пользователя по коду из письма. Создает пользователя в системе.
-     * @param req DTO с email и кодом
-     * @return ApiResponse с результатом и сообщением
-     */
     @Transactional
     public ApiResponse verifyEmail(VerificationRequest req) {
         var cache = cacheManager.getCache(REG_CACHE);
@@ -107,17 +93,10 @@ public class AuthService {
         return new ApiResponse(true, "msg.email_confirmed");
     }
 
-    /**
-     * Авторизует пользователя, возвращает access и refresh токены.
-     * @param req DTO с логином и паролем
-     * @return DTO с access и refresh токеном
-     * @throws LocalizedException если логин или пароль неверные
-     */
     public LoginResponse login(LoginRequest req) {
-        // Проверяем наличие пользователя в базе до аутентификации
         Optional<User> userOpt = userRepo.findByUsernameOrEmail(req.usernameOrEmail(), req.usernameOrEmail());
         if (userOpt.isEmpty()) {
-            throw new LocalizedException("error.user_not_found"); // или свой собственный класс, если требуется
+            throw new LocalizedException("error.user_not_found");
         }
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
@@ -134,13 +113,6 @@ public class AuthService {
         }
     }
 
-
-
-    /**
-     * Инициирует процедуру сброса пароля: создает токен и отправляет код на email пользователя.
-     * @param req DTO с email пользователя
-     * @return ApiResponse с результатом и сообщением
-     */
     @Transactional
     public ApiResponse initiatePasswordReset(PasswordResetRequest req) {
         User user = userService.findByEmail(req.email())
@@ -156,11 +128,6 @@ public class AuthService {
         return new ApiResponse(true, "msg.password_rest_code_sent");
     }
 
-    /**
-     * Подтверждает сброс пароля по email, коду и новому паролю.
-     * @param req DTO с email, кодом и новым паролем
-     * @return ApiResponse с результатом и сообщением
-     */
     @Transactional
     public ApiResponse confirmPasswordReset(PasswordResetConfirm req) {
         User user = userService.findByEmail(req.email())
@@ -176,22 +143,12 @@ public class AuthService {
         return new ApiResponse(true, "msg.password_updated");
     }
 
-    /**
-     * Отменяет активную сессию сброса пароля для указанного пользователя.
-     * @param email email пользователя
-     */
     public void cancelPasswordReset(String email) {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new LocalizedException("error.email_not_found"));
         tokenService.evictPasswordResetToken(user);
     }
 
-    /**
-     * Генерирует новые access и refresh токены по действующему refresh токену.
-     * @param request DTO с refresh токеном
-     * @return DTO с access и refresh токенами
-     * @throws LocalizedException если refresh токен невалиден/просрочен
-     */
     public RefreshTokenResponse refreshTokens(RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.refreshToken());
         User user = refreshToken.getUser();
@@ -204,15 +161,9 @@ public class AuthService {
 
         String accessToken = jwtUtil.generateToken(userDetails);
 
-        // Возвращаем старый refresh token
         return new RefreshTokenResponse(accessToken, refreshToken.getToken());
     }
 
-
-    /**
-     * Удаляет refresh токен (logout).
-     * @param request DTO с refresh токеном
-     */
     public void logout(LogoutRequest request) {
         refreshTokenService.deleteByToken(request.refreshToken());
     }

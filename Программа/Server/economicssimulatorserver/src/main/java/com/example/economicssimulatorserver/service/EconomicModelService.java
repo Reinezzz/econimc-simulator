@@ -61,8 +61,6 @@ public class EconomicModelService {
         economicModelRepository.deleteById(id);
     }
 
-    // ==== Преобразование между entity <-> record ====
-
     private EconomicModelDto toDto(EconomicModel model, Long userId) {
         List<ModelParameterDto> paramDtos =
                 (userId != null)
@@ -94,7 +92,6 @@ public class EconomicModelService {
         model.setModelType(dto.modelType());
         model.setName(dto.name());
         model.setDescription(dto.description());
-        // Параметры и результаты добавляются отдельно после создания
         return model;
     }
 

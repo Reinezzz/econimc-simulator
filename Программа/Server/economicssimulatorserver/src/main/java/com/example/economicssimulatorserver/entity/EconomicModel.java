@@ -18,7 +18,7 @@ public class EconomicModel {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String modelType; // Например: "DemandSupply"
+    private String modelType;
 
     @Column(nullable = false, length = 255)
     private String name;

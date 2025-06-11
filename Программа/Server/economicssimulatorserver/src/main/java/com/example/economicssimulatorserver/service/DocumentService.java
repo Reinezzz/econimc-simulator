@@ -41,7 +41,6 @@ public class DocumentService {
         }
         try {
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            // Загрузка в MinIO
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucket)
@@ -51,7 +50,7 @@ public class DocumentService {
                             .build()
             );
 
-            // Сохраняем метаинфу в БД
+
             DocumentEntity entity = new DocumentEntity();
             entity.setUserId(userId);
             entity.setName(file.getOriginalFilename());
@@ -91,7 +90,6 @@ public class DocumentService {
                             .build()
             );
         } catch (MinioException ignore) {
-            // Файл мог быть уже удалён из minio — игнорируем
         } catch (Exception e) {
             throw new LocalizedException("error.document_delete");
         }
@@ -128,11 +126,9 @@ public class DocumentService {
     }
 
     private boolean isPdf(MultipartFile file) {
-        // 1. Проверка по Content-Type
         String contentType = file.getContentType();
         if ("application/pdf".equalsIgnoreCase(contentType)) return true;
 
-        // 2. Проверка по расширению
         String filename = file.getOriginalFilename();
         return filename != null && filename.toLowerCase().endsWith(".pdf");
     }

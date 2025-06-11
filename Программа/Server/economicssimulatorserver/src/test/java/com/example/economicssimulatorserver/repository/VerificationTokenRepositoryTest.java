@@ -36,17 +36,14 @@ class VerificationTokenRepositoryTest {
         token.setExpiresAt(LocalDateTime.now().plusSeconds(10));
         verificationTokenRepository.save(token);
 
-        // Проверка поиска по коду
         Optional<VerificationToken> foundByCode = verificationTokenRepository.findByCode("verif1");
         assertThat(foundByCode).isPresent();
         assertThat(foundByCode.get().getUser().getUsername()).isEqualTo("veruser");
 
-        // Проверка поиска по пользователю
         Optional<VerificationToken> foundByUser = verificationTokenRepository.findByUser(user);
         assertThat(foundByUser).isPresent();
         assertThat(foundByUser.get().getCode()).isEqualTo("verif1");
 
-        // Удаление по пользователю
         verificationTokenRepository.deleteByUser(user);
         assertThat(verificationTokenRepository.findByUser(user)).isNotPresent();
     }

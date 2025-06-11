@@ -21,7 +21,6 @@ public class ReportController {
     private final ReportService reportService;
     private final UserRepository userRepository;
 
-    // Вспомогательный метод для получения id пользователя
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -33,7 +32,6 @@ public class ReportController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
-    // Вспомогательный метод для получения username
     private String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -42,12 +40,10 @@ public class ReportController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
-    // --- СОЗДАНИЕ ОТЧЁТА ---
     @PostMapping
     public ResponseEntity<ReportListItemDto> createReport(@RequestBody ReportCreateRequestDto dto) throws Exception {
         Long userId = getCurrentUserId();
         String username = getCurrentUsername();
-        // Имя отчета формируется автоматически: modelName + " - " + username
         String name = dto.modelName() + " - " + username;
         ReportCreateRequestDto newDto = new ReportCreateRequestDto(
                 dto.modelId(),
@@ -64,7 +60,6 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // --- ПОЛУЧИТЬ ВСЕ ОТЧЁТЫ ПОЛЬЗОВАТЕЛЯ ---
     @GetMapping
     public ResponseEntity<List<ReportListItemDto>> getReportsForUser() {
         Long userId = getCurrentUserId();
@@ -72,7 +67,6 @@ public class ReportController {
         return ResponseEntity.ok(list);
     }
 
-    // --- СКАЧАТЬ PDF ОТЧЁТА ---
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadReport(@PathVariable("id") Long reportId) throws Exception {
         Long userId = getCurrentUserId();
@@ -83,7 +77,6 @@ public class ReportController {
                 .body(pdfBytes);
     }
 
-    // --- УДАЛИТЬ ОТЧЁТ ---
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable("id") Long reportId) throws Exception {
         Long userId = getCurrentUserId();

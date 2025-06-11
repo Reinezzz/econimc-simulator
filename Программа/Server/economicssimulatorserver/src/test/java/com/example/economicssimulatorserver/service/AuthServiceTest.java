@@ -46,12 +46,9 @@ class AuthServiceTest {
 
     @Test
     void login_whenValid_shouldReturnTokens() {
-        // Мокаем всё, включая userRepo, authManager, jwtUtil, refreshTokenService
         User user = new User();
         when(userRepo.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
-        // Допиши сюда mock для authManager, jwtUtil, refreshTokenService, если нужны детали
     }
 
-    // Дополняй аналогично для других public-методов: verifyEmail, initiatePasswordReset, confirmPasswordReset, etc.
 
 }

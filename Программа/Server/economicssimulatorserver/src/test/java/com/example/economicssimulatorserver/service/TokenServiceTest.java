@@ -30,6 +30,4 @@ class TokenServiceTest {
         assertThat(code).isNotNull();
     }
 
-    // Аналогично для других методов: validatePasswordResetCode, evictPasswordResetToken, etc.
-
 }

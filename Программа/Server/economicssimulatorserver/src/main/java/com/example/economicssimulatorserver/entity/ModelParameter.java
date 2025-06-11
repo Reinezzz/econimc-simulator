@@ -17,26 +17,25 @@ public class ModelParameter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // связь с моделью (многие параметры к одной модели)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", nullable = false)
     private EconomicModel model;
 
     @Column(nullable = false, length = 100)
-    private String paramName;   // Краткое обозначение (например, "a", "P", "Qd")
+    private String paramName;
 
     @Column(nullable = false, length = 50)
-    private String paramType;   // Тип параметра ("double", "int", "string", "enum", "json", ...)
+    private String paramType;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String paramValue;  // Значение параметра в виде строки
+    private String paramValue;
 
     @Column(length = 255)
-    private String displayName; // Полное название (для тултипов, если потребуется)
+    private String displayName;
 
     @Column(columnDefinition = "TEXT")
-    private String description; // Описание параметра
+    private String description;
 
     @Column
-    private Integer customOrder; // Для сортировки параметров в UI (опционально)
+    private Integer customOrder;
 }

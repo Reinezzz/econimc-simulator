@@ -11,7 +11,6 @@ class SecurityConfigTest {
 
     @Test
     void testConstruct() {
-        // Мокаем зависимости
         JwtUtil jwtUtil = Mockito.mock(JwtUtil.class);
         JwtConfig jwtConfig = new JwtConfig();
         UserDetailsService uds = Mockito.mock(UserDetailsService.class);

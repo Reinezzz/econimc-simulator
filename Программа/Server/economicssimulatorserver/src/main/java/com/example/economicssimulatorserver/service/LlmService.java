@@ -43,12 +43,7 @@ public class LlmService {
     @Value("${llm.ollama.language.default:ru}")
     private String defaultLanguage;
     private final MessageSource messageSource;
-    // --- Публичные методы ---
 
-    /**
-     * Извлечение параметров из PDF через LLM (mistral).
-     * Возвращает список параметров (ModelParameterDto) с заполненными значениями.
-     */
     public LlmParameterExtractionResponseDto extractParameters(LlmParameterExtractionRequestDto req,
                                                                EconomicModelDto model,
                                                                DocumentDto document,
@@ -59,7 +54,6 @@ public class LlmService {
             try {
                 String prompt = buildExtractionPrompt(model, document, modelParameters);
                 String llmResponse = callOllama(prompt, ollamaModel);
-                // Парсим json-ответ LLM в нужную структуру
                 List<ModelParameterDto> updatedParams = parseExtractionResponse(llmResponse, modelParameters);
                 return new LlmParameterExtractionResponseDto(updatedParams);
             } catch (Exception ex) {
@@ -71,9 +65,6 @@ public class LlmService {
         throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
-    /**
-     * Общение с LLM в чат-режиме (объяснение модели, параметров, анализ результата).
-     */
     public LlmChatResponseDto chat(LlmChatRequestDto req, EconomicModelDto model) {
         int attempt = 0;
         Exception lastException = null;
@@ -81,7 +72,6 @@ public class LlmService {
             try {
                 String prompt = buildChatPrompt(req, model);
                 String llmResponse = callOllama(prompt, ollamaModel);
-                // Парсим только текст ответа, LLM должна вернуть текст
                 String assistantMessage = parseChatResponse(llmResponse);
                 return new LlmChatResponseDto(assistantMessage);
             } catch (Exception ex) {
@@ -93,9 +83,6 @@ public class LlmService {
         throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
-    // --- Внутренние методы ---
-
-    /** Формируем prompt для extraction запроса */
     private String buildExtractionPrompt(EconomicModelDto model, DocumentDto document, List<ModelParameterDto> params) {
         Locale locale = Locale.forLanguageTag(defaultLanguage);
         StringBuilder sb = new StringBuilder();
@@ -116,7 +103,6 @@ public class LlmService {
         return sb.toString();
     }
 
-    /** Формируем prompt для chat запроса */
     private String buildChatPrompt(LlmChatRequestDto req, EconomicModelDto model) {
         Locale locale = Locale.forLanguageTag(defaultLanguage);
         StringBuilder sb = new StringBuilder();
@@ -151,9 +137,6 @@ public class LlmService {
         return sb.toString();
     }
 
-    /**
-     * Вызывает Ollama (mistral) через REST API, отправляет prompt, возвращает ответ как строку
-     */
     private String callOllama(String prompt, String model) {
         String url = ollamaHost + "/api/generate";
         Map<String, Object> payload = Map.of(
@@ -183,14 +166,9 @@ public class LlmService {
              BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Лог каждой строки
-
-
-                // Парсим строку как JSON и достаем "response"
                 if (line.trim().isEmpty()) continue;
                 Map<String, Object> lineObj = objectMapper.readValue(line, Map.class);
 
-                // Если есть поле response — добавляем к результату
                 Object respPart = lineObj.get("response");
                 if (respPart != null && !respPart.toString().isBlank()) {
                     jsonBuilder.append(respPart.toString());
@@ -204,17 +182,11 @@ public class LlmService {
         if (finalJson.isEmpty()) {
             throw new LocalizedException("error.llm_empty_response");
         }
-        System.out.println("OLLAMA >>> " + finalJson);
         return finalJson;
     }
 
 
-    /**
-     * Парсит JSON-массив от LLM для extraction (список параметров)
-     */
     private List<ModelParameterDto> parseExtractionResponse(String llmJson, List<ModelParameterDto> originParams) {
-        // Используем свой json utils или любой json парсер (например, Jackson)
-        // Ниже пример с Jackson:
         try {
             com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
             List<Map<String, String>> arr = objectMapper.readValue(llmJson, List.class);
@@ -225,7 +197,6 @@ public class LlmService {
                         .map(x -> x.get("paramValue"))
                         .findFirst()
                         .orElse(orig.paramValue());
-                // сохраняем все остальные поля без изменений, только значение подставляем новое
                 result.add(new ModelParameterDto(
                         orig.id(), orig.modelId(), orig.paramName(), orig.paramType(),
                         value, orig.displayName(), orig.description(), orig.customOrder()
@@ -237,12 +208,7 @@ public class LlmService {
         }
     }
 
-    /**
-     * Парсит ответ LLM для чата (текстовое сообщение)
-     */
     private String parseChatResponse(String llmRaw) {
-        // В простейшем случае это просто текст.
-        // Если понадобится расширить протокол - обработать как json
         return llmRaw.trim();
     }
 }

@@ -31,7 +31,6 @@ class RefreshTokenServiceTest {
         when(userRepo.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
         when(refreshTokenRepo.save(any(RefreshToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Для упрощения создаём UserDetails через анонимный класс
         var userDetails = org.springframework.security.core.userdetails.User
                 .withUsername("user").password("pass").authorities("USER").build();
 
@@ -48,5 +47,4 @@ class RefreshTokenServiceTest {
         verify(refreshTokenRepo).delete(token);
     }
 
-    // Аналогично для других методов
 }

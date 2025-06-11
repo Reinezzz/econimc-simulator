@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EconomicModelRepository extends JpaRepository<EconomicModel, Long> {
-    // Дополнительные методы поиска, если будут нужны, добавляй здесь
 }

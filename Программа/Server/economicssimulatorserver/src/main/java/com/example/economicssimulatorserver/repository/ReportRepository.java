@@ -13,6 +13,4 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     List<Report> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    // При необходимости добавить другие методы, например:
-    // Optional<Report> findByIdAndUserId(Long id, Long userId);
 }

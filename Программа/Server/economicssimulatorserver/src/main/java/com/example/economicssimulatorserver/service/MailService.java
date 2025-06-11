@@ -14,9 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Сервис для отправки email-писем с кодами подтверждения и сброса пароля.
- */
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -26,12 +23,6 @@ public class MailService {
     private final MessageSource messageSource;
     private String defaultLanguage;
 
-    /**
-     * Отправляет письмо с кодом подтверждения email.
-     * @param to email получателя
-     * @param username имя пользователя
-     * @param code одноразовый код подтверждения
-     */
     public void sendVerificationEmail(String to, String username, String code) {
         sendVerificationEmail(to, username, code, defaultLanguage);
     }
@@ -46,12 +37,6 @@ public class MailService {
         sendHtml(to, subject, html);
     }
 
-    /**
-     * Отправляет письмо с кодом для сброса пароля.
-     * @param to email получателя
-     * @param username имя пользователя
-     * @param code одноразовый код сброса пароля
-     */
     public void sendPasswordResetEmail(String to, String username, String code) {
         sendPasswordResetEmail(to, username, code, defaultLanguage);
     }
@@ -66,13 +51,6 @@ public class MailService {
         sendHtml(to, subject, html);
     }
 
-    /**
-     * Отправляет HTML-письмо через SMTP.
-     * @param to email получателя
-     * @param subject тема письма
-     * @param html содержимое письма в формате HTML
-     * @throws IllegalStateException если не удалось отправить письмо
-     */
     void sendHtml(String to, String subject, String html) {
         try {
             MimeMessage mime = mailSender.createMimeMessage();
@@ -82,7 +60,7 @@ public class MailService {
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(html, true);   // true = HTML
+            helper.setText(html, true);
             mailSender.send(mime);
 
         } catch (MessagingException ex) {

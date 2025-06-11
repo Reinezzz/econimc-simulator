@@ -27,25 +27,18 @@ class MailServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Мокаем mailSender.createMimeMessage() чтобы возвращал мок MimeMessage
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-
-        // Чтобы не вываливался MessagingException из MimeMessageHelper
-        // можно не мокать, если тест не доходит до реальной отправки
     }
 
     @Test
     void sendVerificationEmail_shouldNotThrow() {
-        // Мокаем шаблон
         when(templateUtil.render(anyString(), anyMap())).thenReturn("<html>test</html>");
 
-        // Не выбрасывает исключения
         assertThatCode(() ->
                 mailService.sendVerificationEmail("to@mail.com", "user", "code123")
         ).doesNotThrowAnyException();
 
-        // Проверяем что mailSender.send был вызван
         verify(mailSender).send(any(MimeMessage.class));
     }
 

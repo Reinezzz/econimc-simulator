@@ -23,7 +23,7 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final UserRepository userRepository; // нужен для поиска id по username
+    private final UserRepository userRepository;
 
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -35,9 +35,7 @@ public class DocumentController {
         }
         throw new LocalizedException("error.user_not_authenticated");
     }
-    /**
-     * Загрузка PDF-документа.
-     */
+
     @PostMapping("/upload")
     public DocumentDto uploadDocument(
             @RequestParam("file") MultipartFile file,
@@ -46,9 +44,6 @@ public class DocumentController {
         return documentService.uploadDocument(userId, file, description);
     }
 
-    /**
-     * Скачивание документа.
-     */
     @GetMapping("/{id}/download")
     public ResponseEntity<InputStreamResource> downloadDocument(
             @PathVariable("id") Long documentId) {
@@ -69,9 +64,6 @@ public class DocumentController {
                 .body(new InputStreamResource(inputStream));
     }
 
-    /**
-     * Удаление документа.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(
             @PathVariable("id") Long documentId) {
@@ -80,9 +72,6 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Получить список документов пользователя.
-     */
     @GetMapping("/")
     public List<DocumentDto> getUserDocuments() {
         Long userId = getCurrentUserId();

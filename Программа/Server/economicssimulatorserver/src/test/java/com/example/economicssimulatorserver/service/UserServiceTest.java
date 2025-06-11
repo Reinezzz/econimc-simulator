@@ -39,6 +39,5 @@ class UserServiceTest {
         assertThat(userService.findByEmail("test@mail.com")).contains(user);
     }
 
-    // Добавь тесты на updatePassword, findByUsername, existsByEmail, etc.
 
 }

@@ -32,7 +32,6 @@ public class Report {
 
     private String language;
 
-    // Для простоты — параметры, результат и llm-сообщения храним как JSON
     @Column(name = "params", columnDefinition = "text")
     private String params;
 

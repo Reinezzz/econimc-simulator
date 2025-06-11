@@ -22,9 +22,8 @@ public class EconomicModelController {
     private final EconomicModelService economicModelService;
     private final ModelParameterService modelParameterService;
     private final ModelCalculationService modelCalculationService;
-    private final UserRepository userRepository; // нужен для поиска id по username
+    private final UserRepository userRepository;
 
-    // Метод для получения id текущего пользователя из security context
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -64,8 +63,6 @@ public class EconomicModelController {
         return ResponseEntity.noContent().build();
     }
 
-    // === ModelParameter для пользователя ===
-
     @GetMapping("/{modelId}/parameters")
     public ResponseEntity<List<ModelParameterDto>> getUserParameters(
             @PathVariable Long modelId
@@ -73,8 +70,6 @@ public class EconomicModelController {
         Long userId = getCurrentUserId();
         return ResponseEntity.ok(modelParameterService.getParametersByModelId(modelId, userId));
     }
-
-    // === ModelParameter CRUD (общие параметры — для админки/конструктора) ===
 
     @PostMapping("/{modelId}/parameters")
     public ResponseEntity<ModelParameterDto> createParameter(@PathVariable Long modelId, @RequestBody ModelParameterDto dto) {
@@ -92,8 +87,6 @@ public class EconomicModelController {
         modelParameterService.deleteParameter(paramId);
         return ResponseEntity.noContent().build();
     }
-
-    // === Calculation ===
 
     @PostMapping("/calculate")
     public ResponseEntity<CalculationResponseDto> calculate(@RequestBody CalculationRequestDto request) {

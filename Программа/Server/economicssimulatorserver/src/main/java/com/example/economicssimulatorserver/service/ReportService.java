@@ -35,16 +35,13 @@ public class ReportService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // --- СОЗДАНИЕ ОТЧЕТА ---
     @Transactional
     public ReportListItemDto createReport(Long userId, String username, ReportCreateRequestDto dto) throws Exception {
         String filename = UUID.randomUUID() + ".pdf";
         String minioPath = userId + "/" + filename;
 
-        // Генерируем PDF
         byte[] pdfBytes = generatePdf(dto, username);
 
-        // Заливаем PDF в Minio
         try (ByteArrayInputStream bis = new ByteArrayInputStream(pdfBytes)) {
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -56,7 +53,6 @@ public class ReportService {
             );
         }
 
-        // Сохраняем отчет в БД (всё сериализуем в строки)
         String paramsJson = objectMapper.writeValueAsString(dto.parameters());
         String resultJson = objectMapper.writeValueAsString(dto.result());
         String llmMessagesJson = objectMapper.writeValueAsString(dto.llmMessages());
@@ -86,7 +82,6 @@ public class ReportService {
         );
     }
 
-    // --- ПОЛУЧЕНИЕ СПИСКА ОТЧЕТОВ ПОЛЬЗОВАТЕЛЯ ---
     public List<ReportListItemDto> getReportsForUser(Long userId) {
         return reportRepository.findByUserId(userId).stream()
                 .map(report -> new ReportListItemDto(
@@ -100,7 +95,6 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
-    // --- СКАЧИВАНИЕ ОТЧЕТА (pdf как bytes) ---
     public byte[] downloadReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new LocalizedException("error.report_not_found"));
@@ -118,7 +112,6 @@ public class ReportService {
         }
     }
 
-    // --- УДАЛЕНИЕ ОТЧЕТА ---
     @Transactional
     public void deleteReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
@@ -126,25 +119,20 @@ public class ReportService {
         if (!report.getUserId().equals(userId)) {
             throw new LocalizedException("error.report_access_denied");
         }
-        // Удалить из Minio
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
                         .bucket(reportBucket)
                         .object(report.getPath())
                         .build()
         );
-        // Удалить из БД
         reportRepository.delete(report);
     }
 
-    // --- PDF-ГЕНЕРАЦИЯ ---
     private byte[] generatePdf(ReportCreateRequestDto dto, String username) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             com.itextpdf.kernel.pdf.PdfWriter writer = new com.itextpdf.kernel.pdf.PdfWriter(baos);
             com.itextpdf.kernel.pdf.PdfDocument pdfDoc = new com.itextpdf.kernel.pdf.PdfDocument(writer);
 
-            // === Подключаем Roboto-Medium.ttf из ресурсов ===
-            // Путь к ttf должен быть src/main/resources/fonts/Roboto-Medium.ttf
             InputStream fontStream = getClass().getResourceAsStream("/fonts/Roboto-Medium.ttf");
             if (fontStream == null) throw new IOException("Roboto-Medium.ttf not found in resources/fonts/");
             byte[] fontBytes = fontStream.readAllBytes();
@@ -161,7 +149,6 @@ public class ReportService {
                     messageSource.getMessage("pdf.language", new Object[]{dto.language()}, locale)).setFont(font));
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
-            // Параметры с описанием
             document.add(new com.itextpdf.layout.element.Paragraph(
                     messageSource.getMessage("pdf.parameters", null, locale)).setFont(font));
             for (ModelParameterDto param : dto.parameters()) {
@@ -173,7 +160,6 @@ public class ReportService {
             }
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
-            // Парсенный результат (текст)
             document.add(new com.itextpdf.layout.element.Paragraph(
                     messageSource.getMessage("pdf.result", null, locale)).setFont(font));
             if (dto.parsedResult() != null && !dto.parsedResult().isBlank()) {
@@ -184,7 +170,6 @@ public class ReportService {
             }
             document.add(new com.itextpdf.layout.element.Paragraph(" ").setFont(font));
 
-            // Все графики
             document.add(new com.itextpdf.layout.element.Paragraph(
                     messageSource.getMessage("pdf.charts", null, locale)).setFont(font));
             if (dto.charts() != null && !dto.charts().isEmpty()) {
@@ -210,10 +195,9 @@ public class ReportService {
         }
     }
     public static String localizedValue(String line) {
-        String[] parts = line.split("\\^", 2); // максимум 2 части
-        if (parts.length == 1) return line; // если нет ^ — возвращаем как есть
+        String[] parts = line.split("\\^", 2);
+        if (parts.length == 1) return line;
         String lang = Locale.getDefault().getLanguage();
-        // Русский — до ^, любой другой — после
         if (lang.equals("ru")) return parts[0].trim();
         else return parts[1].trim();
     }

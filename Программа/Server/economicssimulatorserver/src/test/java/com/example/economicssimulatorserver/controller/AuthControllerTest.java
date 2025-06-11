@@ -39,7 +39,6 @@ class AuthControllerTest {
     @MockBean
     private CacheManager cacheManager;
 
-    // Пример DTO-заглушек
     private static final RegistrationRequest REG_REQ =
             new RegistrationRequest("testuser", "test@email.com", "pass123");
     private static final VerificationRequest VERIFY_REQ =
@@ -193,14 +192,6 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Successfully logged out."));
     }
 
-//    @TestConfiguration
-//    static class NoSecurityConfig {
-//        @Bean
-//        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//            http.csrf().disable().authorizeHttpRequests((authz) -> authz.anyRequest().permitAll());
-//            return http.build();
-//        }
-//    }
 
 
 }

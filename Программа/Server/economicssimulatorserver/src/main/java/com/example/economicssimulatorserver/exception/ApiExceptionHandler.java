@@ -10,26 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-/**
- * Глобальный обработчик исключений REST-контроллеров.
- * <p>
- * Локализует сообщения об ошибках, возвращая их клиенту в унифицированном формате.
- */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
     private final MessageSource messageSource;
 
-    /**
-     * @param messageSource бин для поиска локализованных сообщений
-     */
     public ApiExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
-    /**
-     * Обработка кастомных локализованных ошибок приложения.
-     */
     @ExceptionHandler(LocalizedException.class)
     public ResponseEntity<ApiResponse> handleLocalizedException(
             LocalizedException ex, Locale locale) {
@@ -45,9 +34,6 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiResponse(false, message));
     }
 
-    /**
-     * Обработка ошибок валидации DTO (например, @Valid).
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse> handleValidationException(
             MethodArgumentNotValidException ex, Locale locale) {
@@ -73,9 +59,6 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiResponse(false, message));
     }
 
-    /**
-     * Обработка всех неожиданных ошибок.
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleAllOtherExceptions(
             Exception ex, Locale locale) {
@@ -90,11 +73,7 @@ public class ApiExceptionHandler {
         return ResponseEntity.internalServerError().body(new ApiResponse(false, message));
     }
 
-    /**
-     * Логирует исключение (замени на свой логгер).
-     */
     private void logException(Exception ex) {
-        // Используй свой логгер
         ex.printStackTrace();
     }
 }

@@ -6,10 +6,6 @@ import java.util.*;
 
 public class ChartDataUtil {
 
-    /**
-     * Генерирует список точек для графика по двум массивам X и Y.
-     * Возвращает List<Map<String, Double>>: [{x: ..., y: ...}, ...]
-     */
     public static List<Map<String, Double>> pointsList(double[] x, double[] y) {
         if (x.length != y.length)
             throw new LocalizedException("error.chart_xy_size");
@@ -23,9 +19,6 @@ public class ChartDataUtil {
         return points;
     }
 
-    /**
-     * Формирует диапазон значений для оси (min, max, step)
-     */
     public static double[] range(double min, double max, int steps) {
         if (steps <= 1)
             throw new LocalizedException("error.chart_steps");
@@ -37,9 +30,6 @@ public class ChartDataUtil {
         return arr;
     }
 
-    /**
-     * Быстрое преобразование данных для столбчатой диаграммы: Map<label, value>
-     */
     public static List<Map<String, Object>> barData(String[] labels, double[] values) {
         if (labels.length != values.length)
             throw new LocalizedException("error.chart_label_size");

@@ -33,13 +33,6 @@ public class LlmController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
-    /**
-     * Извлечение параметров из документа через LLM.
-     * @param req - DTO с modelId и documentId
-     * @return Список ModelParameterDto с новыми значениями
-     */
-
-
     @PostMapping("/extract-parameters")
     public ResponseEntity<LlmParameterExtractionResponseDto> extractParameters(
             @RequestBody LlmParameterExtractionRequestDto req) {
@@ -54,11 +47,6 @@ public class LlmController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Общение с LLM по экономической модели (чат-бот).
-     * @param req - DTO с modelId, userMessage, параметрами, визуализациями, результатом
-     * @return Ответ LLM в виде текста
-     */
     @PostMapping("/chat")
     public ResponseEntity<LlmChatResponseDto> chat(
             @RequestBody LlmChatRequestDto req) {

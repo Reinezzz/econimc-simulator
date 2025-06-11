@@ -1,4 +1,4 @@
-package com.example.economicssimulatorserver.entity;// UserModelParameter.java
+package com.example.economicssimulatorserver.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
