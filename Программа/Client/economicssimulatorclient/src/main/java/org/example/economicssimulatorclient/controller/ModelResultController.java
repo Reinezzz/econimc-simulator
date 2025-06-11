@@ -90,9 +90,9 @@ public class ModelResultController extends BaseController {
             int index = i;
             VBox paramBox = new VBox(3);
             paramBox.getStyleClass().add("parameter-card");
-            Label symbol = new Label(param.paramName());
+            Label symbol = new Label(localizedValue(param.paramName()));
             symbol.getStyleClass().add("parameter-name");
-            Label descr = new Label(param.description());
+            Label descr = new Label(localizedValue(param.description()));
             descr.getStyleClass().add("parameter-desc");
             descr.setWrapText(true);
             Label type = new Label(param.paramType());
@@ -286,8 +286,8 @@ public class ModelResultController extends BaseController {
                 chartPane.layout();
                 Node chartNode = chartPane.getChildren().isEmpty() ? null : chartPane.getChildren().get(0);
                 if (chartNode != null) {
-                    String base64 = ReportImageUtil.toBase64Png(chartNode, 500, 300);
-                    chartImages.add(new ReportChartImageDto(chartKey, base64));
+                    String base64 = ReportImageUtil.toBase64Png(chartNode, 800, 300);
+                    chartImages.add(new ReportChartImageDto(I18n.t("chart." + chartKey), base64));
                 }
             }
 
@@ -306,7 +306,7 @@ public class ModelResultController extends BaseController {
 
             ReportCreateRequestDto req = new ReportCreateRequestDto(
                     model.id(),
-                    model.name(),
+                    localizedValue(model.name()),
                     "",
                     Locale.getDefault().getLanguage(),
                     new ArrayList<>(parameters),

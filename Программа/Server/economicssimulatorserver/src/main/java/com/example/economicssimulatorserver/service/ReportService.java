@@ -165,9 +165,9 @@ public class ReportService {
             document.add(new com.itextpdf.layout.element.Paragraph(
                     messageSource.getMessage("pdf.parameters", null, locale)).setFont(font));
             for (ModelParameterDto param : dto.parameters()) {
-                String descr = param.description() == null ? "" : param.description();
+                String descr = param.description() == null ? "" : localizedValue(param.description());
                 document.add(new com.itextpdf.layout.element.Paragraph(
-                        param.paramName() + ": " + param.paramValue() +
+                        localizedValue(param.paramName()) + ": " + param.paramValue() +
                                 (descr.isBlank() ? "" : " (" + descr + ")")
                 ).setFont(font));
             }
@@ -208,6 +208,14 @@ public class ReportService {
             document.close();
             return baos.toByteArray();
         }
+    }
+    public static String localizedValue(String line) {
+        String[] parts = line.split("\\^", 2); // максимум 2 части
+        if (parts.length == 1) return line; // если нет ^ — возвращаем как есть
+        String lang = Locale.getDefault().getLanguage();
+        // Русский — до ^, любой другой — после
+        if (lang.equals("ru")) return parts[0].trim();
+        else return parts[1].trim();
     }
 
 

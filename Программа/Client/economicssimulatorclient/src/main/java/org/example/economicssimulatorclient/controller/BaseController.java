@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.example.economicssimulatorclient.util.I18n;
 
+import java.util.Locale;
+
 /**
  * Базовый класс для всех JavaFX-контроллеров.
  * Предоставляет утилиты для локализации, DI и обработки ошибок.
@@ -100,6 +102,15 @@ public abstract class BaseController {
 
     // Абстрактный метод для очистки всех полей формы
     public abstract void clearFields();
+
+    public static String localizedValue(String line) {
+        String[] parts = line.split("\\^", 2); // максимум 2 части
+        if (parts.length == 1) return line; // если нет ^ — возвращаем как есть
+        String lang = Locale.getDefault().getLanguage();
+        // Русский — до ^, любой другой — после
+        if (lang.equals("ru")) return parts[0].trim();
+        else return parts[1].trim();
+    }
 
 
 }

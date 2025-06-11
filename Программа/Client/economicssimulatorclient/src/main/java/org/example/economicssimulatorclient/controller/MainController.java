@@ -89,7 +89,7 @@ public class MainController extends BaseController {
     private void populateModelList(List<EconomicModelDto> models) {
         modelList.getChildren().clear();
         for (EconomicModelDto model : models) {
-            Button btn = new Button(model.name());
+            Button btn = new Button(localizedValue(model.name()));
             btn.getStyleClass().add("model-list-button");
             btn.setMaxWidth(Double.MAX_VALUE);
             Tooltip tooltip = new Tooltip(model.description() != null ? model.description() : model.name());

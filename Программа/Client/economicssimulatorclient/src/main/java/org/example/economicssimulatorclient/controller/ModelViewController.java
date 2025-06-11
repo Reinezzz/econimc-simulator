@@ -109,11 +109,11 @@ public class ModelViewController extends BaseController {
     }
 
     private void fillModelInfo() {
-        nameLabel.setText(model.name());
-        typeLabel.setText(model.modelType());
-        descriptionArea.setText(model.description() != null ? model.description() : "");
+        nameLabel.setText(localizedValue(model.name()));
+        typeLabel.setText(localizedValue(model.modelType()));
+        descriptionArea.setText(model.description() != null ? localizedValue(model.description()) : "");
         formulaArea.setText(model.formula() != null ? model.formula() : "");
-        modelTitle.setText(model.name());
+        modelTitle.setText(localizedValue(model.name()));
 
         // --- Основная магия:
         if (pendingExtractionParams != null && !pendingExtractionParams.isEmpty()) {
@@ -158,9 +158,9 @@ public class ModelViewController extends BaseController {
             paramBox.getStyleClass().add("parameter-card");
             paramBox.setSpacing(2);
 
-            Label symbol = new Label(param.paramName());
+            Label symbol = new Label(localizedValue(param.paramName()));
             symbol.getStyleClass().add("parameter-name");
-            Label descr = new Label(param.description());
+            Label descr = new Label(localizedValue(param.description()));
             descr.getStyleClass().add("parameter-desc");
             descr.setWrapText(true);
 

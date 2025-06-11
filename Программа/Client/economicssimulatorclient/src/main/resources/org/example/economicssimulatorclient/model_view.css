@@ -6,6 +6,8 @@
 .top-bar {
     -fx-background-color: transparent;
     -fx-pref-height: 100px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
     -fx-padding: 32 36 0 36;
     -fx-spacing: 0;
     -fx-alignment: center;
@@ -26,6 +28,8 @@
 .bottom-bar {
     -fx-background-color: transparent;
     -fx-pref-height: 100px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
     -fx-padding: 0 36 0 36;
     -fx-alignment: center;
     -fx-spacing: 0;
@@ -66,6 +70,12 @@
     -fx-padding: 0;
     -fx-border-color: transparent;
     -fx-border-width: 0;
+    -fx-pref-width: 500px; /* 1/3 ширины */
+    -fx-min-width: 500px;
+    -fx-max-width: 500px;
+    -fx-pref-height: 800px;
+    -fx-min-height: 800px;
+    -fx-max-height: 800px;
 }
 .parameter-scroll > .viewport {
     -fx-background-color: #fff;
@@ -115,6 +125,7 @@
     -fx-spacing: 16;
     -fx-alignment: top-center;
     -fx-pref-width: 900px;
+    -fx-pref-height: 900px;
 }
 
 /* TITLE */

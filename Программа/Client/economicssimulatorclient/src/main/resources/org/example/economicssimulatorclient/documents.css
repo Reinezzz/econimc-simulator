@@ -6,6 +6,8 @@
 .top-bar {
     -fx-background-color: transparent;
     -fx-pref-height: 100px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
     -fx-padding: 32 36 0 36;
     -fx-spacing: 0;
     -fx-alignment: center;
@@ -44,6 +46,8 @@
 .bottom-bar {
     -fx-background-color: transparent;
     -fx-pref-height: 100px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
     -fx-padding: 0 36 0 36;
     -fx-alignment: center;
 }
