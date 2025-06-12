@@ -9,6 +9,7 @@ import com.example.economicssimulatorserver.entity.ModelResult;
 import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.example.economicssimulatorserver.repository.EconomicModelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class EconomicModelService {
     private final ModelParameterService modelParameterService;
 
     @Transactional()
+    @Cacheable(value = "models", key = "#userId")
     public List<EconomicModelDto> getAllModels(Long userId) {
         return economicModelRepository.findAll().stream()
                 .map(model -> toDto(model, userId))
