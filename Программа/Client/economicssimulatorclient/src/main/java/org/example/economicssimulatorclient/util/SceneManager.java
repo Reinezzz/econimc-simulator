@@ -39,7 +39,6 @@ public final class SceneManager {
 
     private static Parent load(String fxml) {
         try {
-            I18n.setLocale(Locale.forLanguageTag("ru"));
             Locale locale = I18n.getLocale();
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(ROOT + fxml));
@@ -55,7 +54,6 @@ public final class SceneManager {
             if (currentFxml != null)
                 history.push(currentFxml);
             currentFxml = fxml;
-            I18n.setLocale(Locale.forLanguageTag("ru"));
             Locale locale = I18n.getLocale();
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(ROOT + fxml));
@@ -66,6 +64,13 @@ public final class SceneManager {
             scene.setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void reloadCurrent() {
+        if (currentFxml != null) {
+            cache.remove(currentFxml);
+            switchToWithoutContorller(currentFxml);
         }
     }
 

@@ -77,7 +77,6 @@ public class ModelViewController extends BaseController {
             llmChatComponent.clear();
         }
         try {
-            I18n.setLocale(Locale.forLanguageTag("ru"));
             Locale locale = I18n.getLocale();
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
@@ -168,7 +167,6 @@ public class ModelViewController extends BaseController {
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
-
         editButton.setOnAction(e -> toggleEditMode());
 
         runButton.setOnAction(e -> {

@@ -19,6 +19,10 @@
 
     <VBox styleClass="card" spacing="20" alignment="CENTER">
 
+        <HBox alignment="CENTER_RIGHT" prefWidth="400">
+            <Button fx:id="langButton" styleClass="topbar-button" />
+        </HBox>
+
         <Label text="%auth.title" styleClass="title"/>
 
         <VBox spacing="8" prefWidth="400">

@@ -25,6 +25,11 @@
         <center>
             <Label fx:id="statusLabel" styleClass="status-label" alignment="CENTER_RIGHT"/>
         </center>
+        <right>
+            <VBox alignment="CENTER" prefHeight="60" styleClass="exit-container">
+                <Button fx:id="langButton" styleClass="exit-button" />
+            </VBox>
+        </right>
     </BorderPane >
 
     <Separator styleClass="top-separator"

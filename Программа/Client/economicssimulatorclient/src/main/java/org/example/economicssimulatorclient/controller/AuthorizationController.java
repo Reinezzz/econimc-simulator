@@ -24,6 +24,11 @@ public class AuthorizationController extends BaseController {
     private final AuthService auth = BaseController.get(AuthService.class);
 
     @FXML
+    private void initialize() {
+        initLangButton();
+    }
+
+    @FXML
     public void doLogin() {
         showError(statusLabel, "");
         String login = usernameEmailField.getText().trim();

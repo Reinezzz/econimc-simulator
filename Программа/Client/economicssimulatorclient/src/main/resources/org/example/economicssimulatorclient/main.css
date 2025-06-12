@@ -6,7 +6,7 @@
     -fx-background-color: transparent;
     -fx-pref-height: 60px;
     -fx-padding: 0 0 0 32;
-    -fx-alignment: center-left;
+    -fx-alignment: center;
 }
 .status-label {
     -fx-font-size: 22px;
@@ -15,7 +15,10 @@
     -fx-text-fill: #1e0acb;
     -fx-alignment: center;
 }
-
+.exit-container{
+    -fx-background-color: transparent;
+    -fx-padding: 0 32 0 32;
+}
 .exit-button {
     -fx-background-color: #1e0acb;
     -fx-background-radius: 12;

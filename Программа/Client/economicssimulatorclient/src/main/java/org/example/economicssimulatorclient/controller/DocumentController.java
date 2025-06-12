@@ -7,8 +7,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import org.example.economicssimulatorclient.dto.DocumentDto;
+import org.example.economicssimulatorclient.dto.LlmParameterExtractionRequestDto;
+import org.example.economicssimulatorclient.dto.LlmParameterExtractionResponseDto;
 import org.example.economicssimulatorclient.dto.ReportListItemDto;
 import org.example.economicssimulatorclient.service.DocumentService;
+import org.example.economicssimulatorclient.service.LlmService;
 import org.example.economicssimulatorclient.service.ReportService;
 import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
@@ -51,7 +54,6 @@ public class DocumentController extends BaseController {
 
     @FXML
     public void initialize() {
-
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
         mainButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
 
@@ -360,7 +362,17 @@ public class DocumentController extends BaseController {
         selectButton.setDisable(true);
         runAsync(() -> {
             try {
-                Platform.runLater(() -> showSuccess(statusLabel, "docs.params_extracted"));
+                LlmParameterExtractionRequestDto req = new LlmParameterExtractionRequestDto(modelId, selectedDoc.id());
+                LlmParameterExtractionResponseDto resp = LlmService.getInstance().extractParameters(
+                        org.example.economicssimulatorclient.util.SessionManager.getInstance().getBaseUri(),
+                        req
+                );
+                List<org.example.economicssimulatorclient.dto.ModelParameterDto> newParams = resp.parameters();
+                Platform.runLater(() -> SceneManager.switchTo("model_view.fxml", c -> {
+                    ((ModelViewController) c).initWithModelId(modelId, newParams);
+                }));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             } finally {
                 Platform.runLater(() -> selectButton.setDisable(false));
             }

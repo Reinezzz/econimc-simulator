@@ -1,0 +1,15 @@
+package org.example.economicssimulatorclient.service;
+
+import org.example.economicssimulatorclient.config.AppConfig;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+
+public class LanguageService extends MainService {
+    private final URI baseUri = URI.create(AppConfig.getBaseUrl() + "/api/");
+
+    public void updateLanguage(String lang) throws IOException, InterruptedException {
+        post(baseUri, "lang", Map.of("lang", lang), Object.class, true, null);
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.economicssimulatorserver.service;
 
+import com.example.economicssimulatorserver.config.LocaleHolder;
 import com.example.economicssimulatorserver.dto.*;
 import com.example.economicssimulatorserver.exception.LocalizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,7 +85,7 @@ public class LlmService {
     }
 
     private String buildExtractionPrompt(EconomicModelDto model, DocumentDto document, List<ModelParameterDto> params) {
-        Locale locale = Locale.forLanguageTag(defaultLanguage);
+        Locale locale = LocaleHolder.getLocale();
         StringBuilder sb = new StringBuilder();
         sb.append(messageSource.getMessage("prompt.extract.task", null, locale)).append(' ');
         sb.append(messageSource.getMessage("prompt.extract.model", new Object[]{model.name()}, locale)).append("\n");
@@ -94,7 +95,7 @@ public class LlmService {
             sb.append(messageSource.getMessage("prompt.extract.param_item",
                     new Object[]{p.displayName(), p.paramName(), p.description(), p.paramType()}, locale)).append("\n");
         }
-        sb.append("\nДокумент: ").append(document.name()).append("\n");
+        sb.append(messageSource.getMessage("prompt.doc", null, locale)).append(document.name()).append("\n");
         sb.append("\n").append(messageSource.getMessage("prompt.extract.document", new Object[]{document.name()}, locale)).append("\n");
         sb.append(messageSource.getMessage("prompt.extract.explain", null, locale)).append(' ');
         sb.append(messageSource.getMessage("prompt.extract.format", null, locale)).append("\n");
@@ -104,7 +105,7 @@ public class LlmService {
     }
 
     private String buildChatPrompt(LlmChatRequestDto req, EconomicModelDto model) {
-        Locale locale = Locale.forLanguageTag(defaultLanguage);
+        Locale locale = LocaleHolder.getLocale();
         StringBuilder sb = new StringBuilder();
         sb.append(messageSource.getMessage("prompt.chat.intro", null, locale)).append(' ');
         sb.append(messageSource.getMessage("prompt.chat.topic", new Object[]{model.name()}, locale)).append("\n");

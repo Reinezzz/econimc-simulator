@@ -47,7 +47,7 @@ public class MainController extends BaseController {
     private void initialize() {
         clearStatusLabel();
         loadModelList();
-
+        initLangButton();
         long lastModelId = LastModelStorage.loadLastModelId();
         tileButton.setDisable(lastModelId == -1);
         tileButton.setOnMouseClicked(e -> {

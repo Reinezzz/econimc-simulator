@@ -70,10 +70,8 @@ public class ModelResultController extends BaseController {
         fillParameters();
         fillResult();
         fillCharts();
-
         chat.getChildren().clear();
         try {
-            I18n.setLocale(Locale.forLanguageTag("ru"));
             Locale locale = I18n.getLocale();
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/economicssimulatorclient/llm_chat_component.fxml"));
@@ -305,7 +303,7 @@ public class ModelResultController extends BaseController {
                     model.id(),
                     localizedValue(model.name()),
                     "",
-                    Locale.getDefault().getLanguage(),
+                    I18n.getLocale().getLanguage(),
                     new ArrayList<>(parameters),
                     response.result(),
                     chartImages,
