@@ -14,12 +14,9 @@ import org.example.economicssimulatorclient.chart.ChartDrawerFactory;
 import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.parser.ParserFactory;
 import org.example.economicssimulatorclient.parser.ResultParser;
-import org.example.economicssimulatorclient.util.I18n;
-import org.example.economicssimulatorclient.util.ReportImageUtil;
+import org.example.economicssimulatorclient.util.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.service.ReportService;
-import org.example.economicssimulatorclient.util.ChartDataConverter;
-import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.io.IOException;
 import java.net.URI;
@@ -86,6 +83,20 @@ public class ModelResultController extends BaseController {
         setupLlmChatComponent();
 
         setupAddToReportButtonForChat();
+    }
+
+    private boolean validateParameters() {
+        for (ModelParameterDto p : parameters) {
+            if (!ParameterValidator.notEmpty(p.paramValue())) {
+                showError(statusLabel, I18n.t("model.param_empty") + p.paramName());
+                return false;
+            }
+            if (!ParameterValidator.isValid(p)) {
+                showError(statusLabel, I18n.t("model.param_invalid") + p.paramName());
+                return false;
+            }
+        }
+        return true;
     }
 
     private void fillParameters() {
@@ -190,6 +201,9 @@ public class ModelResultController extends BaseController {
     }
 
     private void repeatCalculation() {
+        if (!validateParameters()) {
+            return;
+        }
         runAsync(() -> {
             try {
                 CalculationRequestDto req = new CalculationRequestDto(
@@ -269,6 +283,9 @@ public class ModelResultController extends BaseController {
 
     @FXML
     private void onSaveReport() {
+        if (!validateParameters()) {
+            return;
+        }
         saveButton.setDisable(true);
 
         String prevSelectedKey = typeComboBox.getSelectionModel().getSelectedItem();

@@ -9,6 +9,7 @@ import org.example.economicssimulatorclient.dto.*;
 import org.example.economicssimulatorclient.service.EconomicModelService;
 import org.example.economicssimulatorclient.util.I18n;
 import org.example.economicssimulatorclient.util.LastModelStorage;
+import org.example.economicssimulatorclient.util.ParameterValidator;
 import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.io.IOException;
@@ -203,12 +204,12 @@ public class ModelViewController extends BaseController {
             for (int i = 0; i < parameters.size(); i++) {
                 ModelParameterDto p = parameters.get(i);
                 String newValue = valueFields.get(i).getText();
-                if (newValue == null || newValue.isEmpty()) {
+                if (!ParameterValidator.notEmpty(newValue)) {
                     showError(statusLabel, I18n.t("model.param_empty") + p.paramName());
                     valid = false;
                     break;
                 }
-                updated.add(new ModelParameterDto(
+                ModelParameterDto updatedDto = new ModelParameterDto(
                         p.id(),
                         p.modelId(),
                         p.paramName(),
@@ -217,7 +218,13 @@ public class ModelViewController extends BaseController {
                         p.displayName(),
                         p.description(),
                         p.customOrder()
-                ));
+                );
+                if (!ParameterValidator.isValid(updatedDto)) {
+                    showError(statusLabel, I18n.t("model.param_invalid") + p.paramName());
+                    valid = false;
+                    break;
+                }
+                updated.add(updatedDto);
             }
             if (!valid) return;
 
