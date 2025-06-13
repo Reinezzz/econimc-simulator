@@ -6,10 +6,22 @@ import org.example.economicssimulatorclient.dto.ModelResultDto;
 
 import java.util.*;
 
+/**
+ * Утилита для преобразования JSON-результатов модели в структуры,
+ * пригодные для построения графиков.
+ * Данные берутся из {@link org.example.economicssimulatorclient.dto.ModelResultDto#resultData()},
+ * а для парсинга используется {@link com.fasterxml.jackson.databind.ObjectMapper}.
+ */
 public class ChartDataConverter {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Разбирает сырой JSON и превращает его в карту данных по ключу графика.
+     *
+     * @param result результат модели с полем JSON {@code resultData}
+     * @return карта вида {@code имяГрафика -> (параметр -> значение)}
+     */
     public static Map<String, Map<String, Object>> parseRawChartData(ModelResultDto result) {
         if (result == null || result.resultData() == null) return Collections.emptyMap();
         try {
@@ -46,6 +58,12 @@ public class ChartDataConverter {
         return Collections.emptyMap();
     }
 
+    /**
+     * Извлекает блок {@code equilibrium} или {@code optimum} из результата модели.
+     *
+     * @param result результат работы модели
+     * @return карта параметров равновесия
+     */
     public static Map<String, Double> parseEquilibrium(ModelResultDto result) {
         Map<String, Double> equilibrium = new HashMap<>();
         if (result == null || result.resultData() == null) return equilibrium;

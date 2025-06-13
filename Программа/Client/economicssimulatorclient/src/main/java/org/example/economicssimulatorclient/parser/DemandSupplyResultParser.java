@@ -4,8 +4,34 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов базовой модели спроса и предложения.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "supply_demand": {
+ *     "equilibrium": {"quantity": number, "price": number},
+ *     "demand": [...],
+ *     "supply": [...],
+ *     "consumer_surplus_area": ...,  // optional
+ *     "producer_surplus_area": ...   // optional
+ *   },
+ *   "shift_animation": {
+ *     "demand_shifts": [...],
+ *     "supply_shifts": [...]
+ *   }
+ * }
+ * </pre>
+ */
 public class DemandSupplyResultParser implements ResultParser {
 
+    /**
+     * Создаёт текстовое описание результатов модели спроса и предложения.
+     *
+     * @param json JSON строка, возвращённая сервисом
+     * @return читабельный отчёт
+     */
     @Override
     public String parse(String json) {
         JSONObject root = new JSONObject(json);

@@ -14,6 +14,10 @@ import javafx.util.Pair;
 
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер страницы восстановления пароля. Отправляет код на указанный
+ * email и открывает диалог подтверждения.
+ */
 public class PasswordChangeController extends BaseController {
 
     @FXML
@@ -25,6 +29,10 @@ public class PasswordChangeController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
+    /**
+     * Отправляет код сброса на адрес из поля {@link #emailField}. При
+     * успешной отправке открывает диалог подтверждения.
+     */
     @FXML
     void sendCode() {
         statusLabel.setText("");
@@ -51,6 +59,11 @@ public class PasswordChangeController extends BaseController {
         }).start();
     }
 
+    /**
+     * Открывает диалог ввода кода подтверждения и нового пароля.
+     *
+     * @param email адрес, на который был отправлен код
+     */
     void openDialog(String email) {
         try {
             ResourceBundle bundle = I18n.bundle;
@@ -91,6 +104,9 @@ public class PasswordChangeController extends BaseController {
         }
     }
 
+    /**
+     * Возвращает пользователя к экрану входа, не сохраняя введённые данные.
+     */
     @FXML
     void goBack() {
         SceneManager.switchTo("authorization.fxml", c -> {
@@ -99,11 +115,22 @@ public class PasswordChangeController extends BaseController {
         });
     }
 
+    /**
+     * Очищает поле ввода email.
+     */
     @Override
     public void clearFields() {
         if (emailField != null) emailField.clear();
     }
 
+
+    /**
+     * Завершает процедуру сброса пароля.
+     *
+     * @param email    адрес пользователя
+     * @param code     код подтверждения
+     * @param password новый пароль
+     */
     void confirmReset(String email, String code, String password) {
         statusLabel.setText("");
         new Thread(() -> {

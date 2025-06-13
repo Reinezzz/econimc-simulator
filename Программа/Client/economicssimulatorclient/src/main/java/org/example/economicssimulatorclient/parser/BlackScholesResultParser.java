@@ -4,7 +4,26 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер данных модели оценки опционов Блэка&#x2011;Шоулза.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "surface": {"surface": [[{"S": number, "C": number}, ...]]},
+ *   "decay": {"decay": [{"T": number, "C": number}, ...]},
+ *   "greeks": {"greeks": {"delta": [...], "gamma": [...], ...}}
+ * }
+ * </pre>
+ */
 public class BlackScholesResultParser implements ResultParser {
+
+    /**
+     * Формирует текстовые результаты расчёта модели Блэка‑Шоулза.
+     *
+     * @param json JSON, полученный от сервера
+     * @return строка с описанием основных показателей
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();
@@ -63,6 +82,15 @@ public class BlackScholesResultParser implements ResultParser {
         return sb.toString().trim();
     }
 
+    /**
+     * Вспомогательный метод для вывода диапазона значений конкретной греческой
+     * буквы.
+     *
+     * @param sb    буфер, в который добавляется текст
+     * @param greeks объект с массивами греческих букв
+     * @param key   имя массива внутри объекта
+     * @param label локализованное название буквы
+     */
     private void appendGreek(StringBuilder sb, JSONObject greeks, String key, String label) {
         JSONArray arr = greeks.optJSONArray(key);
         if (arr != null && !arr.isEmpty()) {

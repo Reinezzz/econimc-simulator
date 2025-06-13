@@ -23,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Управляет списком документов и отчётов. Позволяет загружать,
+ * удалять, скачивать и выбирать документы. При вызове из просмотра модели
+ * поддерживает извлечение параметров из документа.
+ */
 public class DocumentController extends BaseController {
 
     @FXML
@@ -52,6 +57,11 @@ public class DocumentController extends BaseController {
 
     private Long modelId; // id текущей экономической модели (если пришли из ModelView)
 
+    /**
+     * Инициализирует элементы интерфейса и загружает начальную таблицу
+     * документов или отчётов. Также назначает обработчики кнопок и
+     * включает поддержку смены языка.
+     */
     @FXML
     public void initialize() {
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
@@ -70,6 +80,11 @@ public class DocumentController extends BaseController {
         selectButton.setOnAction(e -> onSelect());
     }
 
+    /**
+     * Включает режим выбора документа для извлечения параметров.
+     *
+     * @param isVisible {@code true}, если контроллер открыт из просмотра модели
+     */
     public void fromView(boolean isVisible) {
         this.fromView = isVisible;
         selectButton.setVisible(isVisible);
@@ -78,6 +93,9 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Загружает таблицу документов или отчётов в зависимости от выбранного типа.
+     */
     private void loadTable() {
         String selectedType = typeComboBox.getValue();
         if (I18n.t("docs.type.documents").equals(selectedType)) {
@@ -90,6 +108,9 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Получает список документов пользователя и отображает его в таблице.
+     */
     private void loadDocuments() {
         tableGrid.getChildren().clear();
         checkBoxes.clear();
@@ -108,6 +129,11 @@ public class DocumentController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.loading_error") + ex.getMessage())));
     }
 
+    /**
+     * Заполняет таблицу строками документов.
+     *
+     * @param docs полученный список документов
+     */
     private void fillDocumentsTable(List<DocumentDto> docs) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         int row = 1;
@@ -152,6 +178,9 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Загружает и отображает список отчётов пользователя.
+     */
     private void loadReports() {
         tableGrid.getChildren().clear();
         checkBoxes.clear();
@@ -170,6 +199,11 @@ public class DocumentController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("docs.reports_loading_error") + ex.getMessage())));
     }
 
+    /**
+     * Заполняет таблицу отчётов данными.
+     *
+     * @param reportList полученный список отчётов
+     */
     private void fillReportsTable(List<ReportListItemDto> reportList) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         int row = 1;
@@ -214,6 +248,11 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Создаёт заголовок таблицы для документов или отчётов.
+     *
+     * @param isReport {@code true} если отображаются отчёты
+     */
     private void addTableHeader(boolean isReport) {
         tableGrid.getChildren().clear();
         String[] headers = isReport ?
@@ -231,6 +270,9 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Загружает новый PDF-документ и обновляет список.
+     */
     private void onAdd() {
         if (!I18n.t("docs.type.documents").equals(typeComboBox.getValue())) {
             showError(statusLabel, "docs.add_only_documents");
@@ -256,6 +298,9 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Удаляет выбранные элементы таблицы.
+     */
     private void onDelete() {
         List<Integer> indicesToDelete = new ArrayList<>();
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -301,6 +346,12 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Сохраняет выбранный документ в файл.
+     *
+     * @param docId   идентификатор документа
+     * @param docName предложенное имя файла
+     */
     private void onDownloadDocument(long docId, String docName) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle(I18n.t("docs.save_as"));
@@ -320,6 +371,12 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Сохраняет выбранный отчёт в файл.
+     *
+     * @param reportId   идентификатор отчёта
+     * @param reportName имя файла для сохранения
+     */
     private void onDownloadReport(long reportId, String reportName) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle(I18n.t("docs.save_as"));
@@ -339,6 +396,10 @@ public class DocumentController extends BaseController {
         }
     }
 
+    /**
+     * Запрашивает извлечение параметров из выбранного документа и
+     * открывает экран модели с новыми значениями.
+     */
     private void onSelect() {
         int selectedIdx = -1;
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -382,6 +443,9 @@ public class DocumentController extends BaseController {
         }));
     }
 
+    /**
+     * Очищает выбранные флажки и сообщение статуса.
+     */
     @Override
     public void clearFields() {
         checkBoxes.forEach(cb -> cb.setSelected(false));

@@ -4,7 +4,26 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов модели оценки активов (CAPM).
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "sml": {"sml": [{"risk": number, "return": number}, ...]},
+ *   "efficient_frontier": {"portfolios": [{"risk": number, "return": number}, ...]},
+ *   "decomposition": {"decomposition": [{"label": string, "alpha": number, "beta": number}, ...]}
+ * }
+ * </pre>
+ */
 public class CAPMResultParser implements ResultParser {
+
+    /**
+     * Преобразует JSON ответа по модели CAPM в краткое текстовое описание.
+     *
+     * @param json данные от сервера
+     * @return строка с результатами
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

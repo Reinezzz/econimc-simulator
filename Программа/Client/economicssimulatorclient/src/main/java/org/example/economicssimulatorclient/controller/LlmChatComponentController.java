@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Контроллер переиспользуемого компонента LLM-чата. Отвечает за отправку
+ * сообщений пользователя, получение ответов ассистента и прокрутку списка.
+ */
 public class LlmChatComponentController {
 
     @FXML
@@ -39,11 +43,19 @@ public class LlmChatComponentController {
     @Setter
     private Supplier<LlmChatRequestDto> requestSupplier;
 
+    /**
+     * Инициализирует обработчики: связывает кнопку отправки и клавишу Enter
+     * с методом {@link #onSend()}.
+     */
     public void initialize() {
         sendButton.setOnMouseClicked(event -> onSend());
         inputField.setOnAction(event -> onSend());
     }
 
+    /**
+     * Отправляет введённое сообщение и обрабатывает ответ ассистента.
+     * Блокирует элементы управления на время запроса.
+     */
     private void onSend() {
         String text = inputField.getText();
         if (text == null || text.trim().isEmpty() || requestSupplier == null) return;
@@ -79,7 +91,12 @@ public class LlmChatComponentController {
         }).start();
     }
 
-
+    /**
+     * Добавляет сообщение в историю и отображает его в области чата.
+     *
+     * @param role    роль отправителя (user/assistant/system)
+     * @param message текст сообщения
+     */
     private void addMessage(String role, String message) {
         chatHistory.add(new Message(role, message));
         HBox row = new HBox();
@@ -107,15 +124,27 @@ public class LlmChatComponentController {
         Platform.runLater(() -> chatScroll.setVvalue(1.0));
     }
 
+    /**
+     * Очищает историю сообщений и область отображения чата.
+     */
     public void clear() {
         chatHistory.clear();
         chatArea.getChildren().clear();
     }
 
+    /**
+     * Представляет одно сообщение в истории чата.
+     */
     private static class Message {
         final String role;
         final String text;
 
+        /**
+         * Создаёт сообщение указанного типа.
+         *
+         * @param role роль автора
+         * @param text текст сообщения
+         */
         Message(String role, String text) {
             this.role = role;
             this.text = text;

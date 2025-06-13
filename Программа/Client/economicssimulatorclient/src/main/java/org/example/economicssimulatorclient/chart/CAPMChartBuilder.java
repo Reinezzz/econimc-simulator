@@ -10,8 +10,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков для модели CAPM.
+ * Поддерживает линию рынка ценных бумаг, эффективную границу и декомпозицию доходности.
+ */
 public class CAPMChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт график согласно ключу модели CAPM.
+     *
+     * @param chartKey  "sml", "efficient_frontier" или "decomposition"
+     * @param chartData входные данные для построения
+     * @return узел JavaFX с нужным графиком
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

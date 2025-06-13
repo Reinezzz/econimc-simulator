@@ -4,6 +4,10 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+/**
+ * Контроллер диалога ввода кода подтверждения при регистрации.
+ * Проверяет введённый код и включает или отключает кнопки диалога.
+ */
 public class VerificationCodeDialogController extends BaseController {
 
     @FXML
@@ -17,6 +21,10 @@ public class VerificationCodeDialogController extends BaseController {
     @FXML
     ButtonType cancelBtn;
 
+    /**
+     * Настраивает слушатели, проверяющие введённый код и управляющие
+     * доступностью кнопок диалога.
+     */
     @FXML
     void initialize() {
         Platform.runLater(() -> {
@@ -35,11 +43,19 @@ public class VerificationCodeDialogController extends BaseController {
         });
     }
 
+    /**
+     * Очищает поле с кодом.
+     */
     @Override
     public void clearFields() {
         if (codeField != null) codeField.clear();
     }
 
+    /**
+     * Возвращает код подтверждения, введённый пользователем.
+     *
+     * @return строка с кодом
+     */
     public String getCode() {
         return codeField.getText().trim();
     }

@@ -8,10 +8,28 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * Базовый класс REST-сервисов. Содержит вспомогательные методы для выполнения
+ * HTTP-запросов и разбора JSON-ответов.
+ */
 public abstract class BaseService {
 
     protected HttpClient httpClient = HttpClientProvider.instance();
 
+    /**
+     * Отправляет POST-запрос с JSON-телом.
+     *
+     * @param baseUri     базовый URI удалённого API
+     * @param endpoint    путь относительно {@code baseUri}
+     * @param body        объект, который будет сериализован в JSON
+     * @param respType    класс ожидаемого ответа
+     * @param auth        добавлять ли заголовок Authorization
+     * @param accessToken токен авторизации, если {@code auth} равно {@code true}
+     * @return ответ, десериализованный в тип {@code respType}
+     * @throws IOException          ошибка ввода-вывода
+     * @throws InterruptedException если запрос был прерван
+     * @throws RuntimeException     при неуспешном статусе или ошибке (де)сериализации
+     */
     protected <T> T post(
             URI baseUri,
             String endpoint,
@@ -46,6 +64,19 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
+    /**
+     * Отправляет GET-запрос.
+     *
+     * @param baseUri     базовый URI удалённого API
+     * @param endpoint    путь относительно {@code baseUri}
+     * @param respType    класс ожидаемого ответа
+     * @param auth        добавлять ли заголовок Authorization
+     * @param accessToken токен авторизации, если {@code auth} равно {@code true}
+     * @return ответ, десериализованный в тип {@code respType}
+     * @throws IOException          ошибка ввода-вывода
+     * @throws InterruptedException если запрос был прерван
+     * @throws RuntimeException     при неуспешном статусе ответа
+     */
     protected <T> T get(
             URI baseUri,
             String endpoint,
@@ -72,6 +103,20 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
+    /**
+     * Отправляет PUT-запрос с JSON-телом.
+     *
+     * @param baseUri     базовый URI удалённого API
+     * @param endpoint    путь относительно {@code baseUri}
+     * @param body        объект, который будет сериализован в JSON
+     * @param respType    класс ожидаемого ответа
+     * @param auth        добавлять ли заголовок Authorization
+     * @param accessToken токен авторизации, если {@code auth} равно {@code true}
+     * @return ответ, десериализованный в тип {@code respType}
+     * @throws IOException          ошибка ввода-вывода
+     * @throws InterruptedException если запрос был прерван
+     * @throws RuntimeException     при неуспешном статусе или ошибке (де)сериализации
+     */
     protected <T> T put(
             URI baseUri,
             String endpoint,
@@ -106,6 +151,17 @@ public abstract class BaseService {
         throw new RuntimeException(org.example.economicssimulatorclient.util.I18n.t("error.http") + resp.statusCode() + ": " + resp.body());
     }
 
+    /**
+     * Отправляет DELETE-запрос.
+     *
+     * @param baseUri     базовый URI удалённого API
+     * @param endpoint    путь относительно {@code baseUri}
+     * @param auth        добавлять ли заголовок Authorization
+     * @param accessToken токен авторизации, если {@code auth} равно {@code true}
+     * @throws IOException          ошибка ввода-вывода
+     * @throws InterruptedException если запрос был прерван
+     * @throws RuntimeException     при неуспешном статусе ответа
+     */
     protected void delete(
             URI baseUri,
             String endpoint,

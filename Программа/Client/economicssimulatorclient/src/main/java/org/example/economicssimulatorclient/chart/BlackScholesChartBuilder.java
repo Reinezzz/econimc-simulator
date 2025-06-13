@@ -10,8 +10,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков модели оценки опционов по формуле Блэка–Шоулза.
+ * Позволяет визуализировать поверхностные зависимости, временной распад и греческие коэффициенты.
+ */
 public class BlackScholesChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт один из графиков модели Блэка–Шоулза.
+     *
+     * @param chartKey  "surface", "decay" или "greeks"
+     * @param chartData исходные данные для графика
+     * @return узел JavaFX с построенной диаграммой
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

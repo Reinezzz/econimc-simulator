@@ -17,8 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков модели спроса и предложения.
+ * Создаёт базовые кривые, области излишков и анимацию сдвига.
+ */
 public class DemandSupplyChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт график в зависимости от ключа.
+     *
+     * @param chartKey  "supply_demand", "surplus_area" или "shift_animation"
+     * @param chartData данные модели
+     * @return узел JavaFX с построенным графиком
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

@@ -1,7 +1,16 @@
 package org.example.economicssimulatorclient.chart;
 
+/**
+ * Фабрика, выдающая нужный {@link ChartDrawer} для определённой экономической модели.
+ */
 public class ChartDrawerFactory {
 
+    /**
+     * Возвращает построитель графиков по названию модели.
+     *
+     * @param modelType строковый идентификатор модели
+     * @return подходящий {@link ChartDrawer} или {@code null}, если тип не поддерживается
+     */
     public static ChartDrawer getDrawer(String modelType) {
         return switch (modelType) {
             case "DemandSupply" -> new DemandSupplyChartBuilder();

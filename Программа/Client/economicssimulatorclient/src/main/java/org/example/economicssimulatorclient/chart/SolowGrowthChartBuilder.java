@@ -10,8 +10,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков неоклассической модели роста Солоу.
+ * Позволяет выводить траектории, фазовый портрет и сравнительную статическую.
+ */
 public class SolowGrowthChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт диаграмму модели Солоу.
+     *
+     * @param chartKey  "trajectories", "phase" или "statics"
+     * @param chartData параметры для построения
+     * @return узел JavaFX с визуализацией
+     */
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;
         switch (chartKey) {

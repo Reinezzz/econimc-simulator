@@ -4,7 +4,33 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов модели выбора потребителя с кривыми безразличия.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "indifference_curves": {
+ *     "indifference_curves": [[{"quantity": number, "price": number}, ...]],
+ *     "budget": [...]
+ *   },
+ *   "optimum_map": {"optimum": {"x": number, "y": number}},
+ *   "income_substitution": {
+ *     "substitution": [...],
+ *     "income": [...]
+ *   }
+ * }
+ * </pre>
+ */
 public class ConsumerChoiceResultParser implements ResultParser {
+
+    /**
+     * Извлекает основные показатели модели выбора потребителя и возвращает их
+     * в виде читаемого текста.
+     *
+     * @param json данные от сервера
+     * @return описание результатов
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

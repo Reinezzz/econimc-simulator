@@ -8,6 +8,9 @@ import org.example.economicssimulatorclient.util.SessionManager;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * Расширение {@link BaseService}, автоматически управляющее токенами сессии.
+ */
 public class MainService extends BaseService {
 
     @Override

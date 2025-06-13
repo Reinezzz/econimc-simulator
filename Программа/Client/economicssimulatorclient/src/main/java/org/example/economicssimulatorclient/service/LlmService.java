@@ -8,6 +8,9 @@ import org.example.economicssimulatorclient.dto.LlmParameterExtractionResponseDt
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * Сервис для взаимодействия с языковой моделью.
+ */
 public class LlmService extends MainService {
 
     private static LlmService instance;
@@ -17,6 +20,9 @@ public class LlmService extends MainService {
     private LlmService() {
     }
 
+    /**
+     * @return лениво создаваемый единственный экземпляр
+     */
     public static synchronized LlmService getInstance() {
         if (instance == null) {
             instance = new LlmService();
@@ -24,6 +30,9 @@ public class LlmService extends MainService {
         return instance;
     }
 
+    /**
+     * Отправляет сообщение в LLM.
+     */
     public LlmChatResponseDto chat(URI baseUri, LlmChatRequestDto request)
             throws IOException, InterruptedException {
         return post(
@@ -36,6 +45,9 @@ public class LlmService extends MainService {
         );
     }
 
+    /**
+     * Извлекает параметры модели из текста с помощью LLM.
+     */
     public LlmParameterExtractionResponseDto extractParameters(URI baseUri, LlmParameterExtractionRequestDto request)
             throws IOException, InterruptedException {
         return post(

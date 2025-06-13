@@ -2,8 +2,20 @@ package org.example.economicssimulatorclient.util;
 
 import org.example.economicssimulatorclient.dto.ModelParameterDto;
 
+/**
+ * Проверяет корректность параметров модели в зависимости от заданного типа.
+ * Поддерживает числовые, логические и JSON-значения,
+ * а также простую проверку на непустоту.
+ */
 public class ParameterValidator {
 
+    /**
+     * Проверяет значение параметра модели согласно его типу.
+     * Поддерживаются числовые, логические и JSON-значения.
+     *
+     * @param param параметр модели
+     * @return {@code true}, если значение корректно
+     */
     public static boolean isValid(ModelParameterDto param) {
         if (param == null || param.paramValue() == null) return false;
         String type = param.paramType().toLowerCase();
@@ -30,6 +42,12 @@ public class ParameterValidator {
         }
     }
 
+    /**
+     * Простая проверка строки на непустоту.
+     *
+     * @param value текстовое значение
+     * @return {@code true}, если строка не пуста
+     */
     public static boolean notEmpty(String value) {
         return value != null && !value.trim().isEmpty();
     }

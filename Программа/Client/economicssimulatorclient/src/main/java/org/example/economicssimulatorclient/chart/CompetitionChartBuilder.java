@@ -10,8 +10,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков для сравнения совершенной конкуренции и монополии.
+ * Включает кривые прибыли, гистограммы сравнения и области потерь.
+ */
 public class CompetitionChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт требуемый график по ключу.
+     *
+     * @param chartKey  "profit_curves", "comparison_hist" или "deadweight_area"
+     * @param chartData данные модели
+     * @return JavaFX-узел с полученным графиком
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

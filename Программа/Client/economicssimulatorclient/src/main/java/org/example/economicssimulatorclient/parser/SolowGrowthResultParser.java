@@ -4,8 +4,26 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов модели экономического роста Солоу.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "trajectories": {"capital": [...], "output": [...]},
+ *   "phase": {"phase": [...]},
+ *   "statics": {"scenarios": {"baseline": [...], "high_savings": [...]}}
+ * }
+ * </pre>
+ */
 public class SolowGrowthResultParser implements ResultParser {
 
+    /**
+     * Создаёт текстовое резюме по модели роста Солоу на основе JSON.
+     *
+     * @param json исходный ответ от сервера
+     * @return описание динамики модели
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

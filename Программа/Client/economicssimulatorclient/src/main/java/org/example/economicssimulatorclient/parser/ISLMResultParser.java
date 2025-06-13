@@ -4,8 +4,30 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов макроэкономической модели IS&#x2011;LM.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "is_lm": {
+ *     "equilibrium": {"rate": number, "income": number},
+ *     "IS": [...],
+ *     "LM": [...]
+ *   },
+ *   "timeseries": {"policy": [...]},
+ *   "surface": {"slices": [[...]]}
+ * }
+ * </pre>
+ */
 public class ISLMResultParser implements ResultParser {
 
+    /**
+     * Разбирает JSON для модели IS‑LM и возвращает текстовый отчёт.
+     *
+     * @param json входные данные от сервера
+     * @return сформированное описание
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

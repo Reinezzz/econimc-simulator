@@ -3,6 +3,10 @@ package org.example.economicssimulatorclient.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+/**
+ * Контроллер диалога подтверждения смены пароля. Проверяет введённый код и
+ * новые значения пароля.
+ */
 public class PasswordResetDialogController extends BaseController {
 
     @FXML
@@ -20,10 +24,17 @@ public class PasswordResetDialogController extends BaseController {
     @FXML
     ButtonType okBtn;
 
+    /**
+     * Пустой метод инициализации, вызываемый загрузчиком FXML.
+     */
     @FXML
     private void initialize() {
     }
 
+    /**
+     * Настраивает слушатели полей, проверяющие код и пароли, и включает
+     * кнопку OK только при корректном вводе.
+     */
     public void setupValidation() {
         Button okButton = (Button) dialogPane.lookupButton(okBtn);
         Button cancelButton = (Button) dialogPane.lookupButton(cancelBtn);
@@ -57,6 +68,9 @@ public class PasswordResetDialogController extends BaseController {
         validate.run();
     }
 
+    /**
+     * Очищает все поля ввода в диалоге.
+     */
     @Override
     public void clearFields() {
         if (codeField != null) codeField.clear();
@@ -64,10 +78,20 @@ public class PasswordResetDialogController extends BaseController {
         if (repeatField != null) repeatField.clear();
     }
 
+    /**
+     * Возвращает введённый пользователем код подтверждения.
+     *
+     * @return код из текстового поля
+     */
     public String getCode() {
         return codeField.getText().trim();
     }
 
+    /**
+     * Получает новый пароль из поля ввода.
+     *
+     * @return введённый пользователем пароль
+     */
     public String getPassword() {
         return passField.getText();
     }

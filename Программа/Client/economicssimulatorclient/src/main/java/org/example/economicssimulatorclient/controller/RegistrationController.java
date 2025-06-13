@@ -14,6 +14,10 @@ import org.example.economicssimulatorclient.util.Validator;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер регистрации пользователей. Проверяет введённые данные,
+ * отправляет запрос на создание аккаунта и обрабатывает подтверждение email.
+ */
 public class RegistrationController extends BaseController {
 
     @FXML
@@ -31,6 +35,11 @@ public class RegistrationController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
+    /**
+     * Обрабатывает нажатие кнопки регистрации. Проверяет поля формы и
+     * отправляет запрос регистрации. При успешном ответе показывает диалог
+     * ввода кода подтверждения.
+     */
     @FXML
     void doRegister() {
         statusLabel.setText("");
@@ -96,6 +105,10 @@ public class RegistrationController extends BaseController {
         }));
     }
 
+    /**
+     * Возвращает пользователя к форме входа и очищает сообщения или поля в
+     * целевом контроллере.
+     */
     @FXML
     void openLogin() {
         SceneManager.switchTo("authorization.fxml", c -> {
@@ -104,6 +117,9 @@ public class RegistrationController extends BaseController {
         });
     }
 
+    /**
+     * Очищает все поля формы регистрации.
+     */
     @Override
     public void clearFields() {
         if (usernameField != null) usernameField.clear();
@@ -112,6 +128,11 @@ public class RegistrationController extends BaseController {
         if (repeatPasswordField != null) repeatPasswordField.clear();
     }
 
+    /**
+     * Открывает диалог ввода кода подтверждения регистрации.
+     *
+     * @return введённый код или {@code null}, если пользователь отменил ввод
+     */
     String showVerificationDialog() {
         try {
             ResourceBundle bundle = I18n.bundle;

@@ -6,6 +6,11 @@ import org.example.economicssimulatorclient.config.AppConfig;
 import java.net.URI;
 import java.util.prefs.Preferences;
 
+/**
+ * Управление сессией пользователя.
+ * Хранит токены в {@link java.util.prefs.Preferences} и предоставляет простые методы для входа/выхода.
+ * Адрес сервера берётся из {@link org.example.economicssimulatorclient.config.AppConfig}.
+ */
 public class SessionManager {
 
     private static final String ACCESS_TOKEN_KEY = "accessToken";
@@ -16,49 +21,68 @@ public class SessionManager {
 
     private final Preferences prefs;
 
+    /**
+     * Создаёт менеджер сессии и инициализирует хранилище предпочтений.
+     */
     private SessionManager() {
         prefs = Preferences.userNodeForPackage(SessionManager.class);
     }
 
+    /**
+     * Возвращает единственный экземпляр менеджера.
+     */
     public static SessionManager getInstance() {
         return INSTANCE;
     }
 
-    public static Long getCurrentUserId() {
-        return null;
-    }
-
+    /**
+     * Позволяет подменить экземпляр менеджера, например, в тестах.
+     */
     public static void setInstance(SessionManager mockSessionManager) {
         INSTANCE = mockSessionManager;
     }
 
+    /**
+     * Сохраняет токены в хранилище настроек.
+     */
     public void saveTokens(String accessToken, String refreshToken) {
         prefs.put(ACCESS_TOKEN_KEY, accessToken);
         prefs.put(REFRESH_TOKEN_KEY, refreshToken);
     }
 
+    /**
+     * Возвращает сохранённый access token.
+     */
     public String getAccessToken() {
         return prefs.get(ACCESS_TOKEN_KEY, null);
     }
 
+    /**
+     * Возвращает сохранённый refresh token.
+     */
     public String getRefreshToken() {
         return prefs.get(REFRESH_TOKEN_KEY, null);
     }
 
+    /**
+     * Удаляет токены и помечает состояние как разлогинившееся.
+     */
     public void logout() {
         prefs.remove(ACCESS_TOKEN_KEY);
         prefs.remove(REFRESH_TOKEN_KEY);
         justLoggedOut = true;
     }
 
+    /**
+     * Сбрасывает флаг {@link #justLoggedOut} после обработки выхода.
+     */
     public void resetJustLoggedOut() {
         justLoggedOut = false;
     }
 
-    public boolean isLoggedIn() {
-        return getAccessToken() != null && getRefreshToken() != null;
-    }
-
+    /**
+     * Возвращает базовый адрес сервера из конфигурации приложения.
+     */
     public URI getBaseUri() {
         return URI.create(AppConfig.getBaseUrl());
     }

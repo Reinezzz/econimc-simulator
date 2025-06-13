@@ -4,7 +4,36 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов модели ценовой эластичности спроса.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "elasticity_curves": {
+ *     "elastic": [{"quantity": number, "price": number}, ...]
+ *   },
+ *   "revenue_bars": {
+ *     "categories": [...],
+ *     "revenue0": [...],
+ *     "revenue1": [...]
+ *   },
+ *   "elasticity_heatmap": {
+ *     "categories": [...],
+ *     "elasticity": [...]
+ *   }
+ * }
+ * </pre>
+ */
 public class ElasticityResultParser implements ResultParser {
+
+    /**
+     * Разбирает JSON и формирует текстовое описание результатов модели
+     * эластичности спроса.
+     *
+     * @param json исходный JSON от сервера
+     * @return форматированный отчёт о расчётах
+     */
     @Override
     public String parse(String json) {
         JSONObject root = new JSONObject(json);

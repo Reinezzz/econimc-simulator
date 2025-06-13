@@ -9,8 +9,19 @@ import javafx.scene.layout.StackPane;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков макроэкономической модели IS-LM.
+ * Позволяет рисовать классическую диаграмму, поверхность и временные ряды.
+ */
 public class ISLMChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт график IS–LM по указанному ключу.
+     *
+     * @param chartKey  "is_lm", "surface" или "timeseries"
+     * @param chartData данные модели
+     * @return узел с визуализацией
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

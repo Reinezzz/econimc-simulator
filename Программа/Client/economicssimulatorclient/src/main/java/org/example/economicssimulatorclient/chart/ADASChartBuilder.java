@@ -12,8 +12,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков модели совокупного спроса и предложения (AD–AS).
+ * Поддерживает визуализацию равновесия, сдвигов кривых и расчёта разрывов.
+ */
 public class ADASChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт график в рамках модели AD–AS.
+     *
+     * @param chartKey  тип визуализации: {@code "equilibrium"}, {@code "shifts"} или {@code "gaps"}
+     * @param chartData исходные данные для построения
+     * @return JavaFX-узел с графиком
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
 

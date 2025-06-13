@@ -11,6 +11,10 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * Сервис аутентификации и авторизации пользователей: регистрация, вход,
+ * подтверждение почты и обновление токенов.
+ */
 public class AuthService extends BaseService {
 
     private static final String AUTH_PATH = "/auth";
@@ -21,6 +25,15 @@ public class AuthService extends BaseService {
     private static final AuthService INSTANCE = new AuthService();
 
 
+    /**
+     * Регистрирует нового пользователя.
+     *
+     * @param req данные для регистрации
+     * @return ответ сервера со статусом и сообщением
+     * @throws IOException              ошибка ввода-вывода
+     * @throws InterruptedException     если запрос был прерван
+     * @throws IllegalArgumentException сервер вернул сообщение об ошибке
+     */
     public ApiResponse register(RegistrationRequest req) throws IOException, InterruptedException {
         try {
             return post(baseUri, "register", req, ApiResponse.class, false, null);
@@ -29,6 +42,15 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Подтверждает электронную почту пользователя кодом верификации.
+     *
+     * @param req запрос с кодом и адресом почты
+     * @return ответ сервера о результате операции
+     * @throws IOException              ошибка ввода-вывода
+     * @throws InterruptedException     если запрос был прерван
+     * @throws IllegalArgumentException сервер вернул сообщение об ошибке
+     */
     public ApiResponse verifyEmail(VerificationRequest req) throws IOException, InterruptedException {
         try {
             return post(baseUri, "verify-email", req, ApiResponse.class, false, null);
@@ -37,6 +59,15 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Выполняет вход пользователя и сохраняет полученные токены.
+     *
+     * @param req учётные данные
+     * @return ответ с токенами
+     * @throws IOException              ошибка ввода-вывода
+     * @throws InterruptedException     если запрос был прерван
+     * @throws IllegalArgumentException неверный логин или пароль
+     */
     public LoginResponse login(LoginRequest req) throws IOException, InterruptedException {
         try {
             var resp = post(baseUri, "login", req, LoginResponse.class, false, null);
@@ -48,6 +79,15 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Начинает сброс пароля, отправляя пользователю ссылку.
+     *
+     * @param req запрос с адресом электронной почты
+     * @return ответ сервера о результате
+     * @throws IOException              ошибка ввода-вывода
+     * @throws InterruptedException     если запрос был прерван
+     * @throws IllegalArgumentException сервер вернул сообщение об ошибке
+     */
     public ApiResponse resetPasswordRequest(PasswordResetRequest req) throws IOException, InterruptedException {
         try {
             return post(baseUri, "password-reset", req, ApiResponse.class, false, null);
@@ -56,6 +96,15 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Завершает процедуру сброса пароля.
+     *
+     * @param req данные с новым паролем и токеном
+     * @return ответ сервера о результате
+     * @throws IOException              ошибка ввода-вывода
+     * @throws InterruptedException     если запрос был прерван
+     * @throws IllegalArgumentException сервер вернул сообщение об ошибке
+     */
     public ApiResponse resetPasswordConfirm(PasswordResetConfirm req) throws IOException, InterruptedException {
         try {
             return post(baseUri, "password-reset/confirm", req, ApiResponse.class, false, null);
@@ -64,6 +113,11 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Отменяет незавершённую регистрацию асинхронно.
+     *
+     * @param email адрес электронной почты
+     */
     public void cancelRegistration(String email) {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(baseUri.resolve(AUTH_CANCEL_REGISTRATION))
@@ -74,6 +128,11 @@ public class AuthService extends BaseService {
         httpClient.sendAsync(req, HttpResponse.BodyHandlers.discarding());
     }
 
+    /**
+     * Отменяет текущий процесс сброса пароля асинхронно.
+     *
+     * @param email адрес электронной почты
+     */
     public void cancelPasswordReset(String email) {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(baseUri.resolve(AUTH_CANCEL_PASSWORD_RESET))
@@ -84,6 +143,9 @@ public class AuthService extends BaseService {
         httpClient.sendAsync(req, HttpResponse.BodyHandlers.discarding());
     }
 
+    /**
+     * Извлекает понятное пользователю сообщение из исключения HTTP-запроса.
+     */
     String extractErrorMessage(Exception ex) {
         String msg = ex.getMessage();
         if (msg != null && msg.contains("{") && msg.contains("message")) {
@@ -99,6 +161,9 @@ public class AuthService extends BaseService {
         return msg;
     }
 
+    /**
+     * Выполняет выход пользователя и при возможности отзывает refresh-токен.
+     */
     public void logout() throws IOException, InterruptedException {
         String refreshToken = SessionManager.getInstance().getRefreshToken();
 
@@ -112,6 +177,11 @@ public class AuthService extends BaseService {
         }
     }
 
+    /**
+     * Пытается обновить просроченные токены доступа и обновления.
+     *
+     * @return {@code true}, если токены успешно обновлены, иначе {@code false}
+     */
     public boolean refreshTokens() throws IOException, InterruptedException {
         String refreshToken = SessionManager.getInstance().getRefreshToken();
         if (refreshToken == null) return false;
@@ -130,6 +200,9 @@ public class AuthService extends BaseService {
         return false;
     }
 
+    /**
+     * @return единственный экземпляр сервиса
+     */
     public static AuthService getInstance() {
         return INSTANCE;
     }

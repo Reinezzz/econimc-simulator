@@ -9,8 +9,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков теории потребительского выбора.
+ * Используется для отображения кривых безразличия, карты оптимума и эффекта дохода/замещения.
+ */
 public class ConsumerChoiceChartBuilder implements ChartDrawer {
 
+    /**
+     * Формирует график потребительского выбора.
+     *
+     * @param chartKey  "indifference_curves", "optimum_map" или "income_substitution"
+     * @param chartData входные данные для построения
+     * @return визуальный узел JavaFX
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

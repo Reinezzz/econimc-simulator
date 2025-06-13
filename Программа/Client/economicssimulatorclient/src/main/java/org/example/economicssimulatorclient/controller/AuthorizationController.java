@@ -8,6 +8,10 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+/**
+ * Контроллер окна авторизации. Выполняет проверку учётных данных и
+ * предоставляет переход к экранам регистрации и восстановления пароля.
+ */
 public class AuthorizationController extends BaseController {
 
     @FXML
@@ -23,11 +27,19 @@ public class AuthorizationController extends BaseController {
 
     private final AuthService auth = BaseController.get(AuthService.class);
 
+    /**
+     * Инициализирует контроллер и настраивает кнопку смены языка.
+     */
     @FXML
     private void initialize() {
         initLangButton();
     }
 
+    /**
+     * Пытается выполнить вход. При успехе открывает главный экран и
+     * создаёт экземпляр {@link EconomicModelService}. Ошибки валидации и
+     * исключения сервиса выводятся в поле состояния.
+     */
     @FXML
     public void doLogin() {
         showError(statusLabel, "");
@@ -61,6 +73,10 @@ public class AuthorizationController extends BaseController {
         }).start();
     }
 
+    /**
+     * Открывает сцену регистрации и очищает сообщения статуса в новом
+     * контроллере.
+     */
     @FXML
     public void openRegister() {
         SceneManager.switchTo("registration.fxml", c -> {
@@ -69,6 +85,10 @@ public class AuthorizationController extends BaseController {
         });
     }
 
+    /**
+     * Открывает форму смены пароля, предварительно очищая её поля и
+     * сообщения статуса.
+     */
     @FXML
     public void openReset() {
         SceneManager.switchTo("password_change.fxml", c -> {
@@ -77,6 +97,9 @@ public class AuthorizationController extends BaseController {
         });
     }
 
+    /**
+     * Очищает поля логина и пароля.
+     */
     @Override
     public void clearFields() {
         if (usernameEmailField != null) usernameEmailField.clear();

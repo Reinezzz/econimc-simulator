@@ -17,6 +17,10 @@ import org.example.economicssimulatorclient.util.SceneManager;
 
 import java.util.List;
 
+/**
+ * Контроллер главного окна приложения. Отображает список экономических
+ * моделей и обеспечивает навигацию к экрану модели и работе с документами.
+ */
 public class MainController extends BaseController {
 
     private final AuthService authService = AuthService.getInstance();
@@ -43,6 +47,10 @@ public class MainController extends BaseController {
 
     private Long lastModelId = null;
 
+    /**
+     * Инициализирует главный экран: загружает список моделей, назначает
+     * обработчики навигации и включает переключение языка.
+     */
     @FXML
     private void initialize() {
         clearStatusLabel();
@@ -65,6 +73,9 @@ public class MainController extends BaseController {
         });
     }
 
+    /**
+     * Загружает список экономических моделей и отображает его на экране.
+     */
     public void loadModelList() {
         runAsync(() -> {
             try {
@@ -76,6 +87,11 @@ public class MainController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("main.load_error") + ex.getMessage())));
     }
 
+    /**
+     * Создаёт кнопки для каждой доступной модели.
+     *
+     * @param models список моделей
+     */
     private void populateModelList(List<EconomicModelDto> models) {
         modelList.getChildren().clear();
         for (EconomicModelDto model : models) {
@@ -92,11 +108,18 @@ public class MainController extends BaseController {
         }
     }
 
+    /**
+     * Сбрасывает текст статуса на главном экране.
+     */
     @Override
     public void clearFields() {
         clearStatusLabel();
     }
 
+    /**
+     * Выполняет выход пользователя и возвращает на экран авторизации.
+     * Ошибки при выходе игнорируются.
+     */
     @FXML
     private void onExitButtonClicked() {
         new Thread(() -> {

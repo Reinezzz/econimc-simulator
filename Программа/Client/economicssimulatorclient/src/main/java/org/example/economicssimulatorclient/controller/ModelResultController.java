@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+/**
+ * Отображает результаты расчёта экономической модели: текстовые данные,
+ * графики и чат с ассистентом. Позволяет повторить расчёт и сохранить
+ * результаты в виде отчёта.
+ */
 public class ModelResultController extends BaseController {
 
     private final EconomicModelService modelService = get(EconomicModelService.class);
@@ -59,6 +64,12 @@ public class ModelResultController extends BaseController {
     private final Map<String, Node> chartNodes = new HashMap<>();
     private final Set<String> selectedAssistantMessages = new LinkedHashSet<>();
 
+    /**
+     * Инициализирует контроллер полученными результатами расчёта.
+     *
+     * @param response ответ сервера с расчётами
+     * @param model    модель, по которой производился расчёт
+     */
     public void initWithResult(CalculationResponseDto response, EconomicModelDto model) {
         this.response = response;
         this.parameters = new ArrayList<>(response.updatedParameters());
@@ -85,6 +96,11 @@ public class ModelResultController extends BaseController {
         setupAddToReportButtonForChat();
     }
 
+    /**
+     * Проверяет значения параметров перед повторным расчётом.
+     *
+     * @return {@code true}, если все параметры корректны
+     */
     private boolean validateParameters() {
         for (ModelParameterDto p : parameters) {
             if (!ParameterValidator.notEmpty(p.paramValue())) {
@@ -99,6 +115,9 @@ public class ModelResultController extends BaseController {
         return true;
     }
 
+    /**
+     * Отображает текущие параметры модели и подготавливает поля для их правки.
+     */
     private void fillParameters() {
         parameterList.getChildren().clear();
         for (int i = 0; i < parameters.size(); i++) {
@@ -130,12 +149,18 @@ public class ModelResultController extends BaseController {
         }
     }
 
+    /**
+     * Показывает текстовый результат расчёта в соответствующем поле.
+     */
     private void fillResult() {
         ModelResultDto result = response.result();
         ResultParser parser = ParserFactory.getParser(model.modelType());
         resultArea.setText(parser.parse(result.resultData()));
     }
 
+    /**
+     * Подготавливает набор графиков и список их типов.
+     */
     private void fillCharts() {
         ModelResultDto result = response.result();
         if (result == null || result.resultData() == null) {
@@ -171,6 +196,12 @@ public class ModelResultController extends BaseController {
         typeComboBox.setOnAction(e -> showChart(chartDataMap, typeComboBox.getValue()));
     }
 
+    /**
+     * Отображает график по ключу в панели визуализации.
+     *
+     * @param chartDataMap набор всех доступных графиков
+     * @param chartKey     ключ выбранного графика
+     */
     private void showChart(Map<String, Map<String, Object>> chartDataMap, String chartKey) {
         chartPane.getChildren().clear();
         this.selectedChartKey = chartKey;
@@ -192,6 +223,13 @@ public class ModelResultController extends BaseController {
         }
     }
 
+    /**
+     * Назначает обработчики кнопок навигации, повторного расчёта и сохранения
+     * отчётов.
+     */
+    /**
+     * Назначает обработчики кнопок навигации и сохранения отчёта.
+     */
     @FXML
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.switchTo("model_view.fxml", (ModelViewController c) -> c.initWithModelId(model.id())));
@@ -200,6 +238,9 @@ public class ModelResultController extends BaseController {
         saveButton.setOnAction(e -> onSaveReport());
     }
 
+    /**
+     * Запускает повторный расчёт с текущими параметрами.
+     */
     private void repeatCalculation() {
         if (!validateParameters()) {
             return;
@@ -219,6 +260,9 @@ public class ModelResultController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, "error.repeat_calculations" + ex.getMessage())));
     }
 
+    /**
+     * Настраивает компонент чата для работы с текущими данными расчёта.
+     */
     private void setupLlmChatComponent() {
         if (llmChatComponent == null) return;
         llmChatComponent.setRequestSupplier(() -> new LlmChatRequestDto(
@@ -230,6 +274,11 @@ public class ModelResultController extends BaseController {
         ));
     }
 
+    /**
+     * Формирует список визуализаций для передачи в LLM.
+     *
+     * @return список визуализаций
+     */
     private List<LlmVisualizationDto> buildVisualizations() {
         List<LlmVisualizationDto> visualizations = new ArrayList<>();
         if (chartDataMap != null && !chartDataMap.isEmpty()) {
@@ -243,6 +292,9 @@ public class ModelResultController extends BaseController {
         return visualizations;
     }
 
+    /**
+     * Добавляет к сообщениям ассистента кнопки выбора для отчёта.
+     */
     private void setupAddToReportButtonForChat() {
         Platform.runLater(() -> {
             if (llmChatComponent == null) return;
@@ -280,7 +332,15 @@ public class ModelResultController extends BaseController {
         });
     }
 
-
+    /**
+     * Сохраняет результаты в виде PDF-отчёта. Собирает изображения всех
+     * графиков и выбранные сообщения чата. На время выполнения кнопка
+     * сохранения блокируется.
+     */
+    /**
+     * Создаёт PDF-отчёт на основании текущих данных и выбранных сообщений.
+     * Кнопка сохранения блокируется на время выполнения.
+     */
     @FXML
     private void onSaveReport() {
         if (!validateParameters()) {
@@ -343,7 +403,9 @@ public class ModelResultController extends BaseController {
         });
     }
 
-
+    /**
+     * Сбрасывает все элементы интерфейса: параметры, текст результата и чат.
+     */
     @Override
     public void clearFields() {
         clearStatusLabel();

@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Отображает экономическую модель, её параметры и описание. Позволяет
+ * редактировать параметры, запускать расчёт и открывать связанные документы.
+ */
 public class ModelViewController extends BaseController {
 
     private final EconomicModelService modelService = get(EconomicModelService.class);
@@ -64,10 +68,21 @@ public class ModelViewController extends BaseController {
 
     private List<ModelParameterDto> pendingExtractionParams = null;
 
+    /**
+     * Загружает модель по её идентификатору.
+     *
+     * @param id идентификатор модели
+     */
     public void initWithModelId(Long id) {
         initWithModelId(id, null);
     }
 
+    /**
+     * Загружает модель и подставляет параметры, извлечённые из документа.
+     *
+     * @param id              идентификатор модели
+     * @param extractedParams параметры, полученные из документа
+     */
     public void initWithModelId(Long id, List<ModelParameterDto> extractedParams) {
         this.modelId = id;
         LastModelStorage.saveLastModelId(modelId);
@@ -90,6 +105,9 @@ public class ModelViewController extends BaseController {
         }
     }
 
+    /**
+     * Получает описание модели и её параметры с сервера.
+     */
     private void loadModel() {
         runAsync(() -> {
             try {
@@ -102,6 +120,9 @@ public class ModelViewController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("model.load_error") + ex.getMessage())));
     }
 
+    /**
+     * Отображает основную информацию о модели и её описание.
+     */
     private void fillModelInfo() {
         nameLabel.setText(localizedValue(model.name()));
         typeLabel.setText(localizedValue(model.modelType()));
@@ -119,6 +140,11 @@ public class ModelViewController extends BaseController {
         setupLlmChatComponent();
     }
 
+    /**
+     * Заменяет значения параметров теми, что были извлечены из документа.
+     *
+     * @param newParams список новых значений параметров
+     */
     public void fillParametersFromExtraction(List<ModelParameterDto> newParams) {
         if (newParams == null || newParams.isEmpty()) return;
         for (int i = 0; i < parameters.size(); i++) {
@@ -139,6 +165,9 @@ public class ModelViewController extends BaseController {
         showSuccess(statusLabel, "model.params_from_doc");
     }
 
+    /**
+     * Создаёт элементы ввода для каждого параметра модели.
+     */
     private void fillParameters() {
         parameterList.getChildren().clear();
         valueFields.clear();
@@ -164,6 +193,13 @@ public class ModelViewController extends BaseController {
         }
     }
 
+    /**
+     * Инициализирует обработчики навигации, редактирования и запуска расчёта.
+     * Метод вызывается автоматически загрузчиком FXML.
+     */
+    /**
+     * Устанавливает обработчики действий и навигации.
+     */
     @FXML
     private void initialize() {
         backButton.setOnAction(e -> SceneManager.switchTo("main.fxml", MainController::loadModelList));
@@ -186,6 +222,11 @@ public class ModelViewController extends BaseController {
         });
     }
 
+    /**
+     * Переключает режим редактирования параметров.
+     *
+     * @param enable {@code true} для включения редактирования
+     */
     private void setEditMode(boolean enable) {
         this.editMode = enable;
         for (TextField value : valueFields) {
@@ -195,6 +236,9 @@ public class ModelViewController extends BaseController {
         runButton.setDisable(enable);
     }
 
+    /**
+     * Сохраняет параметры при выходе из режима редактирования или включает его.
+     */
     private void toggleEditMode() {
         if (!editMode) {
             setEditMode(true);
@@ -246,6 +290,9 @@ public class ModelViewController extends BaseController {
         }
     }
 
+    /**
+     * Отправляет параметры на сервер для расчёта модели.
+     */
     private void runCalculation() {
         runAsync(() -> {
             try {
@@ -262,6 +309,9 @@ public class ModelViewController extends BaseController {
         }, ex -> Platform.runLater(() -> showError(statusLabel, I18n.t("model.calc_error") + ex.getMessage())));
     }
 
+    /**
+     * Настраивает чат для взаимодействия с ассистентом по данной модели.
+     */
     private void setupLlmChatComponent() {
         if (llmChatComponent == null) return;
         llmChatComponent.setRequestSupplier(() -> new org.example.economicssimulatorclient.dto.LlmChatRequestDto(
@@ -273,6 +323,9 @@ public class ModelViewController extends BaseController {
         ));
     }
 
+    /**
+     * Очищает сообщение статуса и историю чата.
+     */
     @Override
     public void clearFields() {
         clearStatusLabel();

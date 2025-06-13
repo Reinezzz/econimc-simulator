@@ -11,14 +11,23 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Сервис для создания, получения и скачивания отчётов расчётов.
+ */
 public class ReportService extends MainService {
 
     private final URI baseUri;
 
+    /**
+     * Создаёт сервис, работающий с конкретным сервером.
+     */
     public ReportService(URI baseUri) {
         this.baseUri = baseUri;
     }
 
+    /**
+     * Создаёт новый отчёт на сервере.
+     */
     public ReportListItemDto createReport(ReportCreateRequestDto dto) throws IOException, InterruptedException {
         return post(
                 baseUri,
@@ -30,6 +39,9 @@ public class ReportService extends MainService {
         );
     }
 
+    /**
+     * Возвращает список созданных ранее отчётов.
+     */
     public List<ReportListItemDto> getReports() throws IOException, InterruptedException {
         ReportListItemDto[] arr = get(
                 baseUri,
@@ -41,6 +53,9 @@ public class ReportService extends MainService {
         return Arrays.asList(arr);
     }
 
+    /**
+     * Скачивает бинарное содержимое отчёта.
+     */
     public byte[] downloadReport(long reportId) throws IOException, InterruptedException {
         return getBytes(
                 baseUri,
@@ -50,6 +65,7 @@ public class ReportService extends MainService {
         );
     }
 
+    /** Удаляет отчёт на сервере. */
     public void deleteReport(long reportId) throws IOException, InterruptedException {
         delete(
                 baseUri,
@@ -59,6 +75,9 @@ public class ReportService extends MainService {
         );
     }
 
+    /**
+     * Выполняет GET-запрос с ожиданием массива байт и обработкой обновления токена.
+     */
     protected byte[] getBytes(
             URI baseUri,
             String endpoint,

@@ -8,6 +8,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Управляет переключением сцен в JavaFX приложении.
+ * Кэширует загруженные FXML, ведёт историю переходов и учитывает текущую локаль при загрузке.
+ * Метод {@link #switchTo} даёт возможность настроить контроллер перед отображением сцены.
+ */
 public final class SceneManager {
 
     private static Stage primary;
@@ -22,11 +27,21 @@ public final class SceneManager {
     private SceneManager() {
     }
 
+    /**
+     * Инициализирует менеджер сцен и сохраняет главную Stage.
+     *
+     * @param stage основное окно приложения
+     */
     public static void init(Stage stage) {
         primary = stage;
         primary.setScene(scene);
     }
 
+    /**
+     * Переключает сцену без возможности настройки контроллера.
+     *
+     * @param fxml путь к FXML-файлу относительно {@link #ROOT}
+     */
     public static void switchToWithoutContorller(String fxml) {
         try {
             Parent root = cache.computeIfAbsent(fxml, SceneManager::load);
@@ -37,6 +52,12 @@ public final class SceneManager {
         }
     }
 
+    /**
+     * Загружает FXML с учётом текущей локали и кэширует результат.
+     *
+     * @param fxml имя FXML-файла
+     * @return загруженный корневой узел сцены
+     */
     private static Parent load(String fxml) {
         try {
             Locale locale = I18n.getLocale();
@@ -49,6 +70,13 @@ public final class SceneManager {
         }
     }
 
+    /**
+     * Переключает сцену и передаёт контроллер потребителю для дополнительной настройки.
+     *
+     * @param fxml путь к FXML-файлу
+     * @param controllerConsumer действие над контроллером
+     * @param <T>  тип контроллера
+     */
     public static <T> void switchTo(String fxml, java.util.function.Consumer<T> controllerConsumer) {
         try {
             if (currentFxml != null)
@@ -67,6 +95,9 @@ public final class SceneManager {
         }
     }
 
+    /**
+     * Перезагружает текущую сцену из файла, сбрасывая кэш.
+     */
     public static void reloadCurrent() {
         if (currentFxml != null) {
             cache.remove(currentFxml);
@@ -74,7 +105,11 @@ public final class SceneManager {
         }
     }
 
-
+    /**
+     * Позволяет заменить единственный экземпляр в тестах.
+     *
+     * @param mockSceneManager тестовый экземпляр
+     */
     public static void setInstance(SceneManager mockSceneManager) {
         INSTANCE = mockSceneManager;
     }

@@ -4,8 +4,26 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов модели кривой Филлипса, связывающей инфляцию и безработицу.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "scatter": {"points": [{"inflation": number, "unemployment": number}, ...]},
+ *   "timeseries": {"inflation": [...], "unemployment": [...]},
+ *   "loops": {"short_run": [...], "long_run": [...]}
+ * }
+ * </pre>
+ */
 public class PhillipsCurveResultParser implements ResultParser {
 
+    /**
+     * Преобразует JSON кривой Филлипса в читаемое описание.
+     *
+     * @param json данные модели
+     * @return текст результатов
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

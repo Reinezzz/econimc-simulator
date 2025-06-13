@@ -4,7 +4,39 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер результатов сравнения совершенной конкуренции и монополии.
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "profit_curves": {
+ *     "competition": [...],
+ *     "monopoly": [...]
+ *   },
+ *   "comparison_hist": {
+ *     "categories": [...],
+ *     "competition": [...],
+ *     "monopoly": [...]
+ *   },
+ *   "deadweight_area": {
+ *     "monopolyQ": number,
+ *     "competitionQ": number,
+ *     "demand": [...],
+ *     "supply": [...]
+ *   }
+ * }
+ * </pre>
+ */
 public class CompetitionResultParser implements ResultParser {
+
+    /**
+     * Обрабатывает JSON сравнения конкуренции и монополии, возвращая
+     * текстовое резюме расчётов.
+     *
+     * @param json строка JSON от сервера
+     * @return человекочитаемое описание
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();

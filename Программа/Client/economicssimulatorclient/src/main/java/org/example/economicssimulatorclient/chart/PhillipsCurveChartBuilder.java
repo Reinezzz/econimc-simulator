@@ -10,8 +10,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков кривой Филлипса.
+ * Может отображать точечные диаграммы, временные ряды и коротко-/долгосрочные петли.
+ */
 public class PhillipsCurveChartBuilder implements ChartDrawer {
 
+    /**
+     * Создаёт график кривой Филлипса по ключу.
+     *
+     * @param chartKey  "scatter", "timeseries" или "loops"
+     * @param chartData набор входных данных
+     * @return JavaFX-узел с графиком
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

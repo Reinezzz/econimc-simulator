@@ -11,8 +11,19 @@ import org.example.economicssimulatorclient.util.I18n;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Построитель графиков для изучения эластичности спроса и предложения.
+ * Умеет строить кривые, столбцы выручки и тепловые карты эластичности.
+ */
 public class ElasticityChartBuilder implements ChartDrawer {
 
+    /**
+     * Возвращает нужный график эластичности.
+     *
+     * @param chartKey  "elasticity_curves", "revenue_bars" или "elasticity_heatmap"
+     * @param chartData исходные данные
+     * @return узел JavaFX с визуализацией
+     */
     @Override
     public Node buildChart(String chartKey, Map<String, Object> chartData) {
         Node node;

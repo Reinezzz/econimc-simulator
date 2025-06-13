@@ -10,9 +10,20 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 
+/**
+ * Преобразует JavaFX-узел в PNG-изображение и кодирует его в Base64.
+ * Используется при формировании отчётов. В случае ошибки бросает RuntimeException с локализованным сообщением.
+ */
 public class ReportImageUtil {
 
-
+    /**
+     * Делает снимок указанного узла и возвращает картинку в виде Base64 PNG.
+     *
+     * @param node   узел JavaFX
+     * @param width  ширина снимка
+     * @param height высота снимка
+     * @return строка Base64 с изображением
+     */
     public static String toBase64Png(Node node, int width, int height) {
 
         WritableImage snapshot = new WritableImage(width, height);

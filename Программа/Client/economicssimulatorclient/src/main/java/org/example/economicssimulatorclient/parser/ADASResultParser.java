@@ -4,7 +4,33 @@ import org.example.economicssimulatorclient.util.I18n;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Парсер модели совокупного спроса и предложения (AD&#x2011;AS).
+ *
+ * <p>Ожидаемая структура JSON:
+ * <pre>
+ * {
+ *   "equilibrium": {
+ *     "equilibrium": {"x": number, "y": number},
+ *     "LRAS": [{"x": number, "y": number}]
+ *   },
+ *   "shifts": {
+ *     "AD2": [{"x": number, "y": number}],
+ *     "SRAS2": [{"x": number, "y": number}]
+ *   },
+ *   "gaps": {"potentialY": number, "actualY": number}
+ * }
+ * </pre>
+ */
 public class ADASResultParser implements ResultParser {
+
+    /**
+     * Разбирает ответ сервера по модели AD-AS и возвращает краткое
+     * текстовое изложение основных результатов.
+     *
+     * @param json исходные данные модели
+     * @return человекочитаемое представление результатов
+     */
     @Override
     public String parse(String json) {
         StringBuilder sb = new StringBuilder();
