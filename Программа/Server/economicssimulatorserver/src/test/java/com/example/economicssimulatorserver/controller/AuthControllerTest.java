@@ -189,7 +189,7 @@ class AuthControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Successfully logged out."));
+                .andExpect(jsonPath("$.message").value("msg.logged_out"));
     }
 
 

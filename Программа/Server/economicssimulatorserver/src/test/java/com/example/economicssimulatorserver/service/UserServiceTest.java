@@ -2,9 +2,11 @@ package com.example.economicssimulatorserver.service;
 
 import com.example.economicssimulatorserver.entity.User;
 import com.example.economicssimulatorserver.repository.UserRepository;
+import com.example.economicssimulatorserver.exception.LocalizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -39,5 +41,19 @@ class UserServiceTest {
         assertThat(userService.findByEmail("test@mail.com")).contains(user);
     }
 
+    @Test
+    void updatePassword_shouldEncodeAndSave() {
+        User user = new User();
+        when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+        userService.updatePassword(user, "pass");
+        assertThat(user.getPasswordHash()).isEqualTo("hashed");
+        verify(userRepo).save(user);
+    }
 
+    @Test
+    void loadUserByUsername_shouldThrowIfNotFound() {
+        when(userRepo.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.loadUserByUsername("notfound"))
+                .isInstanceOf(LocalizedException.class);
+    }
 }

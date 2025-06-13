@@ -68,8 +68,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.3'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
-    testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
-    testImplementation 'org.testfx:testfx-junit5:4.0.16-alpha'
+    testImplementation 'org.assertj:assertj-core:3.26.0'
 }
 
 test {

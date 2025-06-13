@@ -33,19 +33,19 @@ public class LlmService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${llm.ollama.host}")
-    private String ollamaHost;
+    String ollamaHost;
 
     @Value("${llm.ollama.model}")
-    private String ollamaModel;
+    String ollamaModel;
 
     @Value("${llm.ollama.timeout:30s}")
-    private String ollamaTimeout;
+    String ollamaTimeout;
 
     @Value("${llm.ollama.max-retries:3}")
-    private int maxRetries;
+    int maxRetries;
 
     @Value("${llm.ollama.language.default:ru}")
-    private String defaultLanguage;
+    String defaultLanguage;
     private final MessageSource messageSource;
 
     /**

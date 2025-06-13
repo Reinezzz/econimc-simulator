@@ -24,7 +24,7 @@ public class SessionManager {
     /**
      * Создаёт менеджер сессии и инициализирует хранилище предпочтений.
      */
-    private SessionManager() {
+    SessionManager() {
         prefs = Preferences.userNodeForPackage(SessionManager.class);
     }
 

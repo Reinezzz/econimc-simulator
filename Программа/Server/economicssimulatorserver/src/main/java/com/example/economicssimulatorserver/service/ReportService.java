@@ -34,7 +34,7 @@ public class ReportService {
     private final MessageSource messageSource;
 
     @Value("${minio.bucket.reports}")
-    private String reportBucket;
+    String reportBucket;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

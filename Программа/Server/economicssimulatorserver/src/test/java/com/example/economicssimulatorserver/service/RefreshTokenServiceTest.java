@@ -8,9 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.time.Instant;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RefreshTokenServiceTest {
@@ -30,13 +31,27 @@ class RefreshTokenServiceTest {
         User user = new User();
         when(userRepo.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
         when(refreshTokenRepo.save(any(RefreshToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
         var userDetails = org.springframework.security.core.userdetails.User
                 .withUsername("user").password("pass").authorities("USER").build();
-
         RefreshToken token = refreshTokenService.createRefreshToken(userDetails);
         assertThat(token).isNotNull();
         verify(refreshTokenRepo).save(any(RefreshToken.class));
+    }
+
+    @Test
+    void validateRefreshToken_shouldThrowIfNotFound() {
+        when(refreshTokenRepo.findByToken(anyString())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> refreshTokenService.validateRefreshToken("nope"))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void validateRefreshToken_shouldThrowIfExpired() {
+        RefreshToken token = new RefreshToken();
+        token.setExpiryDate(Instant.now().minusSeconds(10));
+        when(refreshTokenRepo.findByToken(anyString())).thenReturn(Optional.of(token));
+        assertThatThrownBy(() -> refreshTokenService.validateRefreshToken("expired"))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -46,5 +61,4 @@ class RefreshTokenServiceTest {
         refreshTokenService.deleteByToken("tok");
         verify(refreshTokenRepo).delete(token);
     }
-
 }
