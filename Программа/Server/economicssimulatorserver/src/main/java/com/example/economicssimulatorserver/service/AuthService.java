@@ -19,6 +19,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Optional;
 
+/**
+ * Сервис аутентификации и управления пользователями.
+ * Отвечает за регистрацию, вход, сброс пароля и работу с токенами.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -35,6 +39,12 @@ public class AuthService {
 
     private static final String REG_CACHE = "registrations";
 
+    /**
+     * Регистрирует нового пользователя и отправляет код подтверждения на почту.
+     *
+     * @param req данные регистрации пользователя
+     * @return результат операции
+     */
     @Transactional
     public ApiResponse register(RegistrationRequest req) {
         if (userRepo.existsByEmail(req.email()))
@@ -65,6 +75,12 @@ public class AuthService {
         return new ApiResponse(true, "msg.verification_code_sent");
     }
 
+    /**
+     * Подтверждает электронную почту пользователя по коду из письма.
+     *
+     * @param req запрос с адресом и кодом подтверждения
+     * @return результат операции
+     */
     @Transactional
     public ApiResponse verifyEmail(VerificationRequest req) {
         var cache = cacheManager.getCache(REG_CACHE);
@@ -93,6 +109,12 @@ public class AuthService {
         return new ApiResponse(true, "msg.email_confirmed");
     }
 
+    /**
+     * Производит вход пользователя и выдаёт пару токенов.
+     *
+     * @param req логин и пароль пользователя
+     * @return токен доступа и refresh-токен
+     */
     public LoginResponse login(LoginRequest req) {
         Optional<User> userOpt = userRepo.findByUsernameOrEmail(req.usernameOrEmail(), req.usernameOrEmail());
         if (userOpt.isEmpty()) {
@@ -113,6 +135,12 @@ public class AuthService {
         }
     }
 
+    /**
+     * Начинает процедуру сброса пароля и отправляет код на почту.
+     *
+     * @param req запрос с адресом пользователя
+     * @return результат операции
+     */
     @Transactional
     public ApiResponse initiatePasswordReset(PasswordResetRequest req) {
         User user = userService.findByEmail(req.email())
@@ -128,6 +156,12 @@ public class AuthService {
         return new ApiResponse(true, "msg.password_rest_code_sent");
     }
 
+    /**
+     * Подтверждает сброс пароля по коду и устанавливает новый пароль.
+     *
+     * @param req параметры с email, кодом и новым паролем
+     * @return результат операции
+     */
     @Transactional
     public ApiResponse confirmPasswordReset(PasswordResetConfirm req) {
         User user = userService.findByEmail(req.email())
@@ -143,12 +177,23 @@ public class AuthService {
         return new ApiResponse(true, "msg.password_updated");
     }
 
+    /**
+     * Отменяет процедуру сброса пароля для указанного пользователя.
+     *
+     * @param email адрес электронной почты
+     */
     public void cancelPasswordReset(String email) {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new LocalizedException("error.email_not_found"));
         tokenService.evictPasswordResetToken(user);
     }
 
+    /**
+     * Обновляет токен доступа по действующему refresh-токену.
+     *
+     * @param request запрос, содержащий refresh-токен
+     * @return новые токены доступа и обновления
+     */
     public RefreshTokenResponse refreshTokens(RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.refreshToken());
         User user = refreshToken.getUser();
@@ -164,6 +209,11 @@ public class AuthService {
         return new RefreshTokenResponse(accessToken, refreshToken.getToken());
     }
 
+    /**
+     * Завершает сессию пользователя и удаляет refresh-токен.
+     *
+     * @param request содержит токен для удаления
+     */
     public void logout(LogoutRequest request) {
         refreshTokenService.deleteByToken(request.refreshToken());
     }

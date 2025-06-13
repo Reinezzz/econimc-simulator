@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Конфигурация клиента MinIO для работы с S3-хранилищем.
+ */
 @Configuration
 public class S3ClientConfig {
 
@@ -17,6 +20,11 @@ public class S3ClientConfig {
     @Value("${minio.secret-key}")
     private String secretKey;
 
+    /**
+     * Создаёт клиента MinIO с заданными параметрами подключения.
+     *
+     * @return настроенный экземпляр {@link MinioClient}
+     */
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()

@@ -11,9 +11,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер для макроэкономической модели IS–LM.
+ * <p>
+ * Строит графики равновесия, поверхности и временные ряды,
+ * демонстрирующие влияние фискальной политики.
+ */
 @Component
 public class ISLMSolver implements EconomicModelSolver {
 
+    /**
+     * Вычисляет пересечение кривых IS и LM и сопутствующие сценарии.
+     *
+     * @param request параметры товарного и денежного рынков
+     * @return ответ с данными для графиков IS–LM
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -132,6 +144,9 @@ public class ISLMSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели IS–LM
+     */
     @Override
     public String getModelType() {
         return "ISLM";

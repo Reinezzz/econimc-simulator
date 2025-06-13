@@ -4,8 +4,19 @@ import com.example.economicssimulatorserver.exception.LocalizedException;
 
 import java.util.*;
 
+/**
+ * Набор вспомогательных методов для подготовки данных графиков.
+ */
 public class ChartDataUtil {
 
+    /**
+     * Преобразует массивы значений в список точек для отображения на графике.
+     *
+     * @param x массив значений по оси X (количество)
+     * @param y массив значений по оси Y (цена)
+     * @return список точек с ключами {@code "quantity"} и {@code "price"}
+     * @throws LocalizedException если размеры массивов не совпадают
+     */
     public static List<Map<String, Double>> pointsList(double[] x, double[] y) {
         if (x.length != y.length)
             throw new LocalizedException("error.chart_xy_size");
@@ -19,6 +30,15 @@ public class ChartDataUtil {
         return points;
     }
 
+    /**
+     * Формирует массив значений в указанном диапазоне.
+     *
+     * @param min   минимальное значение диапазона
+     * @param max   максимальное значение диапазона
+     * @param steps количество шагов (точек)
+     * @return массив значений
+     * @throws LocalizedException если {@code steps} меньше двух
+     */
     public static double[] range(double min, double max, int steps) {
         if (steps <= 1)
             throw new LocalizedException("error.chart_steps");
@@ -30,6 +50,14 @@ public class ChartDataUtil {
         return arr;
     }
 
+    /**
+     * Создаёт список данных для столбиковой диаграммы.
+     *
+     * @param labels массив подписей столбцов
+     * @param values массив значений столбцов
+     * @return список объектов с ключами {@code "label"} и {@code "value"}
+     * @throws LocalizedException если размеры массивов не совпадают
+     */
     public static List<Map<String, Object>> barData(String[] labels, double[] values) {
         if (labels.length != values.length)
             throw new LocalizedException("error.chart_label_size");

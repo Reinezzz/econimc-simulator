@@ -11,9 +11,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер, сравнивающий результаты совершенной конкуренции и монополии.
+ * <p>
+ * Строит кривые прибыли и показатели благосостояния
+ * при заданных параметрах рынка.
+ */
 @Component
 public class CompetitionSolver implements EconomicModelSolver {
 
+    /**
+     * Вычисляет показатели рынка для сценариев конкуренции и монополии.
+     *
+     * @param request параметры спроса и издержек
+     * @return ответ с данными для графиков
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -98,6 +110,9 @@ public class CompetitionSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели «Конкуренция против монополии»
+     */
     @Override
     public String getModelType() {
         return "CompetitionVsMonopoly";

@@ -16,6 +16,9 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Сервис управления refresh-токенами пользователей.
+ */
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
@@ -28,6 +31,12 @@ public class RefreshTokenService {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    /**
+     * Создаёт новый refresh-токен для пользователя или возвращает существующий.
+     *
+     * @param userDetails данные пользователя
+     * @return созданный токен
+     */
     @Transactional
     public RefreshToken createRefreshToken(UserDetails userDetails) {
         String username = userDetails.getUsername();
@@ -52,7 +61,12 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-
+    /**
+     * Проверяет refresh-токен и возвращает его сущность.
+     *
+     * @param token строковое представление токена
+     * @return валидный refresh-токен
+     */
     public RefreshToken validateRefreshToken(String token) {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByToken(token);
         if (refreshTokenOpt.isEmpty()) {
@@ -66,6 +80,11 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    /**
+     * Удаляет refresh-токен по его строковому представлению.
+     *
+     * @param token токен для удаления
+     */
     @Transactional
     public void deleteByToken(String token) {
         System.out.println("Token for delete: " + token);
@@ -79,11 +98,17 @@ public class RefreshTokenService {
                 .ifPresent(refreshTokenRepository::delete);
     }
 
+    /**
+     * Удаляет все refresh-токены пользователя.
+     */
     @Transactional
     public void deleteByUser(User user) {
         refreshTokenRepository.deleteByUser(user);
     }
 
+    /**
+     * Генерирует криптостойкий случайный токен.
+     */
     private String generateSecureToken() {
         byte[] randomBytes = new byte[64];
         secureRandom.nextBytes(randomBytes);

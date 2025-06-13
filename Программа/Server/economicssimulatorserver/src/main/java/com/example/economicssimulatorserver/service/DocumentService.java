@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис работы с пользовательскими документами в хранилище MinIO.
+ */
 @Service
 public class DocumentService {
 
@@ -34,6 +37,14 @@ public class DocumentService {
         this.documentRepository = documentRepository;
     }
 
+    /**
+     * Загружает PDF-документ в MinIO и сохраняет информацию о нём в базе.
+     *
+     * @param userId      идентификатор пользователя
+     * @param file        загружаемый файл
+     * @param description описание документа
+     * @return информация о загруженном документе
+     */
     @Transactional
     public DocumentDto uploadDocument(Long userId, MultipartFile file, String description) {
         if (!isPdf(file)) {
@@ -65,6 +76,13 @@ public class DocumentService {
         }
     }
 
+    /**
+     * Возвращает поток данных запрошенного документа пользователя.
+     *
+     * @param documentId идентификатор документа
+     * @param userId     идентификатор пользователя
+     * @return поток для чтения файла
+     */
     public InputStream downloadDocument(Long documentId, Long userId) {
         DocumentEntity doc = getUserDocumentOrThrow(documentId, userId);
         try {
@@ -79,6 +97,12 @@ public class DocumentService {
         }
     }
 
+    /**
+     * Удаляет документ пользователя из MinIO и базы данных.
+     *
+     * @param documentId идентификатор документа
+     * @param userId     идентификатор пользователя
+     */
     @Transactional
     public void deleteDocument(Long documentId, Long userId) {
         DocumentEntity doc = getUserDocumentOrThrow(documentId, userId);
@@ -96,6 +120,12 @@ public class DocumentService {
         documentRepository.delete(doc);
     }
 
+    /**
+     * Возвращает список документов, принадлежащих пользователю.
+     *
+     * @param userId идентификатор пользователя
+     * @return список документов
+     */
     public List<DocumentDto> getUserDocuments(Long userId) {
         return documentRepository.findByUserId(userId)
                 .stream()
@@ -103,18 +133,37 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Получает документ по идентификатору без проверки владельца.
+     *
+     * @param documentId идентификатор документа
+     * @return найденный документ
+     */
     public DocumentDto getById(Long documentId) {
         DocumentEntity entity = documentRepository.findById(documentId)
                 .orElseThrow(() -> new LocalizedException("error.document_not_found"));
         return toDto(entity);
     }
 
+    /**
+     * Возвращает документ пользователя или выбрасывает исключение при отсутствии доступа.
+     *
+     * @param docId  идентификатор документа
+     * @param userId идентификатор пользователя
+     * @return сущность документа
+     */
     private DocumentEntity getUserDocumentOrThrow(Long docId, Long userId) {
         return documentRepository.findById(docId)
                 .filter(doc -> doc.getUserId().equals(userId))
                 .orElseThrow(() -> new LocalizedException("error.document_access_denied"));
     }
 
+    /**
+     * Преобразует сущность документа в DTO.
+     *
+     * @param entity сущность документа
+     * @return DTO документа
+     */
     private DocumentDto toDto(DocumentEntity entity) {
         return new DocumentDto(
                 entity.getId(),
@@ -125,6 +174,12 @@ public class DocumentService {
         );
     }
 
+    /**
+     * Проверяет, является ли файл PDF-документом.
+     *
+     * @param file загружаемый файл
+     * @return {@code true}, если файл PDF
+     */
     private boolean isPdf(MultipartFile file) {
         String contentType = file.getContentType();
         if ("application/pdf".equalsIgnoreCase(contentType)) return true;

@@ -10,10 +10,18 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 import java.util.Map;
-
+/**
+ * Конфигурация кэширования с использованием Redis.
+ */
 @Configuration
 public class CacheConfig {
 
+    /**
+     * Создаёт и настраивает {@link RedisCacheManager} для работы приложения.
+     *
+     * @param connectionFactory фабрика подключений к Redis
+     * @return настроенный менеджер кэша
+     */
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()

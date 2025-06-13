@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис управления параметрами экономических моделей.
+ */
 @Service
 @RequiredArgsConstructor
 public class ModelParameterService {
@@ -26,6 +29,14 @@ public class ModelParameterService {
     private final ModelParameterRepository economicModelParameterRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Возвращает параметры модели для указанного пользователя.
+     * При отсутствии пользовательских значений создаёт их.
+     *
+     * @param modelId идентификатор модели
+     * @param userId  идентификатор пользователя
+     * @return список параметров
+     */
     @Transactional
     public List<ModelParameterDto> getParametersByModelId(Long modelId, Long userId) {
         List<ModelParameter> params = modelParameterRepository.findByModelId(modelId);
@@ -61,16 +72,14 @@ public class ModelParameterService {
         return result;
     }
 
-    @Transactional
-    public ModelParameterDto createParameter(Long modelId, ModelParameterDto dto) {
-        EconomicModel model = economicModelRepository.findById(modelId)
-                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
-        ModelParameter parameter = fromDto(dto);
-        parameter.setModel(model);
-        ModelParameter saved = modelParameterRepository.save(parameter);
-        return toDto(saved);
-    }
-
+    /**
+     * Обновляет пользовательское значение параметра модели.
+     *
+     * @param paramId идентификатор параметра
+     * @param dto     новые данные
+     * @param userId  идентификатор пользователя
+     * @return обновлённый параметр
+     */
     @Transactional
     public ModelParameterDto updateParameter(Long paramId, ModelParameterDto dto, Long userId) {
         Optional<UserModelParameter> userParamOpt = userModelParameterRepository.findByUserIdAndParameterId(userId, paramId);
@@ -92,26 +101,9 @@ public class ModelParameterService {
         return toDtoWithValue(param, userParam.getValue());
     }
 
-    @Transactional
-    public void deleteParameter(Long paramId) {
-        if (!modelParameterRepository.existsById(paramId))
-            throw new LocalizedException("error.parameter_not_found");
-        modelParameterRepository.deleteById(paramId);
-    }
-
-    private ModelParameterDto toDto(ModelParameter param) {
-        return new ModelParameterDto(
-                param.getId(),
-                param.getModel().getId(),
-                param.getParamName(),
-                param.getParamType(),
-                param.getParamValue(),
-                param.getDisplayName(),
-                param.getDescription(),
-                param.getCustomOrder()
-        );
-    }
-
+    /**
+     * Преобразует параметр и заданное значение в DTO.
+     */
     private ModelParameterDto toDtoWithValue(ModelParameter param, String value) {
         return new ModelParameterDto(
                 param.getId(),
@@ -125,15 +117,4 @@ public class ModelParameterService {
         );
     }
 
-    private ModelParameter fromDto(ModelParameterDto dto) {
-        ModelParameter parameter = new ModelParameter();
-        parameter.setId(dto.id());
-        parameter.setParamName(dto.paramName());
-        parameter.setParamType(dto.paramType());
-        parameter.setParamValue(dto.paramValue());
-        parameter.setDisplayName(dto.displayName());
-        parameter.setDescription(dto.description());
-        parameter.setCustomOrder(dto.customOrder());
-        return parameter;
-    }
 }

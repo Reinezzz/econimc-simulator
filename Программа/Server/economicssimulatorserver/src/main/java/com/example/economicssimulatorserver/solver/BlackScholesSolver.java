@@ -10,9 +10,22 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер для оценки опционов по модели Блэка–Шоулза.
+ * <p>
+ * Строит ряд графиков: поверхность цен опционов,
+ * зависимость от времени и греки по заданным параметрам.
+ */
 @Component
 public class BlackScholesSolver implements EconomicModelSolver {
 
+    /**
+     * Вычисляет поверхности цен опционов и чувствительности.
+     *
+     * @param request содержит параметры опциона: цену базового актива, страйк,
+     *                волатильность и т.д.
+     * @return ответ с данными для построения графиков
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -115,11 +128,17 @@ public class BlackScholesSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели Блэка–Шоулза
+     */
     @Override
     public String getModelType() {
         return "BlackScholes";
     }
 
+    /**
+     * Рассчитывает цену опциона по формуле Блэка–Шоулза.
+     */
     private static double blackScholesPrice(double S, double K, double T, double r, double sigma, String option) {
         double d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
         double d2 = d1 - sigma * Math.sqrt(T);
@@ -130,14 +149,23 @@ public class BlackScholesSolver implements EconomicModelSolver {
         }
     }
 
+    /**
+     * Плотность стандартного нормального распределения.
+     */
     private static double pdf(double x) {
         return Math.exp(-0.5 * x * x) / Math.sqrt(2.0 * Math.PI);
     }
 
+    /**
+     * Функция распределения стандартной нормали.
+     */
     private static double cdf(double x) {
         return 0.5 * (1.0 + erf(x / Math.sqrt(2.0)));
     }
 
+    /**
+     * Приближённая функция ошибок, используемая в CDF.
+     */
     private static double erf(double z) {
         double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
         double ans = 1 - t * Math.exp(-z*z - 1.26551223 +

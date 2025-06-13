@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис управления экономическими моделями и их параметрами.
+ */
 @Service
 @RequiredArgsConstructor
 public class EconomicModelService {
@@ -23,6 +26,12 @@ public class EconomicModelService {
     private final EconomicModelRepository economicModelRepository;
     private final ModelParameterService modelParameterService;
 
+    /**
+     * Возвращает все экономические модели с параметрами пользователя.
+     *
+     * @param userId идентификатор пользователя
+     * @return список моделей
+     */
     @Transactional()
     @Cacheable(value = "models", key = "#userId")
     public List<EconomicModelDto> getAllModels(Long userId) {
@@ -31,6 +40,13 @@ public class EconomicModelService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Возвращает модель по идентификатору.
+     *
+     * @param id     идентификатор модели
+     * @param userId идентификатор пользователя для загрузки параметров
+     * @return найденная модель
+     */
     @Transactional(readOnly = true)
     public EconomicModelDto getModelById(Long id, Long userId) {
         EconomicModel model = economicModelRepository.findById(id)
@@ -38,31 +54,13 @@ public class EconomicModelService {
         return toDto(model, userId);
     }
 
-    @Transactional
-    public EconomicModelDto createModel(EconomicModelDto dto) {
-        EconomicModel model = fromDto(dto);
-        EconomicModel saved = economicModelRepository.save(model);
-        return toDto(saved, null);
-    }
-
-    @Transactional
-    public EconomicModelDto updateModel(Long id, EconomicModelDto dto) {
-        EconomicModel model = economicModelRepository.findById(id)
-                .orElseThrow(() -> new LocalizedException("error.model_not_found"));
-        model.setName(dto.name());
-        model.setDescription(dto.description());
-        model.setModelType(dto.modelType());
-        EconomicModel updated = economicModelRepository.save(model);
-        return toDto(updated, null);
-    }
-
-    @Transactional
-    public void deleteModel(Long id) {
-        if (!economicModelRepository.existsById(id))
-            throw new LocalizedException("error.model_not_found");
-        economicModelRepository.deleteById(id);
-    }
-
+    /**
+     * Преобразует сущность модели в DTO вместе с параметрами и результатами.
+     *
+     * @param model  модель БД
+     * @param userId идентификатор пользователя для загрузки параметров
+     * @return DTO модели
+     */
     private EconomicModelDto toDto(EconomicModel model, Long userId) {
         List<ModelParameterDto> paramDtos =
                 (userId != null)
@@ -88,15 +86,12 @@ public class EconomicModelService {
         );
     }
 
-    private EconomicModel fromDto(EconomicModelDto dto) {
-        EconomicModel model = new EconomicModel();
-        model.setId(dto.id());
-        model.setModelType(dto.modelType());
-        model.setName(dto.name());
-        model.setDescription(dto.description());
-        return model;
-    }
-
+    /**
+     * Преобразует сущность параметра в DTO.
+     *
+     * @param param сущность параметра
+     * @return DTO параметра
+     */
     private ModelParameterDto toDto(ModelParameter param) {
         return new ModelParameterDto(
                 param.getId(),
@@ -110,6 +105,12 @@ public class EconomicModelService {
         );
     }
 
+    /**
+     * Преобразует результат вычислений в DTO.
+     *
+     * @param result сущность результата
+     * @return DTO результата
+     */
     private ModelResultDto toDto(ModelResult result) {
         return new ModelResultDto(
                 result.getId(),

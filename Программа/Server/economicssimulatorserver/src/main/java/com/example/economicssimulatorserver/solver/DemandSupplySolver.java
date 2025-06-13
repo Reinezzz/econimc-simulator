@@ -11,9 +11,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер базовой модели спроса и предложения.
+ * <p>
+ * Считает равновесные цену и объём, излишки и отображает
+ * сдвиги кривых.
+ */
 @Component
 public class DemandSupplySolver implements EconomicModelSolver {
 
+    /**
+     * Вычисляет точки пересечения спроса и предложения и связанные показатели.
+     *
+     * @param request параметры функций спроса и предложения
+     * @return ответ с графиками, описывающими рынок
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -114,6 +126,9 @@ public class DemandSupplySolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели спроса и предложения
+     */
     @Override
     public String getModelType() {
         return "DemandSupply";

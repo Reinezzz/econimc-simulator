@@ -10,9 +10,20 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер, вычисляющий ценовую эластичность спроса.
+ * <p>
+ * Строит тепловые карты и сравнивает выручку для набора товаров.
+ */
 @Component
 public class ElasticitySolver implements EconomicModelSolver {
 
+    /**
+     * Рассчитывает эластичность по начальному и конечному значениям цены и количества.
+     *
+     * @param request параметры изменения цены и объёмов
+     * @return ответ с показателями эластичности и визуализациями
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -80,11 +91,17 @@ public class ElasticitySolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели эластичности
+     */
     @Override
     public String getModelType() {
         return "Elasticity";
     }
 
+    /**
+     * Разбирает список чисел, разделённых точкой с запятой.
+     */
     private List<Double> parseNumberList(String input, int size) {
         if (input == null || input.isEmpty()) {
             List<Double> zeros = new ArrayList<>(Collections.nCopies(size, 0.0));

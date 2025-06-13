@@ -11,9 +11,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер для модели совокупного спроса и предложения (AD-AS).
+ * <p>
+ * Вычисляет равновесные цену и объём выпуска и формирует
+ * набор графиков со сдвигами кривых и разрывами.
+ */
 @Component
 public class ADASSolver implements EconomicModelSolver {
 
+    /**
+     * Рассчитывает модель AD-AS на основе параметров из {@code request}.
+     *
+     * @param request контейнер с параметрами модели
+     * @return ответ с построенными графиками
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -116,6 +128,9 @@ public class ADASSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор, используемый в запросах для выбора данного солвера
+     */
     @Override
     public String getModelType() {
         return "ADAS";

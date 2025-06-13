@@ -10,6 +10,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Конфигурация почтового клиента.
+ * Используется для отправки писем через SMTP.
+ */
 @Configuration
 @EnableConfigurationProperties(MailProperties.class)
 @RequiredArgsConstructor
@@ -17,6 +21,11 @@ public class MailConfig {
 
     private final MailProperties mailProperties;
 
+    /**
+     * Создаёт отправитель почты с настройками из {@link MailProperties}.
+     *
+     * @return экземпляр {@link JavaMailSender}
+     */
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();

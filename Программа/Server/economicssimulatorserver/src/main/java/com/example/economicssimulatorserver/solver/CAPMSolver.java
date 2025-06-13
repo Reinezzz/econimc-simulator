@@ -10,9 +10,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер для модели оценки капитальных активов (CAPM).
+ * <p>
+ * Формирует расчёты ожидаемой доходности и визуализации,
+ * такие как линия рынка ценных бумаг и эффективная граница.
+ */
 @Component
 public class CAPMSolver implements EconomicModelSolver {
 
+    /**
+     * Рассчитывает показатели CAPM по заданным параметрам.
+     *
+     * @param request параметры рынка и характеристики портфеля
+     * @return ответ с данными для графиков
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -80,6 +92,9 @@ public class CAPMSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели CAPM
+     */
     @Override
     public String getModelType() {
         return "CAPM";

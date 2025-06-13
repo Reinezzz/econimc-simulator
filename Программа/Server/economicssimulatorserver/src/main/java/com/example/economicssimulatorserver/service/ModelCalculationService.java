@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Сервис выполнения расчётов экономических моделей.
+ */
 @Service
 @RequiredArgsConstructor
 public class ModelCalculationService {
@@ -25,6 +28,13 @@ public class ModelCalculationService {
     private final SolverFactory solverFactory;
     private final UserRepository userRepository;
 
+    /**
+     * Выполняет расчёт экономической модели и сохраняет результат для пользователя.
+     *
+     * @param request данные для расчёта
+     * @param userId  идентификатор пользователя
+     * @return результат вычислений
+     */
     @Transactional
     public CalculationResponseDto calculate(CalculationRequestDto request,Long userId) {
         EconomicModel model = economicModelRepository.findById(request.modelId())

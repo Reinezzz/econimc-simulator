@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис формирования PDF-отчётов и работы с ними в хранилище.
+ */
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -35,6 +38,14 @@ public class ReportService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Создаёт PDF-отчёт и сохраняет его в хранилище.
+     *
+     * @param userId   идентификатор пользователя
+     * @param username имя пользователя
+     * @param dto      данные отчёта
+     * @return информация о созданном отчёте
+     */
     @Transactional
     public ReportListItemDto createReport(Long userId, String username, ReportCreateRequestDto dto) throws Exception {
         String filename = UUID.randomUUID() + ".pdf";
@@ -82,6 +93,12 @@ public class ReportService {
         );
     }
 
+    /**
+     * Возвращает список отчётов пользователя.
+     *
+     * @param userId идентификатор пользователя
+     * @return список отчётов
+     */
     public List<ReportListItemDto> getReportsForUser(Long userId) {
         return reportRepository.findByUserId(userId).stream()
                 .map(report -> new ReportListItemDto(
@@ -95,6 +112,13 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Загружает готовый отчёт пользователя.
+     *
+     * @param reportId идентификатор отчёта
+     * @param userId   идентификатор пользователя
+     * @return байтовый массив PDF
+     */
     public byte[] downloadReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new LocalizedException("error.report_not_found"));
@@ -112,6 +136,12 @@ public class ReportService {
         }
     }
 
+    /**
+     * Удаляет отчёт пользователя из хранилища и базы данных.
+     *
+     * @param reportId идентификатор отчёта
+     * @param userId   идентификатор пользователя
+     */
     @Transactional
     public void deleteReport(Long reportId, Long userId) throws Exception {
         Report report = reportRepository.findById(reportId)
@@ -128,6 +158,9 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
+    /**
+     * Формирует PDF-файл отчёта на основе переданных данных.
+     */
     private byte[] generatePdf(ReportCreateRequestDto dto, String username) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             com.itextpdf.kernel.pdf.PdfWriter writer = new com.itextpdf.kernel.pdf.PdfWriter(baos);
@@ -194,6 +227,10 @@ public class ReportService {
             return baos.toByteArray();
         }
     }
+
+    /**
+     * Возвращает часть строки в зависимости от текущей локали.
+     */
     public static String localizedValue(String line) {
         String[] parts = line.split("\\^", 2);
         if (parts.length == 1) return line;

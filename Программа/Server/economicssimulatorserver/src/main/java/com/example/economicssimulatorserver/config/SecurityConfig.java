@@ -24,6 +24,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Конфигурация безопасности приложения.
+ * Реализует настройку фильтров JWT и разрешений.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -34,12 +38,26 @@ public class SecurityConfig {
     private final JwtConfig jwtConfig;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Предоставляет менеджер аутентификации из конфигурации Spring.
+     *
+     * @param configuration конфигурация аутентификации
+     * @return менеджер аутентификации
+     * @throws Exception в случае ошибок инициализации
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    /**
+     * Настраивает фильтры безопасности и правила доступа.
+     *
+     * @param http объект для конфигурации HTTP безопасности
+     * @return цепочка фильтров безопасности
+     * @throws Exception при ошибках конфигурации
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -57,12 +75,22 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Фильтр проверки JWT для каждого запроса.
+     */
     private static class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         private final JwtUtil jwtUtil;
         private final JwtConfig jwtConfig;
         private final UserDetailsService userDetailsService;
 
+        /**
+         * Создаёт фильтр аутентификации по JWT.
+         *
+         * @param jwtUtil утилита для работы с токенами
+         * @param jwtConfig конфигурация JWT
+         * @param userDetailsService сервис загрузки данных пользователей
+         */
         public JwtAuthenticationFilter(JwtUtil jwtUtil,
                                        JwtConfig jwtConfig,
                                        UserDetailsService userDetailsService) {
@@ -71,6 +99,15 @@ public class SecurityConfig {
             this.userDetailsService = userDetailsService;
         }
 
+        /**
+         * Выполняет проверку JWT и устанавливает аутентификацию в контекст.
+         *
+         * @param request  входящий HTTP-запрос
+         * @param response ответ HTTP
+         * @param filterChain цепочка фильтров
+         * @throws ServletException в случае ошибок фильтрации
+         * @throws IOException при ошибках ввода-вывода
+         */
         @Override
         protected void doFilterInternal(HttpServletRequest request,
                                         HttpServletResponse response,

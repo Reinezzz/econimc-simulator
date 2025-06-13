@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Контроллер для управления отчётами, созданными пользователями.
+ */
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
@@ -21,6 +24,11 @@ public class ReportController {
     private final ReportService reportService;
     private final UserRepository userRepository;
 
+    /**
+     * Возвращает идентификатор текущего пользователя.
+     *
+     * @return id пользователя
+     */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -32,6 +40,11 @@ public class ReportController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
+    /**
+     * Возвращает имя текущего пользователя.
+     *
+     * @return имя пользователя
+     */
     private String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -40,6 +53,12 @@ public class ReportController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
+    /**
+     * Создаёт отчёт на основе проведённых расчётов и сообщений LLM.
+     *
+     * @param dto параметры нового отчёта
+     * @return созданный отчёт
+     */
     @PostMapping
     public ResponseEntity<ReportListItemDto> createReport(@RequestBody ReportCreateRequestDto dto) throws Exception {
         Long userId = getCurrentUserId();
@@ -60,6 +79,11 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    /**
+     * Получает список отчётов текущего пользователя.
+     *
+     * @return список отчётов
+     */
     @GetMapping
     public ResponseEntity<List<ReportListItemDto>> getReportsForUser() {
         Long userId = getCurrentUserId();
@@ -67,6 +91,12 @@ public class ReportController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * Скачивает PDF-файл отчёта.
+     *
+     * @param reportId идентификатор отчёта
+     * @return содержимое PDF-файла
+     */
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadReport(@PathVariable("id") Long reportId) throws Exception {
         Long userId = getCurrentUserId();
@@ -77,6 +107,12 @@ public class ReportController {
                 .body(pdfBytes);
     }
 
+    /**
+     * Удаляет отчёт пользователя.
+     *
+     * @param reportId идентификатор отчёта
+     * @return пустой ответ при успешном удалении
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable("id") Long reportId) throws Exception {
         Long userId = getCurrentUserId();

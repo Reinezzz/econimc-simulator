@@ -11,9 +11,19 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер кривой Филлипса, показывающей связь между инфляцией
+ * и безработицей.
+ */
 @Component
 public class PhillipsCurveSolver implements EconomicModelSolver {
 
+    /**
+     * Рассчитывает краткосрочную и долгосрочную кривые Филлипса и соответствующие временные ряды.
+     *
+     * @param request параметры: ожидаемая инфляция, естественный уровень безработицы и др.
+     * @return ответ с графиками для кривой Филлипса
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -92,6 +102,9 @@ public class PhillipsCurveSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели кривой Филлипса
+     */
     @Override
     public String getModelType() {
         return "PhillipsCurve";

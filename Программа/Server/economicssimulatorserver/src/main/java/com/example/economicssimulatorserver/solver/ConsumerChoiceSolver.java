@@ -11,10 +11,20 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+/**
+ * Солвер для модели выбора потребителя с функцией полезности Кобба–Дугласа.
+ * <p>
+ * Строит бюджетные и кривые безразличия и демонстрирует эффект изменения цены.
+ */
 @Component
 public class ConsumerChoiceSolver implements EconomicModelSolver {
 
+    /**
+     * Находит оптимальный набор потребления и связанные с ним кривые.
+     *
+     * @param request параметры модели: доход, цены и т.д.
+     * @return ответ с графическими представлениями модели
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -124,6 +134,9 @@ public class ConsumerChoiceSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели потребительского выбора
+     */
     @Override
     public String getModelType() {
         return "ConsumerChoice";

@@ -20,6 +20,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Сервис взаимодействия с локальной моделью LLM через Ollama.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,6 +48,15 @@ public class LlmService {
     private String defaultLanguage;
     private final MessageSource messageSource;
 
+    /**
+     * Извлекает значения параметров модели из текста документа при помощи LLM.
+     *
+     * @param req             параметры запроса к LLM
+     * @param model           модель, по которой идёт извлечение
+     * @param document        документ-источник
+     * @param modelParameters параметры модели
+     * @return обновлённые параметры
+     */
     public LlmParameterExtractionResponseDto extractParameters(LlmParameterExtractionRequestDto req,
                                                                EconomicModelDto model,
                                                                DocumentDto document,
@@ -66,6 +78,13 @@ public class LlmService {
         throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
+    /**
+     * Выполняет диалог с LLM по заданной модели.
+     *
+     * @param req   сообщение пользователя и дополнительные данные
+     * @param model модель, контекст диалога
+     * @return ответ ассистента
+     */
     public LlmChatResponseDto chat(LlmChatRequestDto req, EconomicModelDto model) {
         int attempt = 0;
         Exception lastException = null;
@@ -84,6 +103,9 @@ public class LlmService {
         throw new LocalizedException("error.llm_invalid_response", maxRetries);
     }
 
+    /**
+     * Формирует текст запроса к LLM для извлечения параметров из документа.
+     */
     private String buildExtractionPrompt(EconomicModelDto model, DocumentDto document, List<ModelParameterDto> params) {
         Locale locale = LocaleHolder.getLocale();
         StringBuilder sb = new StringBuilder();
@@ -104,6 +126,9 @@ public class LlmService {
         return sb.toString();
     }
 
+    /**
+     * Создаёт запрос к LLM для продолжения диалога с пользователем.
+     */
     private String buildChatPrompt(LlmChatRequestDto req, EconomicModelDto model) {
         Locale locale = LocaleHolder.getLocale();
         StringBuilder sb = new StringBuilder();
@@ -138,6 +163,13 @@ public class LlmService {
         return sb.toString();
     }
 
+    /**
+     * Отправляет сформированный запрос к Ollama и возвращает ответ.
+     *
+     * @param prompt текст запроса
+     * @param model  используемая модель
+     * @return ответ LLM в виде JSON
+     */
     private String callOllama(String prompt, String model) {
         String url = ollamaHost + "/api/generate";
         Map<String, Object> payload = Map.of(
@@ -186,7 +218,13 @@ public class LlmService {
         return finalJson;
     }
 
-
+    /**
+     * Разбирает JSON-ответ LLM с параметрами модели.
+     *
+     * @param llmJson      JSON-строка от LLM
+     * @param originParams исходные параметры
+     * @return список обновлённых параметров
+     */
     private List<ModelParameterDto> parseExtractionResponse(String llmJson, List<ModelParameterDto> originParams) {
         try {
             com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -209,6 +247,12 @@ public class LlmService {
         }
     }
 
+    /**
+     * Минимальная обработка ответа LLM для чата.
+     *
+     * @param llmRaw строка ответа
+     * @return текст сообщения ассистента
+     */
     private String parseChatResponse(String llmRaw) {
         return llmRaw.trim();
     }

@@ -17,6 +17,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Контроллер управления пользовательскими документами.
+ */
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
@@ -25,6 +28,11 @@ public class DocumentController {
     private final DocumentService documentService;
     private final UserRepository userRepository;
 
+    /**
+     * Получение идентификатора текущего пользователя из контекста безопасности.
+     *
+     * @return id пользователя
+     */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -36,6 +44,13 @@ public class DocumentController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
+    /**
+     * Загрузка PDF-документа пользователя.
+     *
+     * @param file        загружаемый файл
+     * @param description необязательное описание документа
+     * @return информация о сохранённом документе
+     */
     @PostMapping("/upload")
     public DocumentDto uploadDocument(
             @RequestParam("file") MultipartFile file,
@@ -44,6 +59,12 @@ public class DocumentController {
         return documentService.uploadDocument(userId, file, description);
     }
 
+    /**
+     * Скачивание ранее загруженного документа.
+     *
+     * @param documentId идентификатор документа
+     * @return поток для загрузки PDF-файла
+     */
     @GetMapping("/{id}/download")
     public ResponseEntity<InputStreamResource> downloadDocument(
             @PathVariable("id") Long documentId) {
@@ -64,6 +85,12 @@ public class DocumentController {
                 .body(new InputStreamResource(inputStream));
     }
 
+    /**
+     * Удаление документа пользователя.
+     *
+     * @param documentId идентификатор удаляемого документа
+     * @return пустой ответ с кодом 204
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(
             @PathVariable("id") Long documentId) {
@@ -72,6 +99,11 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Получение списка документов текущего пользователя.
+     *
+     * @return список загруженных документов
+     */
     @GetMapping("/")
     public List<DocumentDto> getUserDocuments() {
         Long userId = getCurrentUserId();

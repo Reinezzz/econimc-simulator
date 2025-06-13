@@ -11,17 +11,24 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+/**
+ * Сервис генерации и проверки временных кодов.
+ */
 @Service
 @RequiredArgsConstructor
 public class TokenService {
 
-    private static final int CODE_LENGTH = 6;
     private static final int EXP_MINUTES = 15;
 
-    private final VerificationTokenRepository verifyRepo;
     private final PasswordResetTokenRepository resetRepo;
     private final Random rng = new Random();
 
+    /**
+     * Создаёт токен для восстановления пароля пользователя.
+     *
+     * @param user пользователь
+     * @return сгенерированный код
+     */
     @Transactional
     public String createPasswordResetToken(User user) {
         resetRepo.deleteByUser(user);
@@ -35,6 +42,13 @@ public class TokenService {
         return code;
     }
 
+    /**
+     * Проверяет код сброса пароля и удаляет его при успехе.
+     *
+     * @param user пользователь
+     * @param code введённый код
+     * @return {@code true}, если код верен
+     */
     @Transactional
     public boolean validatePasswordResetCode(User user, String code) {
         return resetRepo.findByUser(user)
@@ -44,10 +58,16 @@ public class TokenService {
                 .orElse(false);
     }
 
+    /**
+     * Генерирует случайный шестизначный код.
+     */
     private String randomCode() {
         return "%06d".formatted(rng.nextInt(1_000_000));
     }
 
+    /**
+     * Удаляет токен сброса пароля пользователя.
+     */
     @Transactional
     public void evictPasswordResetToken(User user) {
         resetRepo.deleteByUser(user);

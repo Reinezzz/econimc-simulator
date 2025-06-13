@@ -10,15 +10,35 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+/**
+ * Глобальный обработчик исключений REST-слоя приложения.
+ * <p>
+ * Преобразует возникшие исключения в {@link ApiResponse} c локализованными
+ * сообщениями. Для локализации используется {@link MessageSource}, а при
+ * отсутствии нужного сообщения возвращается сам код ошибки.
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    /** Источник сообщений для локализации ответов. */
     private final MessageSource messageSource;
 
+    /**
+     * Создаёт обработчик с указанным источником сообщений.
+     *
+     * @param messageSource {@link MessageSource} для поиска текстов ошибок
+     */
     public ApiExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
+    /**
+     * Обрабатывает пользовательские исключения с кодом локализованного сообщения.
+     *
+     * @param ex     выброшенное исключение
+     * @param locale текущая локаль клиента
+     * @return {@link ApiResponse} с текстом ошибки
+     */
     @ExceptionHandler(LocalizedException.class)
     public ResponseEntity<ApiResponse> handleLocalizedException(
             LocalizedException ex, Locale locale) {
@@ -34,6 +54,13 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiResponse(false, message));
     }
 
+    /**
+     * Формирует ответ при ошибках валидации параметров запроса.
+     *
+     * @param ex     исключение валидации
+     * @param locale локаль клиента
+     * @return {@link ApiResponse} с описанием ошибок
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse> handleValidationException(
             MethodArgumentNotValidException ex, Locale locale) {
@@ -59,6 +86,13 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiResponse(false, message));
     }
 
+    /**
+     * Перехватывает все остальные необработанные исключения.
+     *
+     * @param ex     возникшее исключение
+     * @param locale локаль клиента
+     * @return ответ с кодом 500 и текстом неизвестной ошибки
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleAllOtherExceptions(
             Exception ex, Locale locale) {

@@ -10,9 +10,21 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Солвер модели экономического роста Солоу.
+ * <p>
+ * Имитирует накопление капитала во времени и строит графики
+ * для различных сценариев сбережений.
+ */
 @Component
 public class SolowGrowthSolver implements EconomicModelSolver {
 
+    /**
+     * Запускает модель Солоу для переданных параметров.
+     *
+     * @param request начальные значения капитала, труда и прочие параметры
+     * @return ответ с траекториями и фазовыми диаграммами
+     */
     @Override
     public CalculationResponseDto solve(CalculationRequestDto request) {
         Map<String, String> paramMap = request.parameters().stream()
@@ -124,6 +136,9 @@ public class SolowGrowthSolver implements EconomicModelSolver {
         return new CalculationResponseDto(result, request.parameters());
     }
 
+    /**
+     * @return идентификатор модели роста Солоу
+     */
     @Override
     public String getModelType() {
         return "SolowGrowth";

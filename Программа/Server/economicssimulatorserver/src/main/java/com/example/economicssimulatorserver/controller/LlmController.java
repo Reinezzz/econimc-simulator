@@ -10,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер взаимодействия с LLM-сервисом для обработки запросов пользователей.
+ */
 @RestController
 @RequestMapping("/api/llm")
 @RequiredArgsConstructor
@@ -22,6 +25,11 @@ public class LlmController {
     private final ModelCalculationService calculationService;
     private final UserRepository userRepository;
 
+    /**
+     * Получение id текущего пользователя.
+     *
+     * @return идентификатор пользователя
+     */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -33,6 +41,12 @@ public class LlmController {
         throw new LocalizedException("error.user_not_authenticated");
     }
 
+    /**
+     * Извлекает параметры модели из документа с помощью LLM.
+     *
+     * @param req запрос с идентификаторами модели и документа
+     * @return найденные параметры и текстовые подсказки
+     */
     @PostMapping("/extract-parameters")
     public ResponseEntity<LlmParameterExtractionResponseDto> extractParameters(
             @RequestBody LlmParameterExtractionRequestDto req) {
@@ -47,6 +61,12 @@ public class LlmController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Чат с LLM для получения ответов по выбранной модели.
+     *
+     * @param req параметры диалога и идентификатор модели
+     * @return ответ LLM на запрос пользователя
+     */
     @PostMapping("/chat")
     public ResponseEntity<LlmChatResponseDto> chat(
             @RequestBody LlmChatRequestDto req) {
