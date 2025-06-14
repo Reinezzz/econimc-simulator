@@ -21,5 +21,6 @@ module org.example.economicssimulatorclient {
     opens org.example.economicssimulatorclient to javafx.fxml, org.testfx.junit5;
     opens org.example.economicssimulatorclient.config to javafx.fxml;
     opens org.example.economicssimulatorclient.dto to com.fasterxml.jackson.databind;
+    exports org.example.economicssimulatorclient.service to com.fasterxml.jackson.databind;
     exports org.example.economicssimulatorclient;
 }

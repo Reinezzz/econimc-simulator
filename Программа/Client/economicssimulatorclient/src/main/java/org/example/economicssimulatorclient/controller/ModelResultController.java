@@ -30,7 +30,7 @@ import java.util.*;
 public class ModelResultController extends BaseController {
 
     private final EconomicModelService modelService = get(EconomicModelService.class);
-    private final ReportService reportService = new ReportService(URI.create("http://localhost:8080"));
+    private final ReportService reportService = new ReportService(URI.create("http://92.118.85.123:8080"));
 
     @FXML
     private Button backButton;

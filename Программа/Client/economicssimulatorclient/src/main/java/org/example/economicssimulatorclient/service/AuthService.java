@@ -22,7 +22,7 @@ public class AuthService extends BaseService {
     private static final String AUTH_CANCEL_PASSWORD_RESET = "cancel-password-reset";
     private final URI baseUri = URI.create(AppConfig.getBaseUrl() + AUTH_PATH + "/");
 
-    private static final AuthService INSTANCE = new AuthService();
+    private static AuthService INSTANCE = new AuthService();
 
 
     /**

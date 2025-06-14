@@ -14,7 +14,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class BaseServiceTest {
+public  class BaseServiceTest {
 
     HttpClient mockClient;
 

@@ -37,7 +37,7 @@ public class AppConfig {
      * по умолчанию равно {@code http://localhost:8080}.
      */
     public static String getBaseUrl() {
-        return props.getProperty("baseUrl", "http://localhost:8080");
+        return props.getProperty("baseUrl", "http://92.118.85.123:8080");
     }
 
     /**

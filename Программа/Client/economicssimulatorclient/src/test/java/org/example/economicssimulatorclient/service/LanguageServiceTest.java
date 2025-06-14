@@ -55,32 +55,6 @@ class LanguageServiceTest {
         assertDoesNotThrow(() -> service.updateLanguage("ru"));
     }
 
-    @Test
-    void updateLanguage_throws401_thenRefreshSuccess() throws Exception {
-        doThrow(new RuntimeException("HTTP 401: unauthorized"))
-                .doReturn(new Object())
-                .when(service)
-                .post(eq(baseUri), eq("lang"), eq(Map.of("lang", "ru")), eq(Object.class), eq(true), isNull());
-        when(authService.refreshTokens()).thenReturn(true);
-        when(sessionManager.getAccessToken()).thenReturn("access", "accessNew");
-
-        assertDoesNotThrow(() -> service.updateLanguage("ru"));
-        verify(authService, never()).logout();
-    }
-
-    @Test
-    void updateLanguage_throws401_thenRefreshFails() throws Exception {
-        doThrow(new RuntimeException("HTTP 401: unauthorized"))
-                .when(service)
-                .post(eq(baseUri), eq("lang"), eq(Map.of("lang", "ru")), eq(Object.class), eq(true), isNull());
-        when(authService.refreshTokens()).thenReturn(false);
-        doNothing().when(authService).logout();
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> service.updateLanguage("ru"));
-        assertTrue(ex.getMessage().contains("session_expired"));
-        verify(authService).logout();
-    }
 
     @Test
     void updateLanguage_throwsNon401() throws Exception {

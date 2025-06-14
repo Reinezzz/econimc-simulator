@@ -48,7 +48,7 @@ public class DocumentController extends BaseController {
     protected Label statusLabel;
 
     private final DocumentService documentService = new DocumentService();
-    private final ReportService reportService = new ReportService(URI.create("http://localhost:8080")); // замени на свой адрес
+    private final ReportService reportService = new ReportService(URI.create("http://92.118.85.123:8080")); // замени на свой адрес
 
     final List<CheckBox> checkBoxes = new ArrayList<>();
     final List<DocumentDto> documents = new ArrayList<>();
