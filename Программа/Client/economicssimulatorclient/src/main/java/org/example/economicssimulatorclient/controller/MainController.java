@@ -29,7 +29,7 @@ public class MainController extends BaseController {
     public VBox tileDocuments;
 
     @FXML
-    private VBox modelList;
+    VBox modelList;
 
     @FXML
     private Button exitButton;
@@ -38,7 +38,7 @@ public class MainController extends BaseController {
     private GridPane mainGrid;
 
     @FXML
-    private VBox tileButton;
+    VBox tileButton;
     @FXML
     private Pane iconLastModel;
 
@@ -92,7 +92,7 @@ public class MainController extends BaseController {
      *
      * @param models список моделей
      */
-    private void populateModelList(List<EconomicModelDto> models) {
+    void populateModelList(List<EconomicModelDto> models) {
         modelList.getChildren().clear();
         for (EconomicModelDto model : models) {
             Button btn = new Button(localizedValue(model.name()));

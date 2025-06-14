@@ -12,6 +12,7 @@ public class ChartDrawerFactory {
      * @return подходящий {@link ChartDrawer} или {@code null}, если тип не поддерживается
      */
     public static ChartDrawer getDrawer(String modelType) {
+        if (modelType == null) return null; // или можно бросить IllegalArgumentException — на твой выбор
         return switch (modelType) {
             case "DemandSupply" -> new DemandSupplyChartBuilder();
             case "Elasticity" -> new ElasticityChartBuilder();

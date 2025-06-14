@@ -37,30 +37,30 @@ public class ModelResultController extends BaseController {
     @FXML
     private Button mainButton;
     @FXML
-    private VBox parameterList;
+    VBox parameterList;
     @FXML
-    private TextArea resultArea;
+    TextArea resultArea;
     @FXML
-    private ComboBox<String> typeComboBox;
+    ComboBox<String> typeComboBox;
     @FXML
-    private Pane chartPane;
+    Pane chartPane;
     @FXML
-    private Button saveButton;
+    Button saveButton;
     @FXML
     private Button repeatButton;
     @FXML
-    private Label statusLabel;
+    Label statusLabel;
     @FXML
-    private VBox chat;
+    VBox chat;
 
     @FXML
     private LlmChatComponentController llmChatComponent;
 
     private CalculationResponseDto response;
-    private List<ModelParameterDto> parameters = new ArrayList<>();
+    List<ModelParameterDto> parameters = new ArrayList<>();
     private EconomicModelDto model;
     private String selectedChartKey;
-    private Map<String, Map<String, Object>> chartDataMap = new HashMap<>();
+    Map<String, Map<String, Object>> chartDataMap = new HashMap<>();
     private final Map<String, Node> chartNodes = new HashMap<>();
     private final Set<String> selectedAssistantMessages = new LinkedHashSet<>();
 
@@ -101,7 +101,7 @@ public class ModelResultController extends BaseController {
      *
      * @return {@code true}, если все параметры корректны
      */
-    private boolean validateParameters() {
+    boolean validateParameters() {
         for (ModelParameterDto p : parameters) {
             if (!ParameterValidator.notEmpty(p.paramValue())) {
                 showError(statusLabel, I18n.t("model.param_empty") + p.paramName());
@@ -279,7 +279,7 @@ public class ModelResultController extends BaseController {
      *
      * @return список визуализаций
      */
-    private List<LlmVisualizationDto> buildVisualizations() {
+    List<LlmVisualizationDto> buildVisualizations() {
         List<LlmVisualizationDto> visualizations = new ArrayList<>();
         if (chartDataMap != null && !chartDataMap.isEmpty()) {
             for (Map.Entry<String, Map<String, Object>> entry : chartDataMap.entrySet()) {

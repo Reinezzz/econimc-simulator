@@ -29,13 +29,13 @@ public class LlmChatComponentController {
     private Label titleLabel;
     @Getter
     @FXML
-    private VBox chatArea;
+    VBox chatArea;
     @FXML
-    private ScrollPane chatScroll;
+    ScrollPane chatScroll;
     @FXML
-    private TextField inputField;
+    TextField inputField;
     @FXML
-    private VBox sendButton;
+    VBox sendButton;
 
     private final List<Message> chatHistory = new ArrayList<>();
     @Setter
@@ -56,7 +56,7 @@ public class LlmChatComponentController {
      * Отправляет введённое сообщение и обрабатывает ответ ассистента.
      * Блокирует элементы управления на время запроса.
      */
-    private void onSend() {
+    void onSend() {
         String text = inputField.getText();
         if (text == null || text.trim().isEmpty() || requestSupplier == null) return;
         inputField.clear();
@@ -97,7 +97,7 @@ public class LlmChatComponentController {
      * @param role    роль отправителя (user/assistant/system)
      * @param message текст сообщения
      */
-    private void addMessage(String role, String message) {
+    void addMessage(String role, String message) {
         chatHistory.add(new Message(role, message));
         HBox row = new HBox();
         Label lbl = new Label(message);

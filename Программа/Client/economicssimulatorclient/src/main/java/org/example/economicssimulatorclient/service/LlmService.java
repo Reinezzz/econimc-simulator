@@ -17,7 +17,7 @@ public class LlmService extends MainService {
 
     private static final String BASE_PATH = "/api/llm";
 
-    private LlmService() {
+    LlmService() {
     }
 
     /**

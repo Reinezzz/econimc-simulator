@@ -31,27 +31,27 @@ import java.util.List;
 public class DocumentController extends BaseController {
 
     @FXML
-    private Button backButton;
+    Button backButton;
     @FXML
-    private Button mainButton;
+    Button mainButton;
     @FXML
-    private Button addButton;
+    Button addButton;
     @FXML
-    private Button deleteButton;
+    Button deleteButton;
     @FXML
-    private Button selectButton;
+    Button selectButton;
     @FXML
-    private ComboBox<String> typeComboBox;
+    ComboBox<String> typeComboBox;
     @FXML
-    private GridPane tableGrid;
+    GridPane tableGrid;
     @FXML
     protected Label statusLabel;
 
     private final DocumentService documentService = new DocumentService();
     private final ReportService reportService = new ReportService(URI.create("http://localhost:8080")); // замени на свой адрес
 
-    private final List<CheckBox> checkBoxes = new ArrayList<>();
-    private final List<DocumentDto> documents = new ArrayList<>();
+    final List<CheckBox> checkBoxes = new ArrayList<>();
+    final List<DocumentDto> documents = new ArrayList<>();
     private final List<ReportListItemDto> reports = new ArrayList<>();
     private boolean fromView = false;
 
@@ -134,7 +134,7 @@ public class DocumentController extends BaseController {
      *
      * @param docs полученный список документов
      */
-    private void fillDocumentsTable(List<DocumentDto> docs) {
+    void fillDocumentsTable(List<DocumentDto> docs) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         int row = 1;
         checkBoxes.clear();

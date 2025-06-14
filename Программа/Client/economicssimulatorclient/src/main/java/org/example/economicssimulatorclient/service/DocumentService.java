@@ -117,17 +117,17 @@ public class DocumentService extends MainService {
     }
 
     /** Возвращает текущий access-токен. */
-    private String getToken() {
+    String getToken() {
         return org.example.economicssimulatorclient.util.SessionManager.getInstance().getAccessToken();
     }
 
     /** Создаёт новый {@link HttpClient} для загрузки и скачивания файлов. */
-    private HttpClient getHttpClient() {
+    HttpClient getHttpClient() {
         return HttpClient.newHttpClient();
     }
 
     /** Пытается обновить токен аутентификации. */
-    private boolean tryRefreshToken() throws IOException, InterruptedException {
+    boolean tryRefreshToken() throws IOException, InterruptedException {
         return org.example.economicssimulatorclient.service.AuthService.getInstance().refreshTokens();
     }
 }

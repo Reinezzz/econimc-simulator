@@ -27,16 +27,16 @@ public class ModelViewController extends BaseController {
     private final EconomicModelService modelService = get(EconomicModelService.class);
 
     private EconomicModelDto model;
-    private List<ModelParameterDto> parameters = new ArrayList<>();
-    private boolean editMode = false;
-    private final List<TextField> valueFields = new ArrayList<>();
+    List<ModelParameterDto> parameters = new ArrayList<>();
+    boolean editMode = false;
+    final List<TextField> valueFields = new ArrayList<>();
 
     @FXML
     private Button backButton;
     @FXML
     private Button mainButton;
     @FXML
-    private VBox parameterList;
+    VBox parameterList;
     @FXML
     private Label modelTitle;
     @FXML
@@ -55,10 +55,10 @@ public class ModelViewController extends BaseController {
     private Button addDocumentButton;
 
     @FXML
-    private Label statusLabel;
+    Label statusLabel;
 
     @FXML
-    private LlmChatComponentController llmChatComponent;
+    LlmChatComponentController llmChatComponent;
 
     @FXML
     private VBox chat;
@@ -239,7 +239,7 @@ public class ModelViewController extends BaseController {
     /**
      * Сохраняет параметры при выходе из режима редактирования или включает его.
      */
-    private void toggleEditMode() {
+    void toggleEditMode() {
         if (!editMode) {
             setEditMode(true);
         } else {

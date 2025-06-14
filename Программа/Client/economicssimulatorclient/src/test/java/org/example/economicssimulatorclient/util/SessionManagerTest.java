@@ -2,6 +2,7 @@ package org.example.economicssimulatorclient.util;
 
 import org.example.economicssimulatorclient.config.AppConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -10,6 +11,13 @@ import java.util.prefs.Preferences;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SessionManagerTest {
+
+    @BeforeEach
+    void cleanPrefs() {
+        // Подмени инстанс на свой, если используешь mock
+        SessionManager.getInstance().logout();
+        SessionManager.getInstance().resetJustLoggedOut();
+    }
 
     @AfterEach
     void cleanup() {
