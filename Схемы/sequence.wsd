@@ -1,6 +1,6 @@
 @startuml
 skinparam defaultFontName "Times New Roman"
-skinparam defaultFontSize 12
+skinparam defaultFontSize 24
 
 actor Пользователь as User
 participant "Клиентское приложение" as Client
