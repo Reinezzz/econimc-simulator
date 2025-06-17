@@ -1,0 +1,146 @@
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+left to right direction
+
+' --- Верхний ряд: config, util ---
+package "config" #DDFFDD {
+  class AppConfig
+}
+
+package "util" #EFEFEF {
+  class I18n
+  class SceneManager
+  class SessionManager
+  class JsonUtil
+  class HttpClientProvider
+  class Validator
+  class ParameterValidator
+  class ChartDataConverter
+  class LastModelStorage
+  class ReportImageUtil
+}
+
+' --- Нижний ряд: три логических агрегатора ---
+class DTOs <<DTO>> {
+  + ApiResponse
+  + CalculationRequestDto
+  + CalculationResponseDto
+  + DocumentDto
+  + EconomicModelDto
+  + ModelParameterDto
+  + ModelResultDto
+  + LlmChatRequestDto
+  + LlmChatResponseDto
+  + LlmParameterExtractionRequestDto
+  + LlmParameterExtractionResponseDto
+  + LlmVisualizationDto
+  + LoginRequest
+  + LoginResponse
+  + PasswordResetRequest
+  + PasswordResetConfirm
+  + RefreshTokenRequest
+  + RefreshTokenResponse
+  + RegistrationRequest
+  + ReportCreateRequestDto
+  + ReportChartImageDto
+  + ReportListItemDto
+  + VerificationRequest
+}
+
+class ChartDrawers <<Chart>> {
+  + ChartDrawer
+  + ChartDrawerFactory
+  + ADASChartBuilder
+  + BlackScholesChartBuilder
+  + CAPMChartBuilder
+  + CompetitionChartBuilder
+  + ConsumerChoiceChartBuilder
+  + DemandSupplyChartBuilder
+  + ElasticityChartBuilder
+  + ISLMChartBuilder
+  + PhillipsCurveChartBuilder
+  + SolowGrowthChartBuilder
+}
+
+class Parsers <<Parser>> {
+  + ResultParser
+  + ParserFactory
+  + ADASResultParser
+  + BlackScholesResultParser
+  + CAPMResultParser
+  + CompetitionResultParser
+  + ConsumerChoiceResultParser
+  + DemandSupplyResultParser
+  + ElasticityResultParser
+  + ISLMResultParser
+  + PhillipsCurveResultParser
+  + SolowGrowthResultParser
+}
+
+' --- Центральный блок: App, Controllers, Services ---
+package "org.example.economicssimulatorclient" #F7F6D7 {
+  class App
+  class MainApp
+}
+
+package "controller" #FFD6D6 {
+  abstract class BaseController
+  class AuthorizationController
+  class DocumentController
+  class LlmChatComponentController
+  class MainController
+  class ModelResultController
+  class ModelViewController
+  class PasswordChangeController
+  class PasswordResetDialogController
+  class RegistrationController
+  class VerificationCodeDialogController
+}
+
+package "service" #DFD6FF {
+  class BaseService
+  class MainService
+  class AuthService
+  class EconomicModelService
+  class DocumentService
+  class LanguageService
+  class LlmService
+  class ReportService
+}
+
+' --- Наследование, ключевые связи, выравнивание ---
+MainApp --|> javafx.application.Application
+BaseController <|-- AuthorizationController
+BaseController <|-- DocumentController
+BaseController <|-- LlmChatComponentController
+BaseController <|-- MainController
+BaseController <|-- ModelResultController
+BaseController <|-- ModelViewController
+BaseController <|-- PasswordChangeController
+BaseController <|-- PasswordResetDialogController
+BaseController <|-- RegistrationController
+BaseController <|-- VerificationCodeDialogController
+
+BaseService <|-- MainService
+BaseService <|-- AuthService
+MainService <|-- EconomicModelService
+MainService <|-- DocumentService
+MainService <|-- LanguageService
+MainService <|-- LlmService
+MainService <|-- ReportService
+
+MainApp ..> AuthService
+MainApp ..> SceneManager
+AuthorizationController ..> AuthService
+DocumentController ..> DocumentService
+MainController ..> EconomicModelService
+ModelViewController ..> EconomicModelService
+ModelResultController ..> Parsers
+ModelResultController ..> ChartDrawers
+ModelResultController ..> DTOs
+ModelResultController ..> ReportService
+
+@enduml

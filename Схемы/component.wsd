@@ -1,0 +1,67 @@
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam dpi 110
+left to right direction
+
+package "Клиентское приложение (JavaFX)" {
+  [UI интерфейс]
+  [Auth Client]
+  [Model Client]
+  [Document Client]
+  [Report Client]
+  [LLM Chat Client]
+}
+
+package "Серверное приложение (Spring Boot)" {
+  [REST API]
+  [Auth Service]
+  [Model Service]
+  [Document Service]
+  [Report Service]
+  [LLM Service]
+  [Language Service]
+  [Cache (Redis)]
+}
+
+database "PostgreSQL" as PG
+component "MinIO"
+component "Почтовый сервер"
+component "LLM-сервис (Mistral 7B)"
+
+' --- Клиент взаимодействует с сервером через REST API
+[UI интерфейс] --> [Auth Client]
+[UI интерфейс] --> [Model Client]
+[UI интерфейс] --> [Document Client]
+[UI интерфейс] --> [Report Client]
+[UI интерфейс] --> [LLM Chat Client]
+
+[Auth Client] --> [REST API]
+[Model Client] --> [REST API]
+[Document Client] --> [REST API]
+[Report Client] --> [REST API]
+[LLM Chat Client] --> [REST API]
+
+' --- Взаимодействие компонентов сервера
+[REST API] --> [Auth Service]
+[REST API] --> [Model Service]
+[REST API] --> [Document Service]
+[REST API] --> [Report Service]
+[REST API] --> [LLM Service]
+[REST API] --> [Language Service]
+
+[Auth Service] --> PG
+[Model Service] --> PG
+[Document Service] --> PG
+[Report Service] --> PG
+
+[Document Service] --> MinIO
+[Report Service] --> MinIO
+
+[Auth Service] --> "Почтовый сервер"
+[LLM Service] --> "LLM-сервис (Mistral 7B)"
+[Model Service] --> [Cache (Redis)]
+[Auth Service] --> [Cache (Redis)]
+[Cache (Redis)] --> PG
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+
+actor Пользователь as User
+actor "Почтовый сервер" as Mail
+actor "LLM-сервис" as LLM
+actor "MinIO-хранилище" as Storage
+
+' Первый горизонтальный ряд
+rectangle AuthBlock {
+  (Регистрация) as Register
+  (Вход в систему) as Login
+  (Подтверждение e-mail) as VerifyEmail
+  (Запрос сброса пароля) as ResetRequest
+  (Подтверждение сброса пароля) as ResetConfirm
+  (Выход) as Logout
+  (Выбор языка) as SetLang
+}
+rectangle DocBlock {
+  (Список документов) as ListDocs
+  (Загрузить документ) as UploadDoc
+  (Скачать документ) as DownloadDoc
+  (Удалить документ) as DeleteDoc
+}
+rectangle "Работа с моделями" as ModelBlock {
+  (Получить список моделей) as GetModels
+  (Получить параметры модели) as GetParams
+  (Изменить параметры) as UpdateParams
+  (Рассчитать модель) as CalculateModel
+}
+
+' Второй горизонтальный ряд
+rectangle AiBlock {
+  (Извлечь параметры из документа) as ExtractParams
+  (Чат с LLM) as ChatLLM
+}
+rectangle ReportBlock {
+  (Создать отчёт) as CreateReport
+  (Список отчётов) as ListReports
+  (Скачать отчёт) as DownloadReport
+  (Удалить отчёт) as DeleteReport
+}
+
+' Визуальное выравнивание двух рядов (фиктивные связи)
+AuthBlock -[hidden]-> DocBlock
+DocBlock -[hidden]-> ModelBlock
+AiBlock -[hidden]-> ReportBlock
+' Вертикальный переход от первого к второму ряду
+ModelBlock -[hidden]-> AiBlock
+
+' --- Связи пользователя с use-case ---
+User --> Register
+User --> Login
+User --> VerifyEmail
+User --> ResetRequest
+User --> ResetConfirm
+User --> Logout
+User --> SetLang
+
+User --> ListDocs
+User --> UploadDoc
+User --> DownloadDoc
+User --> DeleteDoc
+
+User --> GetModels
+User --> GetParams
+User --> UpdateParams
+User --> CalculateModel
+
+User --> ExtractParams
+User --> ChatLLM
+
+User --> CreateReport
+User --> ListReports
+User --> DownloadReport
+User --> DeleteReport
+
+' --- Внешние сервисы ---
+VerifyEmail --> Mail
+ResetRequest --> Mail
+UploadDoc --> Storage
+DownloadDoc --> Storage
+DeleteDoc --> Storage
+
+ExtractParams --> LLM
+ChatLLM --> LLM
+
+@enduml

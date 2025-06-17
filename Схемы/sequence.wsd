@@ -1,0 +1,50 @@
+@startuml
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+
+actor Пользователь as User
+participant "Клиентское приложение" as Client
+participant "Сервис аутентификации" as Auth
+participant "Сервис моделей" as ModelSvc
+participant "Сервис документов" as DocSvc
+participant "LLM-сервис" as LLM
+participant "Модуль вычислений" as Solver
+participant "Сервис отчётов" as ReportSvc
+
+== Аутентификация ==
+User -> Client: Ввод данных для входа
+Client -> Auth: Запрос на вход
+Auth --> Client: Токены доступа
+
+== Загрузка моделей ==
+User -> Client: Открытие приложения
+Client -> ModelSvc: Получить список моделей
+ModelSvc --> Client: Список моделей
+
+== Открытие модели ==
+User -> Client: Выбор модели
+Client -> ModelSvc: Получить данные модели и параметры
+ModelSvc --> Client: Данные модели
+
+== Загрузка документа и извлечение параметров ==
+User -> Client: Загрузка документа
+Client -> DocSvc: Загрузить документ
+DocSvc --> Client: ID документа
+User -> Client: Извлечь параметры
+Client -> LLM: Извлечение параметров
+LLM --> Client: Параметры
+
+== Расчёт ==
+User -> Client: Запустить расчёт
+Client -> ModelSvc: Отправить запрос на расчёт
+ModelSvc -> Solver: Вычисление
+Solver --> ModelSvc: Результат
+ModelSvc --> Client: Результат
+
+== Формирование отчёта ==
+User -> Client: Создать отчёт
+Client -> ReportSvc: Запрос на создание отчёта
+ReportSvc --> Client: ID отчёта
+Client --> User: Отчёт готов
+
+@enduml

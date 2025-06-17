@@ -1,0 +1,128 @@
+@startuml
+' ER-диаграмма БД "Симулятор экономических моделей"
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+left to right direction
+
+entity "users" as users {
+  +id : bigint [PK]
+  username : varchar(50) [UQ]
+  email : varchar(100) [UQ]
+  password_hash : varchar(255)
+  enabled : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "documents" as documents {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  name : varchar(255)
+  path : varchar(1024)
+  uploaded_at : timestamp
+}
+
+entity "economic_models" as economic_models {
+  +id : bigint [PK]
+  model_type : varchar(100)
+  name : varchar(255)
+  description : text
+  created_at : timestamp
+  updated_at : timestamp
+  formula : text
+}
+
+entity "model_parameters" as model_parameters {
+  +id : bigint [PK]
+  model_id : bigint [FK]
+  param_name : varchar(100)
+  param_type : varchar(50)
+  param_value : text
+  display_name : varchar(255)
+  description : text
+  custom_order : integer
+}
+
+entity "user_model_parameter" as user_model_parameter {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  model_id : bigint [FK]
+  parameter_id : bigint [FK]
+  value : varchar(255)
+}
+
+entity "model_results" as model_results {
+  +id : bigint [PK]
+  model_id : bigint [FK]
+  result_type : varchar(100)
+  result_data : text
+  calculated_at : timestamp
+  user_id : bigint [FK]
+}
+
+entity "reports" as reports {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  model_id : bigint [FK]
+  name : varchar(255)
+  model_name : varchar(255)
+  path : varchar(255)
+  created_at : timestamp
+  language : varchar(10)
+  params : text
+  result : text
+  llm_messages : text
+}
+
+entity "refresh_tokens" as refresh_tokens {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  token : varchar(512) [UQ]
+  expiry_date : timestamp
+  created_at : timestamp
+}
+
+entity "verification_tokens" as verification_tokens {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  code : varchar(6)
+  expires_at : timestamp
+}
+
+entity "password_reset_tokens" as password_reset_tokens {
+  +id : bigint [PK]
+  user_id : bigint [FK]
+  code : varchar(6)
+  expires_at : timestamp
+}
+
+' ----- Связи -----
+users ||--o{ documents : "user_id"
+users ||--o{ reports : "user_id"
+users ||--o{ refresh_tokens : "user_id"
+users ||--o{ verification_tokens : "user_id"
+users ||--o{ password_reset_tokens : "user_id"
+users ||--o{ user_model_parameter : "user_id"
+users ||--o{ model_results : "user_id"
+
+economic_models ||--o{ model_parameters : "model_id"
+economic_models ||--o{ user_model_parameter : "model_id"
+economic_models ||--o{ model_results : "model_id"
+economic_models ||--o{ reports : "model_id"
+
+model_parameters ||--o{ user_model_parameter : "parameter_id"
+
+reports }|--|| users : "user_id"
+reports }|--|| economic_models : "model_id"
+
+refresh_tokens }|--|| users : "user_id"
+verification_tokens }|--|| users : "user_id"
+password_reset_tokens }|--|| users : "user_id"
+
+model_results }|--|| users : "user_id"
+model_results }|--|| economic_models : "model_id"
+
+documents }|--|| users : "user_id"
+
+@enduml

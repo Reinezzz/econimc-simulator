@@ -1,0 +1,164 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+' Верхний ряд: технические пакеты
+package "config" #DDFFDD {
+  class CacheConfig
+  class JwtConfig
+  class LocaleHolder
+  class MailConfig
+  class MessageSourceConfig
+  class PasswordConfig
+  class S3ClientConfig
+  class SecurityConfig
+}
+
+package "exception" #FFEFEF {
+  class ApiExceptionHandler
+  class LocalizedException
+}
+
+package "util" #EFEFEF {
+  class ChartDataUtil
+  class JwtUtil
+  class ParameterTypeConverter
+  class TemplateUtil
+}
+
+' Выровнять config, exception, util в одну линию
+config -[hidden]-> exception
+exception -[hidden]-> util
+
+' Центральный блок: контроллеры и сервисы
+package "controller" #F7F6D7 {
+  class AuthController
+  class DocumentController
+  class EconomicModelController
+  class LanguageController
+  class LlmController
+  class ReportController
+}
+package "service" #D7F7DF {
+  class AuthService
+  class DocumentService
+  class EconomicModelService
+  class LlmService
+  class MailService
+  class ModelCalculationService
+  class ModelParameterService
+  class RefreshTokenService
+  class ReportService
+  class TokenService
+  class UserService
+}
+
+class EconomicsSimulatorServerApplication
+
+' Нижний ряд: агрегаторы данных и вычислений
+class DTOs <<DTO>> {
+  + ApiResponse
+  + CalculationRequestDto
+  + CalculationResponseDto
+  + DocumentDto
+  + EconomicModelDto
+  + LlmChatRequestDto
+  + LlmChatResponseDto
+  + LlmParameterExtractionRequestDto
+  + LlmParameterExtractionResponseDto
+  + LlmVisualizationDto
+  + PasswordResetConfirm
+  + PasswordResetRequest
+  + PendingRegistration
+  + RefreshTokenRequest
+  + RefreshTokenResponse
+  + RegistrationRequest
+  + ReportChartImageDto
+  + ReportCreateRequestDto
+  + ReportListItemDto
+  + VerificationRequest
+}
+class Entities <<Entity>> {
+  + DocumentEntity
+  + EconomicModel
+  + ModelParameter
+  + ModelResult
+  + PasswordResetToken
+  + RefreshToken
+  + Report
+  + User
+  + UserModelParameter
+  + VerificationToken
+}
+class Repositories <<interface>> {
+  + DocumentRepository
+  + EconomicModelRepository
+  + ModelParameterRepository
+  + ModelResultRepository
+  + PasswordResetTokenRepository
+  + RefreshTokenRepository
+  + ReportRepository
+  + UserModelParameterRepository
+  + UserRepository
+  + VerificationTokenRepository
+}
+class Solvers <<interface>> {
+  + EconomicModelSolver
+  + ADASSolver
+  + BlackScholesSolver
+  + CAPMSolver
+  + CompetitionSolver
+  + ConsumerChoiceSolver
+  + DemandSupplySolver
+  + ElasticitySolver
+  + ISLMSolver
+  + PhillipsCurveSolver
+  + SolowGrowthSolver
+  + SolverFactory
+}
+
+' --- Выравнивание нижнего ряда для симметрии ---
+DTOs -[hidden]-> Entities
+Entities -[hidden]-> Repositories
+Repositories -[hidden]-> Solvers
+
+' --- Основные связи ---
+AuthController --> AuthService
+DocumentController --> DocumentService
+EconomicModelController --> EconomicModelService
+LanguageController --> AuthService
+LlmController --> LlmService
+ReportController --> ReportService
+
+AuthService --> UserService
+AuthService --> TokenService
+AuthService --> RefreshTokenService
+AuthService --> MailService
+
+DocumentService --> Repositories
+DocumentService --> S3ClientConfig
+
+UserService --> Repositories
+UserService --> PasswordConfig
+UserService --> MailService
+
+EconomicModelService --> Repositories
+EconomicModelService --> ModelParameterService
+
+ModelCalculationService --> Repositories
+ModelCalculationService --> Solvers
+
+ModelParameterService --> Repositories
+
+RefreshTokenService --> Repositories
+ReportService --> Repositories
+TokenService --> Repositories
+
+Solvers --> DTOs
+
+SecurityConfig --> JwtUtil
+
+@enduml
