@@ -1,0 +1,51 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+package "config" #DDFFDD {
+  class AppConfig
+}
+
+package "util" #EFEFEF {
+  class I18n
+  class SceneManager
+  class SessionManager
+  class JsonUtil
+  class Validator
+  class ParameterValidator
+}
+
+package "service" #E3F2FD {
+  class AuthService
+  class LanguageService
+}
+
+package "controller" #FFD6D6 {
+  abstract class BaseController
+  class AuthorizationController
+  class RegistrationController
+  class VerificationCodeDialogController
+  class PasswordChangeController
+  class PasswordResetDialogController
+}
+
+BaseController <|-- AuthorizationController
+BaseController <|-- RegistrationController
+BaseController <|-- VerificationCodeDialogController
+BaseController <|-- PasswordChangeController
+BaseController <|-- PasswordResetDialogController
+
+AuthorizationController ..> AuthService
+RegistrationController ..> AuthService
+VerificationCodeDialogController ..> AuthService
+PasswordChangeController ..> AuthService
+PasswordResetDialogController ..> AuthService
+
+MainApp --|> javafx.application.Application
+MainApp ..> AuthService
+MainApp ..> SceneManager
+
+@enduml

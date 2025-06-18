@@ -1,0 +1,65 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 25
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+' --- Контроллеры ---
+package "controller" #F7F6D7 {
+  class AuthController
+  class DocumentController
+  class EconomicModelController
+  class LanguageController
+  class LlmController
+  class ReportController
+}
+
+' --- Сервисы авторизации и безопасности ---
+package "Сервисы авторизации и безопасности" #D7F7DF {
+  class AuthService
+  class UserService
+  class TokenService
+  class RefreshTokenService
+  class MailService
+}
+
+' --- Сервисы работы с документами и файлами ---
+package "Сервисы работы с документами" #E3F2FD {
+  class DocumentService
+  class ReportService
+}
+
+' --- Сервисы работы с моделями и LLM ---
+package "Сервисы работы с моделями" #E8F5E9 {
+  class EconomicModelService
+  class ModelCalculationService
+  class ModelParameterService
+  class LlmService
+}
+
+' --- Конфигурация ---
+class S3ClientConfig
+class PasswordConfig
+
+' --- Взаимосвязи между контроллерами и сервисами ---
+AuthController --> AuthService
+LanguageController --> AuthService
+
+AuthService --> UserService
+AuthService --> TokenService
+AuthService --> RefreshTokenService
+AuthService --> MailService
+UserService --> PasswordConfig
+UserService --> MailService
+
+DocumentController --> DocumentService
+ReportController --> ReportService
+DocumentService --> S3ClientConfig
+
+EconomicModelController --> EconomicModelService
+EconomicModelService --> ModelParameterService
+EconomicModelService --> ModelCalculationService
+LlmController --> LlmService
+
+@enduml

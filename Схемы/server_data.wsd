@@ -1,0 +1,72 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 16
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+class DTOs <<DTO>> {
+  + ApiResponse
+  + CalculationRequestDto
+  + CalculationResponseDto
+  + DocumentDto
+  + EconomicModelDto
+  + LlmChatRequestDto
+  + LlmChatResponseDto
+  + LlmParameterExtractionRequestDto
+  + LlmParameterExtractionResponseDto
+  + LlmVisualizationDto
+  + PasswordResetConfirm
+  + PasswordResetRequest
+  + PendingRegistration
+  + RefreshTokenRequest
+  + RefreshTokenResponse
+  + RegistrationRequest
+  + ReportChartImageDto
+  + ReportCreateRequestDto
+  + ReportListItemDto
+  + VerificationRequest
+}
+class Entities <<Entity>> {
+  + DocumentEntity
+  + EconomicModel
+  + ModelParameter
+  + ModelResult
+  + PasswordResetToken
+  + RefreshToken
+  + Report
+  + User
+  + UserModelParameter
+  + VerificationToken
+}
+class Repositories <<interface>> {
+  + DocumentRepository
+  + EconomicModelRepository
+  + ModelParameterRepository
+  + ModelResultRepository
+  + PasswordResetTokenRepository
+  + RefreshTokenRepository
+  + ReportRepository
+  + UserModelParameterRepository
+  + UserRepository
+  + VerificationTokenRepository
+}
+class Solvers <<interface>> {
+  + EconomicModelSolver
+  + ADASSolver
+  + BlackScholesSolver
+  + CAPMSolver
+  + CompetitionSolver
+  + ConsumerChoiceSolver
+  + DemandSupplySolver
+  + ElasticitySolver
+  + ISLMSolver
+  + PhillipsCurveSolver
+  + SolowGrowthSolver
+  + SolverFactory
+}
+
+' Взаимосвязи для данных и вычислений
+Solvers --> DTOs
+
+@enduml

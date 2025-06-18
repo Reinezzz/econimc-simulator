@@ -1,0 +1,37 @@
+@startuml
+top to bottom direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 25
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+package "util" #EFEFEF {
+  class LastModelStorage
+  class ReportImageUtil
+  class HttpClientProvider
+}
+
+package "service" #FFEBEE {
+  class DocumentService
+  class ReportService
+}
+
+package "controller" #FFD6D6 {
+  abstract class BaseController
+  class DocumentController
+}
+
+class DTOs <<DTO>> {
+  + DocumentDto
+  + ReportCreateRequestDto
+  + ReportListItemDto
+  + ReportChartImageDto
+  + VerificationRequest
+}
+
+BaseController <|-- DocumentController
+DocumentController ..> DocumentService
+DocumentController ..> ReportService
+DocumentController ..> DTOs
+
+@enduml

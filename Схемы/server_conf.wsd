@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 16
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+package "config" #DDFFDD {
+  class CacheConfig
+  class JwtConfig
+  class LocaleHolder
+  class MailConfig
+  class MessageSourceConfig
+  class PasswordConfig
+  class S3ClientConfig
+  class SecurityConfig
+}
+
+package "util" #EFEFEF {
+  class ChartDataUtil
+  class JwtUtil
+  class ParameterTypeConverter
+  class TemplateUtil
+}
+
+package "exception" #FFEFEF {
+  class ApiExceptionHandler
+  class LocalizedException
+}
+
+class EconomicsSimulatorServerApplication
+
+' Основные связи
+SecurityConfig --> JwtUtil
+
+@enduml

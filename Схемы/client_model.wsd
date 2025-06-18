@@ -1,0 +1,85 @@
+@startuml
+left to right direction
+skinparam defaultFontName "Times New Roman"
+skinparam defaultFontSize 12
+skinparam packageTitleAlignment left
+skinparam classAttributeIconSize 0
+
+package "util" #EFEFEF {
+  class ChartDataConverter
+}
+
+package "service" #E8F5E9 {
+  class MainService
+  class EconomicModelService
+  class LlmService
+}
+
+package "controller" #FFD6D6 {
+  abstract class BaseController
+  class MainController
+  class ModelViewController
+  class ModelResultController
+  class LlmChatComponentController
+}
+
+class DTOs <<DTO>> {
+  + EconomicModelDto
+  + ModelParameterDto
+  + ModelResultDto
+  + CalculationRequestDto
+  + CalculationResponseDto
+  + LlmChatRequestDto
+  + LlmChatResponseDto
+  + LlmParameterExtractionRequestDto
+  + LlmParameterExtractionResponseDto
+  + LlmVisualizationDto
+  + LoginRequest
+  + LoginResponse
+  + RefreshTokenRequest
+  + RefreshTokenResponse
+}
+
+class ChartDrawers <<Chart>> {
+  + ChartDrawer
+  + ChartDrawerFactory
+  + ADASChartBuilder
+  + BlackScholesChartBuilder
+  + CAPMChartBuilder
+  + CompetitionChartBuilder
+  + ConsumerChoiceChartBuilder
+  + DemandSupplyChartBuilder
+  + ElasticityChartBuilder
+  + ISLMChartBuilder
+  + PhillipsCurveChartBuilder
+  + SolowGrowthChartBuilder
+}
+
+class Parsers <<Parser>> {
+  + ResultParser
+  + ParserFactory
+  + ADASResultParser
+  + BlackScholesResultParser
+  + CAPMResultParser
+  + CompetitionResultParser
+  + ConsumerChoiceResultParser
+  + DemandSupplyResultParser
+  + ElasticityResultParser
+  + ISLMResultParser
+  + PhillipsCurveResultParser
+  + SolowGrowthResultParser
+}
+
+BaseController <|-- MainController
+BaseController <|-- ModelViewController
+BaseController <|-- ModelResultController
+BaseController <|-- LlmChatComponentController
+
+MainController ..> EconomicModelService
+ModelViewController ..> EconomicModelService
+ModelResultController ..> ChartDrawers
+ModelResultController ..> Parsers
+ModelResultController ..> DTOs
+LlmChatComponentController ..> LlmService
+
+@enduml
